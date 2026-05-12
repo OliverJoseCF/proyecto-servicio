@@ -1,0 +1,228 @@
+﻿<?php
+$tsj_module     = 'visitantes';
+$tsj_title      = 'DOCENTES - Sistemas';
+$tsj_extra_css  = ['style.css'];
+$tsj_head_extra = '<style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #4B0082;
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+        }
+        h1 {
+            background-color: #5757c0;
+            padding: 30px 0;
+            font-size: 40px;
+            font-weight: bold;
+            margin: 0;
+        }
+        /* Contenedor de la Tabla Principal */
+        .docentes {
+            background-color: white;
+            color: black;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 700px;
+            margin: 30px auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ccc;
+            text-align: left;
+            font-size: 18px;
+        }
+        th {
+            background-color: #5757c0;
+            color: white;
+        }
+        .foto-lista {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            vertical-align: middle;
+            margin-right: 15px;
+            border: 1px solid #ddd;
+        }
+
+        /* Botones dentro de la tabla */
+        .btn-accion {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        .btn-editar { background-color: #ffc107; color: black; }
+        .btn-borrar { background-color: #dc3545; color: white; }
+
+        /* PANEL DE ADMINISTRACIÓN (AL FINAL) */
+        .admin-panel {
+            background-color: rgba(255, 255, 255, 0.95);
+            color: black;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 700px;
+            margin: 20px auto 50px auto;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .admin-panel input {
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        .btn-guardar {
+            background-color: #28a745;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .footer {
+            background: #333;
+            padding: 20px;
+            width: 100%;
+            margin-top: auto;
+        }
+        .footer img { margin: 15px; }
+        .top-right {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+    </style>';
+require_once __DIR__ . '/../../shared/header.php';
+?>
+
+
+    <h1>DOCENTES</h1>
+
+    <div class="docentes">
+        <h2>Lista de Docentes</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre del Docente</th>
+                    <th style="width: 180px; text-align: center;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="listaCuerpo">
+                </tbody>
+        </table>
+    </div>
+
+    <div class="admin-panel">
+        <h3 id="panel-titulo" style="margin: 0 0 10px 0; color: #4B0082;">Añadir / Editar Maestro</h3>
+        <input type="hidden" id="edit-index" value="">
+        <input type="text" id="input-nombre" placeholder="Nombre completo">
+        <input type="text" id="input-foto" placeholder="Nombre de imagen (ej: miguel.png)">
+        <button class="btn-guardar" onclick="guardarDocente()">Guardar en la Lista</button>
+    </div>
+
+    <a href="index.php" class="top-right">
+        <img src="imagenes/casa.png" alt="Inicio" style="width: 80px; height: auto;">
+    </a>
+
+    <script>
+        // Lista inicial de maestros
+        const iniciales = [
+            { nombre: "Miguel Ángel Delgado", foto: "miguel.png" },
+            { nombre: "María Gómez", foto: "user.png" },
+            { nombre: "Rodolfo Rojas", foto: "user.png" },
+            { nombre: "José Hernández", foto: "user.png" },
+            { nombre: "Juan Desales", foto: "user.png" },
+            { nombre: "José Gamas", foto: "user.png" }
+        ];
+
+        let docentes = JSON.parse(localStorage.getItem("db_docentes_kiosco")) || iniciales;
+
+        function render() {
+            const cuerpo = document.getElementById("listaCuerpo");
+            cuerpo.innerHTML = "";
+            docentes.forEach((d, i) => {
+                cuerpo.innerHTML += `
+                    <tr>
+                        <td>
+                            <img src="imagenes/${d.foto}" class="foto-lista" onerror="this.src='imagenes/user.png'">
+                            ${d.nombre}
+                        </td>
+                        <td style="text-align: center;">
+                            <button class="btn-accion btn-editar" onclick="prepararEdicion(${i})">Editar</button>
+                            <button class="btn-accion btn-borrar" onclick="eliminarDocente(${i})">Borrar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function guardarDocente() {
+            const nombre = document.getElementById("input-nombre").value;
+            let foto = document.getElementById("input-foto").value || "user.png";
+            const index = document.getElementById("edit-index").value;
+
+            if (nombre === "") return alert("Por favor escribe el nombre");
+
+            // Limpiar ruta si escriben "imagenes/"
+            foto = foto.replace("imagenes/", "");
+
+            if (index === "") {
+                docentes.push({ nombre, foto });
+            } else {
+                docentes[index] = { nombre, foto };
+                document.getElementById("edit-index").value = "";
+                document.getElementById("panel-titulo").innerText = "Añadir Maestro";
+            }
+
+            localStorage.setItem("db_docentes_kiosco", JSON.stringify(docentes));
+            limpiar();
+            render();
+        }
+
+        function prepararEdicion(i) {
+            document.getElementById("input-nombre").value = docentes[i].nombre;
+            document.getElementById("input-foto").value = docentes[i].foto;
+            document.getElementById("edit-index").value = i;
+            document.getElementById("panel-titulo").innerText = "Editando a: " + docentes[i].nombre;
+            // Desplazar suavemente al panel de abajo
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function eliminarDocente(i) {
+            if (confirm("¿Seguro que quieres eliminar este docente?")) {
+                docentes.splice(i, 1);
+                localStorage.setItem("db_docentes_kiosco", JSON.stringify(docentes));
+                render();
+            }
+        }
+
+        function limpiar() {
+            document.getElementById("input-nombre").value = "";
+            document.getElementById("input-foto").value = "";
+        }
+
+        render();
+    </script>
+
+<?php require_once __DIR__ . '/../../shared/footer.php'; ?>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORDINADOR/A “lSC”</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #4B0082; /* Color de fondo */
+            color: white; /* Color del texto */
+            text-align: center; /* Centrar el texto */
+            display: flex; /* Usar flexbox */
+            flex-direction: column; /* Colocar elementos en columna */
+            justify-content: center; /* Centrar verticalmente */
+            height: 100vh; /* Altura completa de la ventana */
+            position: relative; /* Posición relativa para el posicionamiento de la imagen */
+        }
+        h1 {
+            background-color: #5757c0; /* Color de fondo del encabezado */
+            padding: 30px 0; /* Espaciado interno */
+            font-size: 40px; /* Tamaño de fuente */
+            font-weight: bold; /* Negrita */
+        }
+        .docentes {
+            background-color: white; /* Color de fondo del cuadro */
+            color: black; /* Color del texto dentro del cuadro */
+            padding: 20px; /* Espaciado interno */
+            border-radius: 8px; /* Bordes redondeados */
+            width: 80%; /* Ancho del cuadro */
+            max-width: 470px; /* Ancho máximo del cuadro */
+            margin: 20px auto; /* Centrar el cuadro */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra del cuadro */
+            text-align: left; /* Alinear texto a la izquierda */
+            font-size: 24px; /* Tamaño del texto aumentado */
+            }
+        .footer {
+            background: #333; /* Color de fondo del pie de página */
+            color: white; /* Color del texto del pie de página */
+            text-align: center; /* Centrar el texto */
+            padding: 20px; /* Espaciado interno */
+            position: relative; /* Posición relativa */
+            width: 100%; /* Ancho completo */
+        }
+        .footer img {
+            margin: 25px; /* Espacio entre imágenes */
+        }
+        .top-right {
+            position: absolute; /* Posición absoluta */
+            top: 20px; /* Espacio desde la parte superior */
+            right: 20px; /* Espacio desde la derecha */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>CORDINADOR/A “lSC”</h1>
+
+    <div class="docentes">
+        <h2>CORDINADOR</h2>
+        <ul>
+            <li contenteditable="true">PabloRojas@chapala.tecmm.edu.mx</li>
+        </ul>
+    </div>
+
+    <!-- Imagen en la esquina superior derecha como botón -->
+    <a href="index.html" class="top-right">
+        <img src="imagenes/casa.png" alt="Ir a otra página" style="width: 80px; height: auto;"> <!-- Ajusta el tamaño según sea necesario -->
+    </a>
+
+    <div class="footer">
+        <img src="imagenes/image.png" alt="Imagen 1" style="width: 160px;"> 
+        <img src="imagenes/image2.png" alt="Icono 2" style="width: 100px;"> 
+        <img src="imagenes/image3.png" alt="Icono 3" style="width: 160px;"> 
+        <img src="imagenes/image4.png" alt="Icono 4" style="width: 60px;"> 
+    </div>
+
+</body>
+</html>

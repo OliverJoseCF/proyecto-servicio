@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Docentes - Sistemas</title>
+    <style>
+        :root {
+            --morado-oscuro: #3b0062;
+            --morado-claro: #5d56a5;
+            --fondo: #4B0082;
+            --blanco: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--fondo);
+            color: white;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            background-color: #5757c0;
+            width: 100%;
+            padding: 30px 0;
+            margin: 0;
+            text-align: center;
+            font-size: 35px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* Botón Casita */
+        .top-right {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        /* Contenedor de la Tabla */
+        .tabla-container {
+            width: 90%;
+            max-width: 900px;
+            background: white;
+            margin: 30px 0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #333;
+        }
+
+        th {
+            background-color: var(--morado-claro);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover { background-color: #f9f9f9; }
+
+        .foto-mini {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            vertical-align: middle;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+        }
+
+        /* Panel de Administración (Abajo) */
+        .admin-panel {
+            width: 90%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 50px;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.3);
+        }
+
+        .admin-panel h3 { margin-top: 0; color: var(--morado-oscuro); }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 15px;
+        }
+
+        input {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-save { background: #28a745; color: white; }
+        .btn-edit { background: #ffc107; color: black; margin-right: 5px; }
+        .btn-delete { background: #dc3545; color: white; }
+
+        /* Footer */
+        .footer {
+            background: #222;
+            width: 100%;
+            padding: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+        }
+        .footer img { height: 45px; filter: brightness(0) invert(1); opacity: 0.7; }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="top-right">
+        <img src="imagenes/casa.png" alt="Inicio" style="width: 70px;">
+    </a>
+
+    <h1>DOCENTES DE SISTEMAS</h1>
+
+    <div class="tabla-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Docente</th>
+                    <th style="text-align: center;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="lista-docentes">
+                </tbody>
+        </table>
+    </div>
+
+    <div class="admin-panel">
+        <h3>⚙️ Panel de Gestión (Añadir o Editar)</h3>
+        <input type="hidden" id="edit-index" value="">
+        <div class="form-grid">
+            <input type="text" id="nombre-input" placeholder="Nombre completo del docente">
+            <input type="text" id="foto-input" placeholder="Nombre de foto (ej: miguel.png)">
+            <button class="btn btn-save" id="btn-main" onclick="guardarDocente()">✅ Guardar</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <img src="imagenes/image.png" alt="">
+        <img src="imagenes/image2.png" alt="">
+        <img src="imagenes/image3.png" alt="">
+        <img src="imagenes/image4.png" alt="">
+    </div>
+
+    <script>
+        // LISTA DE MAESTROS
+        const iniciales = [
+            { nombre: "Miguel Ángel Delgado López", foto: "miguel.png" },
+            { nombre: "Alberto Chavolla", foto: "user.png" },
+            { nombre: "Francisco Javier González", foto: "user.png" },
+            { nombre: "Julio César Chávez Novoa", foto: "user.png" },
+            { nombre: "Edgar Martínez", foto: "user.png" },
+            { nombre: "José Jorge Hernández Ochoa", foto: "user.png" },
+            { nombre: "Carmen Leticia Salcedo", foto: "user.png" },
+            { nombre: "José Guadalupe Gamas", foto: "user.png" }
+        ];
+
+        let docentes = JSON.parse(localStorage.getItem("docentes_lista_final")) || iniciales;
+
+        function render() {
+            const tbody = document.getElementById("lista-docentes");
+            tbody.innerHTML = "";
+
+            docentes.forEach((d, i) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>
+                            <img src="imagenes/${d.foto}" class="foto-mini" onerror="this.src='imagenes/user.png'">
+                            <b>${d.nombre}</b>
+                        </td>
+                        <td style="text-align: center;">
+                            <button class="btn btn-edit" onclick="prepararEdicion(${i})">Editar</button>
+                            <button class="btn btn-delete" onclick="borrar(${i})">Borrar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function guardarDocente() {
+            const nombre = document.getElementById("nombre-input").value;
+            let foto = document.getElementById("foto-input").value || "user.png";
+            const index = document.getElementById("edit-index").value;
+
+            if (nombre === "") return alert("Escribe el nombre");
+
+            // Limpiar el nombre de la foto
+            foto = foto.replace("imagenes/", "");
+
+            if (index === "") {
+                docentes.push({ nombre, foto });
+            } else {
+                docentes[index] = { nombre, foto };
+                document.getElementById("edit-index").value = "";
+                document.getElementById("btn-main").textContent = "Guardar";
+            }
+
+            localStorage.setItem("docentes_lista_final", JSON.stringify(docentes));
+            limpiar();
+            render();
+        }
+
+        function prepararEdicion(i) {
+            document.getElementById("nombre-input").value = docentes[i].nombre;
+            document.getElementById("foto-input").value = docentes[i].foto;
+            document.getElementById("edit-index").value = i;
+            document.getElementById("btn-main").textContent = "Actualizar";
+            // Desplazar hacia abajo para que vean el panel de edición
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function borrar(i) {
+            if (confirm("¿Seguro que quieres eliminar este docente?")) {
+                docentes.splice(i, 1);
+                localStorage.setItem("docentes_lista_final", JSON.stringify(docentes));
+                render();
+            }
+        }
+
+        function limpiar() {
+            document.getElementById("nombre-input").value = "";
+            document.getElementById("foto-input").value = "";
+        }
+
+        render();
+    </script>
+</body>
+</html>

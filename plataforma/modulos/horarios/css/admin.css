@@ -1,0 +1,402 @@
+/* =====================================================
+   admin.css  —  Panel de administración · responsive
+   ===================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap');
+
+:root {
+    --morado:      #32129a;
+    --morado-dark: #1e0a6e;
+    --rosa:        #ec5a68;
+    --blanco:      #ffffff;
+    --fondo:       #f5f5f5;
+    --texto:       #333;
+    --sombra:      0 3px 9px rgba(0,0,0,.16);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--fondo);
+    background-image: url('../Imagenes/FondoTec.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    color: var(--texto);
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+img { max-width: 100%; height: auto; vertical-align: middle; }
+
+/* =====================================================
+   BARRA ROSA + TOOLBAR
+   ===================================================== */
+.up-header {
+    height: 10px;
+    background: var(--rosa);
+}
+
+.toolbar {
+    background: var(--morado);
+    box-shadow: var(--sombra);
+    color: var(--blanco);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    position: relative;
+    z-index: 100;
+}
+
+.toolbar-logo { flex-shrink: 0; }
+.imgJalisco   { width: auto; max-width: 160px; height: 48px; object-fit: contain; }
+
+/* Logos institucionales centrados */
+.toolbar-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.logos2 {
+    width: auto;
+    max-width: 800px;
+    height: 58px;
+    object-fit: contain;
+}
+
+/* Derecha: home + cerrar sesión */
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-shrink: 0;
+}
+
+.home-icon a { display: flex; align-items: center; }
+.home-icon img { width: 26px; height: 26px; filter: brightness(0) invert(1); transition: opacity .2s; }
+.home-icon img:hover { opacity: .7; }
+
+.cerrar-sesion {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    color: var(--blanco);
+    text-decoration: none;
+    font-size: .85rem;
+    white-space: nowrap;
+    position: relative;
+}
+.cerrar-sesion::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: var(--blanco);
+    left: 0; bottom: -2px;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform .3s;
+}
+.cerrar-sesion:hover::after { transform: scaleX(1); }
+.texto-inter { font-family: 'Inter', sans-serif; font-weight: 300; }
+
+/* =====================================================
+   CONTENIDO PRINCIPAL
+   ===================================================== */
+.main-content {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 28px 20px;
+}
+
+/* =====================================================
+   TÍTULOS
+   ===================================================== */
+.section-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    color: var(--morado);
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+    text-align: center;
+    margin-bottom: 4px;
+    text-shadow: 0 1px 3px rgba(255,255,255,.6);
+}
+.section-subtitle {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: var(--rosa);
+    font-size: .9rem;
+    letter-spacing: .08em;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* =====================================================
+   BUSCADOR
+   ===================================================== */
+.buscador { margin-bottom: 20px; }
+
+.form-busqueda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+.form-busqueda input[type="text"] {
+    flex: 1;
+    min-width: 200px;
+    max-width: 340px;
+    height: 44px;
+    padding: 0 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: .9rem;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background: rgba(255,255,255,.9);
+    transition: border-color .2s;
+}
+.form-busqueda input[type="text"]:focus {
+    border-color: var(--morado);
+    outline: none;
+    background: var(--blanco);
+}
+.form-busqueda select {
+    height: 44px;
+    min-width: 200px;
+    padding: 0 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: .9rem;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background: rgba(255,255,255,.9);
+    cursor: pointer;
+    transition: border-color .2s;
+}
+.form-busqueda select:focus {
+    border-color: var(--morado);
+    outline: none;
+}
+.form-busqueda input[type="submit"] {
+    height: 44px;
+    padding: 0 24px;
+    font-family: 'Poppins', sans-serif;
+    font-size: .88rem;
+    font-weight: 700;
+    background: var(--morado);
+    color: var(--blanco);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .2s;
+}
+.form-busqueda input[type="submit"]:hover { background: var(--morado-dark); }
+
+/* =====================================================
+   TABLA
+   ===================================================== */
+.tabla-section { margin-bottom: 24px; }
+.tabla-wrapper {
+    overflow-x: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.12);
+    background: rgba(255,255,255,.95);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Inter', sans-serif;
+    font-size: .88rem;
+}
+thead th {
+    background: var(--morado);
+    color: var(--blanco);
+    padding: 14px 18px;
+    text-align: left;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    white-space: nowrap;
+}
+thead th:first-child { border-radius: 10px 0 0 0; }
+thead th:last-child  { border-radius: 0 10px 0 0; }
+
+tbody td {
+    padding: 12px 18px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+    background: rgba(255,255,255,.9);
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:nth-child(even) td { background: rgba(247,245,255,.9); }
+tbody tr:hover td { background: rgba(237,233,255,.95); }
+tbody tr:hover    { box-shadow: inset 3px 0 0 var(--morado); }
+
+.sin-resultados {
+    text-align: center;
+    color: #888;
+    padding: 2.5rem;
+    font-style: italic;
+}
+
+/* Botones en tabla */
+.btn-horario {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--morado);
+    color: var(--blanco);
+    text-decoration: none;
+    border-radius: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: .78rem;
+    font-weight: 700;
+    transition: background .2s;
+}
+.btn-horario:hover { background: var(--rosa); }
+
+.acciones { white-space: nowrap; }
+.btn-editar, .btn-eliminar {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: .8rem;
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: 5px;
+    transition: background .2s, color .2s;
+    margin-right: 4px;
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+.btn-editar   { color: var(--morado); border: 2px solid var(--morado); }
+.btn-editar:hover   { background: var(--morado); color: var(--blanco); }
+.btn-eliminar { color: var(--rosa); border: 2px solid var(--rosa); }
+.btn-eliminar:hover { background: var(--rosa); color: var(--blanco); }
+
+/* =====================================================
+   BOTÓN AGREGAR
+   ===================================================== */
+.agregar-btn-wrap { text-align: center; margin: 8px 0 24px; }
+
+.boton-agregar {
+    display: inline-block;
+    padding: 12px 32px;
+    background: var(--morado);
+    color: var(--blanco);
+    text-decoration: none;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: .95rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: .04em;
+    position: relative;
+    overflow: hidden;
+    transition: background .2s, box-shadow .2s, transform .15s;
+}
+.boton-agregar::before {
+    content: '';
+    display: block;
+    width: 0;
+    height: 86%;
+    position: absolute;
+    top: 7%; left: 0;
+    opacity: 0;
+    background: rgba(255,255,255,.5);
+    box-shadow: 0 0 30px 20px rgba(255,255,255,.3);
+    transform: skewX(-20deg);
+}
+.boton-agregar:hover {
+    background: var(--rosa);
+    box-shadow: 0 0 20px rgba(236,90,104,.4);
+    transform: translateY(-2px);
+}
+.boton-agregar:hover::before { animation: flash .5s linear; }
+.boton-agregar:active { transform: translateY(0); }
+@keyframes flash {
+    from { opacity: 0; left: 0; }
+    50%  { opacity: 1; }
+    to   { opacity: 0; left: 100%; }
+}
+
+/* =====================================================
+   MODAL
+   ===================================================== */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+.modal.is-open { display: flex; }
+.modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,.8); }
+.modal-box {
+    position: relative;
+    z-index: 1;
+    background: var(--blanco);
+    border-radius: 12px;
+    padding: 16px;
+    width: min(92vw, 860px);
+    max-height: 90vh;
+    overflow: auto;
+    box-shadow: 0 12px 40px rgba(0,0,0,.4);
+    animation: modalIn .25s ease;
+}
+@keyframes modalIn {
+    from { transform: translateY(-16px); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
+}
+.modal-content img,
+.modal-content object { display: block; width: 100%; max-height: 80vh; object-fit: contain; }
+.modal-close {
+    position: absolute;
+    top: 8px; right: 12px;
+    font-size: 2rem;
+    line-height: 1;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--texto);
+    z-index: 2;
+    transition: color .2s;
+}
+.modal-close:hover { color: var(--rosa); }
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 900px) {
+    .logos2 { max-width: 360px; }
+}
+
+@media (max-width: 600px) {
+    .toolbar {
+        flex-wrap: wrap;
+        justify-content: space-between;
+        padding: 10px 14px;
+        gap: 10px;
+    }
+    .toolbar-center { order: 3; width: 100%; justify-content: center; }
+    .logos2 { max-width: 350px; height: 44px; }
+    .toolbar-logo { order: 1; }
+    .toolbar-right { order: 2; }
+    .imgJalisco { max-width: 120px; height: 38px; }
+
+    .main-content { padding: 16px 12px; }
+    .section-title { font-size: 1.2rem; }
+
+    .form-busqueda { flex-direction: column; }
+    .form-busqueda input[type="text"],
+    .form-busqueda select,
+    .form-busqueda input[type="submit"] { width: 100%; max-width: 100%; }
+
+    thead th { padding: 11px 12px; font-size: .8rem; }
+    tbody td  { padding: 10px 12px; font-size: .82rem; }
+    .acciones { display: flex; gap: 4px; }
+}

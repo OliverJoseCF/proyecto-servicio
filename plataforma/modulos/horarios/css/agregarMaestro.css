@@ -1,0 +1,197 @@
+/* =====================================================
+   agregarMaestro.css  —  Formulario · responsive
+   ===================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap');
+
+:root {
+    --morado:      #32129a;
+    --morado-dark: #1e0a6e;
+    --rosa:        #ec5a68;
+    --blanco:      #ffffff;
+    --fondo:       #f5f5f5;
+    --texto:       #333;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--fondo);
+    background-image: url('../Imagenes/FondoTec.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    color: var(--texto);
+    min-height: 100vh;
+}
+
+img { max-width: 100%; height: auto; vertical-align: middle; }
+
+/* =====================================================
+   BARRA ROSA + HEADER
+   ===================================================== */
+.barrarosa { height: 10px; background: var(--rosa); }
+
+.fondomorado {
+    background: var(--morado);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    box-shadow: 0 3px 9px rgba(0,0,0,.16);
+}
+.logo-container img { max-height: 72px; width: auto; }
+
+/* =====================================================
+   TARJETA FORMULARIO
+   ===================================================== */
+.margenVista {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2.5rem 2rem;
+    background: rgba(255,255,255,.88);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(50,18,154,.16);
+    width: 90%;
+    max-width: 640px;
+    margin: 2.5rem auto;
+    transition: transform .3s, box-shadow .3s;
+}
+.margenVista:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 40px rgba(50,18,154,.22);
+}
+.margenVista h2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    color: var(--morado);
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+/* =====================================================
+   FORMULARIO
+   ===================================================== */
+.contenedor-formulario { width: 100%; }
+.formulario-maestro    { width: 100%; }
+.form-group            { margin-bottom: 1.3rem; }
+
+.form-group label {
+    display: block;
+    font-size: .88rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 6px;
+}
+
+.form-group input[type="text"],
+.form-group select,
+.form-group input[type="file"] {
+    width: 100%;
+    padding: 11px 14px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: .9rem;
+    background: #fafafa;
+    transition: border-color .25s, box-shadow .25s;
+}
+.form-group input[type="text"]:focus,
+.form-group select:focus {
+    border-color: var(--morado);
+    box-shadow: 0 0 0 3px rgba(50,18,154,.1);
+    outline: none;
+    background: var(--blanco);
+}
+.form-group select:focus { animation: glow 1.5s ease-in-out infinite; }
+@keyframes glow {
+    0%,100% { box-shadow: 0 0 6px rgba(127,27,185,.5); border-color: #7f1bb9; }
+    50%      { box-shadow: 0 0 14px rgba(114,52,172,.7); border-color: #7234ac; }
+}
+.form-group input[type="file"] { padding: 9px; background: transparent; cursor: pointer; }
+
+.archivo-actual  { font-size: .82rem; color: #666; margin: 6px 0 4px; }
+.preview-horario { max-width: 160px; border-radius: 8px; margin-top: 6px; display: block; }
+
+/* =====================================================
+   BOTONES
+   ===================================================== */
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.boton-agregar {
+    padding: 11px 28px;
+    background: var(--morado);
+    color: var(--blanco);
+    border: none;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: .9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: background .25s, box-shadow .2s, transform .15s;
+}
+.boton-agregar::before {
+    content: '';
+    display: block;
+    width: 0;
+    height: 86%;
+    position: absolute;
+    top: 7%; left: 0;
+    opacity: 0;
+    background: rgba(255,255,255,.55);
+    box-shadow: 0 0 30px 20px rgba(255,255,255,.3);
+    transform: skewX(-20deg);
+}
+.boton-agregar:hover {
+    background: var(--rosa);
+    box-shadow: 0 0 20px rgba(236,90,104,.35);
+    transform: translateY(-2px);
+}
+.boton-agregar:hover::before { animation: flash .5s linear; }
+.boton-agregar:active { transform: translateY(0); }
+@keyframes flash {
+    from { opacity: 0; left: 0; }
+    50%  { opacity: 1; }
+    to   { opacity: 0; left: 100%; }
+}
+
+.boton-volver {
+    color: var(--morado);
+    text-decoration: none;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    padding: 10px 20px;
+    border: 2px solid var(--morado);
+    border-radius: 8px;
+    font-size: .88rem;
+    transition: all .25s;
+}
+.boton-volver:hover { background: var(--morado); color: var(--blanco); }
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 600px) {
+    .margenVista  { width: 96%; padding: 1.5rem 1rem; }
+    .fondomorado  { flex-direction: column; align-items: center; }
+    .form-actions { flex-direction: column; }
+    .boton-agregar,
+    .boton-volver { width: 100%; text-align: center; }
+}

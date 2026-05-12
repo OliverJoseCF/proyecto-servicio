@@ -1,0 +1,280 @@
+/* ================================================================
+   theme.css — Tokens y estilos compartidos de la plataforma TSJ
+   Cargado por shared/header.php antes de cualquier CSS de módulo.
+   Prefijo "tsj-" para todos los componentes comunes.
+   ================================================================ */
+
+/* ── Tokens ─────────────────────────────────────────────────── */
+:root {
+  --tsj-blue:       #32129a;
+  --tsj-blue-dark:  #1e0b6e;
+  --tsj-pink:       #ec5a68;
+  --tsj-bg:         #f5f5f5;
+  --tsj-dark:       #39383b;
+  --tsj-white:      #ffffff;
+  --tsj-orange:     rgb(243, 178, 66);
+  --tsj-green:      #5bc792;
+  --tsj-text:       #1f2937;
+  --tsj-radius:     8px;
+  --tsj-shadow:     0 4px 12px rgba(0, 0, 0, 0.08);
+  --tsj-header-h:   103px;
+  --tsj-font:       'Poppins', 'Arial', sans-serif;
+}
+
+/* ── Reset mínimo (sólo aplica a componentes tsj-) ──────────── */
+.tsj-header *,
+.tsj-footer * {
+  box-sizing: border-box;
+}
+
+/* ── Barra rosa superior ─────────────────────────────────────── */
+.tsj-top-bar {
+  height: 10px;
+  background: var(--tsj-pink);
+  width: 100%;
+}
+
+/* ── Toolbar / Navbar ───────────────────────────────────────── */
+.tsj-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+  font-family: var(--tsj-font);
+}
+
+.tsj-toolbar {
+  background: var(--tsj-blue);
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.16);
+  color: var(--tsj-white);
+  padding: 10px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: nowrap;
+}
+
+.tsj-logo {
+  width: auto;
+  max-width: 200px;
+  height: auto;
+  display: block;
+}
+
+.tsj-home-icon img {
+  width: 26px;
+  height: 26px;
+  display: block;
+}
+
+/* ── Nav de escritorio ──────────────────────────────────────── */
+.tsj-nav {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tsj-nav a {
+  color: var(--tsj-white);
+  text-decoration: none;
+  font-family: var(--tsj-font);
+  font-weight: 300;
+  font-size: 14px;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.3s ease;
+  white-space: nowrap;
+}
+
+.tsj-nav a:hover,
+.tsj-nav a.active {
+  border-bottom: 2px solid var(--tsj-white);
+}
+
+/* ── Botón hamburguesa (móvil) ──────────────────────────────── */
+.tsj-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.tsj-menu-btn img {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+/* ── Panel lateral móvil ─────────────────────────────────────── */
+.tsj-menu-panel {
+  position: fixed;
+  top: var(--tsj-header-h);
+  left: -300px;
+  width: 300px;
+  height: calc(100vh - var(--tsj-header-h));
+  background: var(--tsj-white);
+  transition: left 0.3s ease;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.12);
+  z-index: 9998;
+  overflow-y: auto;
+}
+
+.tsj-menu-panel.active {
+  left: 0;
+}
+
+.tsj-menu-content {
+  padding: 20px;
+}
+
+.tsj-menu-item {
+  display: block;
+  color: var(--tsj-blue);
+  font-family: var(--tsj-font);
+  font-size: 14px;
+  font-weight: 400;
+  text-decoration: none;
+  padding: 14px 0;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
+}
+
+.tsj-menu-item:last-child {
+  border-bottom: none;
+}
+
+.tsj-menu-item:hover {
+  background-color: var(--tsj-bg);
+  padding-left: 8px;
+}
+
+/* ── Spacer para compensar header fixed ─────────────────────── */
+.tsj-body-offset {
+  margin-top: var(--tsj-header-h);
+}
+
+/* ── Footer ─────────────────────────────────────────────────── */
+.tsj-footer {
+  background-color: var(--tsj-dark);
+  padding: 40px 20px;
+  margin-top: 40px;
+  font-family: var(--tsj-font);
+}
+
+.tsj-footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 24px;
+}
+
+.tsj-footer-logo img {
+  width: 220px;
+  height: auto;
+}
+
+.tsj-footer-social {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.tsj-footer-social img {
+  width: 72px;
+  height: auto;
+}
+
+.tsj-footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.tsj-footer-link {
+  color: var(--tsj-white);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 400;
+  transition: color 0.2s;
+}
+
+.tsj-footer-link:hover {
+  color: var(--tsj-pink);
+}
+
+/* ── Logos institucionales (barra inferior del footer) ──────── */
+.tsj-footer-gov {
+  background-color: #1a1a1c;
+  padding: 16px 20px;
+}
+
+.tsj-footer-gov-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.tsj-footer-gov-inner img {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .tsj-nav {
+    display: none;
+  }
+
+  .tsj-menu-btn {
+    display: block;
+  }
+
+  .tsj-toolbar {
+    justify-content: space-between;
+    padding: 10px 16px;
+    gap: 12px;
+  }
+
+  .tsj-logo {
+    max-width: 150px;
+  }
+
+  .tsj-footer-inner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .tsj-footer-links {
+    align-items: center;
+  }
+
+  .tsj-footer-gov-inner {
+    gap: 24px;
+  }
+
+  .tsj-footer-gov-inner img {
+    height: 36px;
+  }
+}
+
+@media (min-width: 769px) {
+  .tsj-menu-panel {
+    display: none !important;
+  }
+}
