@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingeniería Mecatrónica</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #4B0082; /* Color de fondo */
+            color: white; /* Color del texto */
+            text-align: center; /* Centrar el texto */
+            display: flex; /* Usar flexbox */
+            flex-direction: column; /* Colocar elementos en columna */
+            justify-content: space-between; /* Espaciar elementos */
+            height: 100vh; /* Altura completa de la ventana */
+            position: relative; /* Posición relativa para el posicionamiento de la imagen */
+        }
+        h1 {
+            background-color: #5757c0; /* Color de fondo del encabezado */
+            padding: 30px 0; /* Espaciado interno */
+            font-size: 30px; /* Tamaño de fuente */
+            font-weight: bold; /* Negrita */
+        }
+        .botones {
+            display: flex; /* Usar flexbox para los botones */
+            flex-direction: column; /* Colocar botones en columna */
+            align-items: center; /* Centrar los botones */
+            margin: 30px; /* Margen alrededor de los botones */
+        }
+        .button {
+            margin: 30px 0; /* Aumentar el espacio entre botones */
+            padding: 15px 30px; /* Aumentar el espaciado interno */
+            font-size: 18px; /* Aumentar el tamaño de fuente */
+            background-color: #c72e2e; /* Color de fondo de los botones */
+            color: white; /* Color del texto de los botones */
+            border: none; /* Sin borde */
+            border-radius: 8px; /* Bordes redondeados */
+            cursor: pointer; /* Cambiar cursor al pasar el mouse */
+            transition: background-color 0.3s, transform 0.3s; /* Transiciones suaves */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra del botón */
+        }
+        .button:hover {
+            background-color: #4B0082; /* Color al pasar el mouse */
+            transform: translateY(-2px); /* Efecto de elevación al pasar el mouse */
+        }
+        .button:active {
+            transform: translateY(0); /* Efecto de pulsación */
+        }
+        .imagenes {
+            display: flex; /* Usar flexbox para las imágenes */
+            justify-content: center; /* Centrar las imágenes */
+            flex-wrap: wrap; /* Permitir que las imágenes se envuelvan */
+            margin-bottom: 20px; /* Margen inferior */
+        }
+        .imagenes img {
+            margin: 10px; /* Espacio entre imágenes */
+            width: 200px; /* Ancho de las imágenes */
+            height: auto; /* Mantener la proporción de la imagen */
+        }
+        .footer {
+            background: #333; /* Color de fondo del pie de página */
+            color: white; /* Color del texto del pie de página */
+            text-align: center; /* Centrar el texto */
+            padding: 10px; /* Espaciado interno */
+            position: relative; /* Posición relativa */
+            width: 100%; /* Ancho completo */
+        }
+        .footer img {
+            margin: 25px; /* Espacio entre imágenes */
+        }
+        .top-right {
+            position: absolute; /* Posición absoluta */
+            top: 20px; /* Espacio desde la parte superior */
+            right: 20px; /* Espacio desde la derecha */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Ingeniería Mecatrónica</h1>
+
+    <div class="botones">
+        <a href="MateriasMecatronica.html" class="button">MATERIAS</a>
+        <a href="DocentesMecatronica.html" class="button">DOCENTES</a>
+        <a href="CordinadorMecatronica.html" class="button">CORDINADOR/A</a>
+    </div>
+
+    <!-- Imagen en la esquina superior derecha como botón -->
+    <a href="index.html" class="top-right">
+        <img src="imagenes/casa.png" alt="Ir a otra página" style="width: 80px; height: auto;"> <!-- Ajusta el tamaño según sea necesario -->
+    </a>
+
+    <div class="footer">
+        <img src="imagenes/image.png" alt="Imagen 1" style="width: 160px;"> 
+        <img src="imagenes/image2.png" alt="Icono 2" style="width: 100px;"> 
+        <img src="imagenes/image3.png" alt="Icono 3" style="width: 160px;"> 
+        <img src="imagenes/image4.png" alt="Icono 4" style="width: 60px;"> 
+    </div>
+
+</body>
+</html>

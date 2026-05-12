@@ -1,0 +1,21 @@
+.button {
+    margin: 10px 0; /* Espacio entre botones */
+    padding: 12px 20px; /* Espaciado interno */
+    font-size: 6px; /* Tamaño de fuente */
+    background-color: #2A2A72; /* Color de fondo de los botones */
+    color: white; /* Color del texto de los botones */
+    border: none; /* Sin borde */
+    border-radius: 5px; /* Bordes redondeados */
+    cursor: pointer; /* Cambiar cursor al pasar el mouse */
+    transition: background-color 0.3s, transform 0.3s; /* Transiciones suaves */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra del botón */
+}
+
+.button:hover {
+    background-color: #4B0082; /* Color al pasar el mouse */
+    transform: translateY(-2px); /* Efecto de elevación al pasar el mouse */
+}
+
+.button:active {
+    transform: translateY(0); /* Efecto de pulsación */
+}

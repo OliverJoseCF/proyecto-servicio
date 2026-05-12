@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directorio de Sistemas - Tec Chapala</title>
+    <style>
+        /* ESTILO PARA LA CASITA (IGUAL A TU EJEMPLO DE ESCOLARES) */
+        .top-right {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .top-right img:hover {
+            transform: scale(1.1);
+            transition: 0.3s;
+        }
+
+        :root {
+            --morado-oscuro: #3b0062;
+            --morado-claro: #5d56a5;
+            --fondo-panel: #51227e;
+            --blanco: #ffffff;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--morado-oscuro); 
+            color: var(--blanco); 
+            margin: 0;
+            padding: 20px;
+            position: relative; 
+        }
+
+        .container { 
+            max-width: 1100px; 
+            margin: auto; 
+            background: var(--fondo-panel); 
+            padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-top: 50px; 
+        }
+
+        h2 { text-align: center; font-size: 2.2rem; margin-bottom: 30px; }
+
+        /* Panel de Administración */
+        #admin-panel { 
+            background: rgba(255, 255, 255, 0.1); 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin-bottom: 30px; 
+            display: none; 
+            border: 1px solid var(--morado-claro);
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        input { 
+            padding: 12px; 
+            border-radius: 8px; 
+            border: none; 
+            outline: none;
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* Tabla Estilizada */
+        .tabla-scroll { overflow-x: auto; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            background: var(--blanco); 
+            color: #333; 
+            border-radius: 12px; 
+            overflow: hidden; 
+        }
+
+        th { background-color: var(--morado-claro); color: white; padding: 15px; text-align: left; }
+        td { padding: 15px; border-bottom: 1px solid #eee; }
+        tr:hover { background-color: #f9f9f9; }
+
+        /* Botones */
+        .btn { 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: 0.3s;
+        }
+
+        .btn-admin-toggle { background: var(--morado-claro); color: white; margin-bottom: 20px; }
+        .btn-save { background-color: #28a745; color: white; width: 100%; }
+        .btn-edit { background-color: #ffc107; color: #000; margin-right: 5px; }
+        .btn-delete { background-color: #dc3545; color: white; }
+
+        .foto-perfil { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background: #ddd; }
+        .acciones-col { display: none; } 
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="top-right">
+        <img src="imagenes/casa.png" alt="Inicio" style="width: 80px; height: auto;">
+    </a>
+
+    <div class="container">
+        <h2>Directorio Institucional</h2>
+        
+        <button class="btn btn-admin-toggle" onclick="toggleAdmin()">Modo Administrador (Añadir/Editar)</button>
+
+        <div id="admin-panel">
+            <h3>Panel de Control</h3>
+            <input type="hidden" id="index-edit">
+            <div class="grid-inputs">
+                <input type="text" id="nombre" placeholder="Nombre completo">
+                <input type="text" id="puesto" placeholder="Puesto (ej. Docente)">
+                <input type="text" id="telefono" placeholder="Teléfono">
+                <input type="email" id="correo" placeholder="Correo electrónico">
+                <input type="text" id="foto" placeholder="Nombre de imagen (ej: profe.jpg)">
+            </div>
+            <button class="btn btn-save" onclick="guardarDato()">Guardar / Actualizar Registro</button>
+        </div>
+
+        <div class="tabla-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Foto</th>
+                        <th>Nombre</th>
+                        <th>Puesto</th>
+                        <th>Teléfono</th>
+                        <th>Correo</th>
+                        <th class="acciones-col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpo-tabla">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // LISTA INICIAL DE MAESTROS QUE ME PASASTE
+        const datosIniciales = [
+            { foto: 'imagenes/user.png', nombre: 'Miguel Angel Delgado Lopez', puesto: 'Docente Sistemas', telefono: 'S/N', correo: 'miguel.delgado@chapala.tecnm.mx' },
+            { foto: 'imagenes/user.png', nombre: 'Julio Cesar Chavez Novoa', puesto: 'Docente Sistemas', telefono: 'S/N', correo: 'julio.chavez@chapala.tecnm.mx' },
+            { foto: 'imagenes/user.png', nombre: 'Carmen Leticia Salcedo Quevedo', puesto: 'Docente Sistemas', telefono: 'S/N', correo: 'carmen.salcedo@chapala.tecnm.mx' },
+            { foto: 'imagenes/user.png', nombre: 'Jose Jorge Hernandez Ochoa', puesto: 'Docente Sistemas', telefono: 'S/N', correo: 'jorge.hernandez@chapala.tecnm.mx' },
+            { foto: 'imagenes/user.png', nombre: 'Francisco Javier Gonzales Siordia', puesto: 'Docente Sistemas', telefono: 'S/N', correo: 'francisco.gonzales@chapala.tecnm.mx' },
+            { foto: 'imagenes/user.png', nombre: 'Jose Guadalupe Gamas Gamas', puesto: 'Docente Sistemas', telefono: 'S/N', correo: 'jose.gamas@chapala.tecnm.mx' }
+        ];
+
+        // Se intenta cargar de LocalStorage, si no hay nada, se usan los datosIniciales
+        let directorio = JSON.parse(localStorage.getItem('db_directorio')) || datosIniciales;
+
+        function render() {
+            const tabla = document.getElementById('cuerpo-tabla');
+            const isAdmin = document.getElementById('admin-panel').style.display === 'block';
+            const colsAcciones = document.querySelectorAll('.acciones-col');
+            
+            // Mostrar u ocultar columna de acciones
+            colsAcciones.forEach(el => el.style.display = isAdmin ? 'table-cell' : 'none');
+
+            tabla.innerHTML = '';
+            directorio.forEach((item, i) => {
+                tabla.innerHTML += `
+                    <tr>
+                        <td><img src="${item.foto}" class="foto-perfil" onerror="this.src='imagenes/user.png'"></td>
+                        <td><b>${item.nombre}</b></td>
+                        <td>${item.puesto}</td>
+                        <td>${item.telefono}</td>
+                        <td>${item.correo}</td>
+                        <td class="acciones-col" style="display: ${isAdmin ? 'table-cell' : 'none'}">
+                            <button class="btn btn-edit" onclick="prepararEdicion(${i})">Editar</button>
+                            <button class="btn btn-delete" onclick="eliminar(${i})">Borrar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function toggleAdmin() {
+            const panel = document.getElementById('admin-panel');
+            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+            render();
+        }
+
+        function guardarDato() {
+            const id = document.getElementById('index-edit').value;
+            let fotoInput = document.getElementById('foto').value;
+
+            // OPCIÓN 1: Lógica para autocompletar la ruta de la carpeta imagenes
+            if (fotoInput !== "" && !fotoInput.includes("/") && !fotoInput.startsWith("http")) {
+                fotoInput = "imagenes/" + fotoInput;
+            }
+
+            const nuevo = {
+                nombre: document.getElementById('nombre').value,
+                puesto: document.getElementById('puesto').value,
+                telefono: document.getElementById('telefono').value, 
+                correo: document.getElementById('correo').value,
+                foto: fotoInput || 'imagenes/user.png'
+            };
+
+            if(nuevo.nombre === "") return alert("Debes poner al menos el nombre");
+
+            if(id === "") {
+                directorio.push(nuevo); // Añadir nuevo registro
+            } else {
+                directorio[id] = nuevo; // Actualizar registro existente
+                document.getElementById('index-edit').value = "";
+            }
+
+            actualizarStorage();
+        }
+
+        function eliminar(i) {
+            if(confirm("¿Estás seguro de eliminar a este docente del directorio?")) {
+                directorio.splice(i, 1);
+                actualizarStorage();
+            }
+        }
+
+        function prepararEdicion(i) {
+            const m = directorio[i];
+            document.getElementById('nombre').value = m.nombre;
+            document.getElementById('puesto').value = m.puesto;
+            document.getElementById('telefono').value = m.telefono;
+            document.getElementById('correo').value = m.correo;
+            document.getElementById('foto').value = m.foto;
+            document.getElementById('index-edit').value = i;
+            window.scrollTo(0,0); // Sube la pantalla para ver el formulario
+        }
+
+        function actualizarStorage() {
+            localStorage.setItem('db_directorio', JSON.stringify(directorio));
+            limpiarForm();
+            render();
+        }
+
+        function limpiarForm() {
+            document.getElementById('nombre').value = '';
+            document.getElementById('puesto').value = '';
+            document.getElementById('telefono').value = '';
+            document.getElementById('correo').value = '';
+            document.getElementById('foto').value = '';
+            document.getElementById('index-edit').value = '';
+        }
+
+        // Primera carga de la tabla al abrir la página
+        render();
+    </script>
+
+</body>
+</html>

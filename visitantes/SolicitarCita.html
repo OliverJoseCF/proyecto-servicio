@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solicitar una Cita</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #4B0082;
+      color: white;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100vh;
+      position: relative;
+    }
+    h1 {
+      background-color: #5757c0;
+      padding: 30px 0;
+      font-size: 30px;
+      font-weight: bold;
+    }
+    .table-container {
+      background-color: #5757c0;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px auto;
+      max-width: 90%;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      color: white;
+      font-size: 16px;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid white;
+      background-color: #6f6fd7;
+    }
+    th {
+      background-color: #4d4dc2;
+    }
+    .top-right {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+    .footer {
+      background: #333;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      width: 100%;
+      margin-top: auto;
+    }
+    .footer img {
+      margin: 5px;
+    }
+    .nombre {
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .correo {
+      font-size: 17px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Secretarías</h1>
+
+  <div class="table-container">
+    <table>
+      <tr>
+        <th>Nombre</th>
+        <th>Rol</th>
+        <th>Correo</th>
+        <th>Teléfono</th>
+      </tr>
+      <tr>
+        <td class="nombre" contenteditable="true">Laura Martínez</td>
+        <td contenteditable="true">Secretaria Administrativa</td>
+        <td class="correo" contenteditable="true">laura.martinez@chapala.tecmm.edu.mx</td>
+        <td contenteditable="true">331-234-5678</td>
+      </tr>
+      <tr>
+        <td class="nombre" contenteditable="true">María López</td>
+        <td contenteditable="true">Recepcionista</td>
+        <td class="correo" contenteditable="true">maria.lopez@chapala.tecmm.edu.mx</td>
+        <td contenteditable="true">331-456-7890</td>
+      </tr>
+      <tr>
+        <td class="nombre" contenteditable="true">Patricia Gómez</td>
+        <td contenteditable="true">Secretaria de Dirección</td>
+        <td class="correo" contenteditable="true">patricia.gomez@chapala.tecmm.edu.mx</td>
+        <td contenteditable="true">332-567-8901</td>
+      </tr>
+      <tr>
+        <td class="nombre" contenteditable="true">Ana Rivera</td>
+        <td contenteditable="true">Asistente Académica</td>
+        <td class="correo" contenteditable="true">ana.rivera@chapala.tecmm.edu.mx</td>
+        <td contenteditable="true">333-678-9012</td>
+      </tr>
+      <tr>
+        <td class="nombre" contenteditable="true">Gabriela Torres</td>
+        <td contenteditable="true">Secretaria de Control Escolar</td>
+        <td class="correo" contenteditable="true">gabriela.torres@chapala.tecmm.edu.mx</td>
+        <td contenteditable="true">334-789-0123</td>
+      </tr>
+    </table>
+  </div>
+
+  <a href="index.html" class="top-right">
+    <img src="imagenes/casa.png" alt="Ir a otra página" style="width: 80px; height: auto;">
+  </a>
+
+  <div class="footer">
+    <img src="imagenes/image.png" alt="Imagen 1" style="width: 160px;"> 
+    <img src="imagenes/image2.png" alt="Icono 2" style="width: 100px;"> 
+    <img src="imagenes/image3.png" alt="Icono 3" style="width: 160px;"> 
+    <img src="imagenes/image4.png" alt="Icono 4" style="width: 60px;"> 
+  </div>
+
+</body>
+</html>
