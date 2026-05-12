@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("ssssss", $fecha, $nombre, $aula, $recibo, $h_p, $h_e);
 
     if ($stmt->execute()) {
-        echo "<script>alert('Solicitud enviada con éxito. Espere aprobación.'); window.location.href='../index.html';</script>";
+        echo "<script>alert('Solicitud enviada con éxito. Espere aprobación.'); window.location.href='../buscar.php';</script>";
     } else {
         echo "Error: " . $conexion->error;
     }

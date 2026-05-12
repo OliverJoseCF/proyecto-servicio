@@ -121,48 +121,28 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $logoFile = !empty($convenio['logo']) ? basename($convenio['logo']) : '';
-?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Convenio — TecSJ</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="estilo/estilo.css">
-    <style>
-        .form-container { max-width:800px; margin:30px auto; padding:20px; background:#fff; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,.1); }
-        .form-group { margin-bottom:15px; }
-        .form-group label { display:block; margin-bottom:5px; font-weight:500; }
-        .form-control { width:100%; padding:8px 12px; border:1px solid #ddd; border-radius:4px; font-family:'Poppins',sans-serif; }
-        .btn-container { display:flex; justify-content:space-between; margin-top:20px; }
-        .btn { padding:10px 20px; border:none; border-radius:4px; cursor:pointer; font-weight:bold; text-decoration:none; display:inline-block; }
-        .btn-primary { background-color:#32129A; color:white; }
-        .btn-secondary { background-color:#6c757d; color:white; }
-        .alert { padding:15px; margin-bottom:20px; border-radius:4px; text-align:center; }
-        .alert-danger  { background-color:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
-        .current-logo { max-width:100px; margin-bottom:10px; display:block; }
-        .form-row { display:flex; gap:15px; }
-        .form-row .form-group { flex:1; }
-        .btn-cerrar-sesion { background-color:#d9534f; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-weight:bold; }
-        @media(max-width:768px){ .form-row{ flex-direction:column; gap:0; } }
-    </style>
-</head>
-<body>
-    <div class="barra-rosa"></div>
 
-    <header class="barra-purpura">
-        <div class="logo-institucion">
-            <img src="images/Grupo_10491.svg" alt="Tecnológico Superior de Jalisco" />
-        </div>
-        <nav class="menu-principal" aria-label="Menú principal">
-            <a href="../index.php" style="color:white; text-decoration:none;">Inicio</a>
-            <form method="POST" action="cerrar_sesion.php" style="display:inline;">
-                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
-                <button type="submit" class="btn-cerrar-sesion">Cerrar Sesión</button>
-            </form>
-        </nav>
-    </header>
+$tsj_module     = 'convenios';
+$tsj_title      = 'Convenios — Editar';
+$tsj_extra_css  = ['estilo/estilo.css'];
+$tsj_head_extra = '<style>
+    .form-container { max-width:800px; margin:30px auto; padding:20px; background:#fff; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,.1); }
+    .form-group { margin-bottom:15px; }
+    .form-group label { display:block; margin-bottom:5px; font-weight:500; }
+    .form-control { width:100%; padding:8px 12px; border:1px solid #ddd; border-radius:4px; font-family:\'Poppins\',sans-serif; }
+    .btn-container { display:flex; justify-content:space-between; margin-top:20px; }
+    .btn { padding:10px 20px; border:none; border-radius:4px; cursor:pointer; font-weight:bold; text-decoration:none; display:inline-block; }
+    .btn-primary { background-color:#32129A; color:white; }
+    .btn-secondary { background-color:#6c757d; color:white; }
+    .alert { padding:15px; margin-bottom:20px; border-radius:4px; text-align:center; }
+    .alert-danger { background-color:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+    .current-logo { max-width:100px; margin-bottom:10px; display:block; }
+    .form-row { display:flex; gap:15px; }
+    .form-row .form-group { flex:1; }
+    @media(max-width:768px){ .form-row{ flex-direction:column; gap:0; } }
+</style>';
+require_once __DIR__ . '/../../shared/header.php';
+?>
 
     <div class="fila-busqueda">
         <h2>Editar Convenio</h2>
@@ -284,5 +264,5 @@ $logoFile = !empty($convenio['logo']) ? basename($convenio['logo']) : '';
             </div>
         </form>
     </div>
-</body>
-</html>
+
+<?php require_once __DIR__ . '/../../shared/footer.php'; ?>

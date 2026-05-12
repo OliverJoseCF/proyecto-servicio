@@ -27,52 +27,22 @@ $mensajesValidos = ['agregado' => 'El convenio ha sido agregado correctamente.',
                     'eliminado'=> 'El convenio ha sido eliminado correctamente.'];
 $msgKey   = $_GET['mensaje'] ?? '';
 $msgFlash = $mensajesValidos[$msgKey] ?? null;
+<?php
+$tsj_module     = 'convenios';
+$tsj_title      = 'Convenios — Lista';
+$tsj_extra_css  = ['estilo/estilo.css', 'https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css'];
+$tsj_head_extra = '<style>
+  .data-row td:not(.actions-cell) { cursor: pointer; }
+  .actions-cell { white-space: nowrap; text-align: center; }
+  .btn-agregar { background-color: #32129A; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; font-weight: bold; display: inline-block; margin-left: 10px; }
+  .btn-editar, .btn-eliminar-btn { display: inline-block; margin: 0 5px; font-size: 18px; text-decoration: none; background: none; border: none; cursor: pointer; padding: 0; }
+  .btn-editar:hover, .btn-eliminar-btn:hover { transform: scale(1.2); }
+  .alerta { padding: 15px; margin-bottom: 20px; border-radius: 4px; text-align: center; }
+  .alerta-exito { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .btn-cerrar-sesion { background-color: #d9534f; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+</style>';
+require_once __DIR__ . '/../../shared/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lista de Convenios — TecSJ</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="estilo/estilo.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
-  <style>
-    .data-row td:not(.actions-cell) { cursor: pointer; }
-    .actions-cell { white-space: nowrap; text-align: center; }
-    .btn-agregar {
-      background-color: #32129A; color: white;
-      padding: 8px 16px; border-radius: 4px;
-      text-decoration: none; font-weight: bold;
-      display: inline-block; margin-left: 10px;
-    }
-    .btn-editar, .btn-eliminar-btn {
-      display: inline-block; margin: 0 5px;
-      font-size: 18px; text-decoration: none;
-      background: none; border: none; cursor: pointer;
-      padding: 0;
-    }
-    .btn-editar:hover, .btn-eliminar-btn:hover { transform: scale(1.2); }
-    .alerta { padding: 15px; margin-bottom: 20px; border-radius: 4px; text-align: center; }
-    .alerta-exito { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .btn-cerrar-sesion { background-color: #d9534f; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-  </style>
-</head>
-<body>
-  <div class="barra-rosa"></div>
-
-  <header class="barra-purpura">
-    <div class="logo-institucion">
-      <img src="images/Grupo_10491.svg" alt="Tecnológico Superior de Jalisco" />
-    </div>
-    <nav class="menu-principal" aria-label="Menú principal">
-      <a href="../index.php" style="color:white; text-decoration:none;">Inicio</a>
-      <form method="POST" action="cerrar_sesion.php" style="display:inline;">
-        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
-        <button type="submit" class="btn-cerrar-sesion">Cerrar Sesión</button>
-      </form>
-    </nav>
-  </header>
 
   <?php if ($msgFlash !== null): ?>
   <div class="alerta alerta-exito" role="alert" id="flashMsg">
@@ -139,36 +109,7 @@ $msgFlash = $mensajesValidos[$msgKey] ?? null;
     </table>
   </div>
 
-  <footer class="footer w-full p-10" role="contentinfo">
-    <div class="footer-container flex justify-between items-center">
-      <div class="footer-img">
-        <img src="images/Grupo_10491.svg" alt="Tecnológico Superior de Jalisco" loading="lazy" />
-      </div>
-      <div class="footer-links flex gap-4">
-        <a href="https://www.facebook.com/TecSJ" class="footer-img" target="_blank" rel="noopener noreferrer">
-          <img src="images/facebook-svgrepo-com.svg" alt="Visitar Facebook del TecSJ" loading="lazy" />
-        </a>
-        <a href="https://www.youtube.com/@TecSJ" class="footer-img" target="_blank" rel="noopener noreferrer">
-          <img src="images/youtube-svgrepo-com.svg" alt="Visitar YouTube del TecSJ" loading="lazy" />
-        </a>
-      </div>
-      <div class="footer-text-links flex flex-col items-center gap-2">
-        <a href="../index.php" class="footer-link">Módulo de convenios</a>
-        <a href="https://consultapublicamx.plataformadetransparencia.org.mx/vut-web/faces/view/consultaPublica.xhtml?idEntidad=MTQ=&idSujetoObligado=MTM3OTE=#inicio" class="footer-link" target="_blank" rel="noopener noreferrer">Plataforma Nacional de Transparencia</a>
-      </div>
-    </div>
-  </footer>
-
-  <div class="extra-info w-full p-6 bg-gray-800 text-white text-center">
-    <div class="additional-images">
-      <img src="images/educacion.png" alt="Secretaría de Educación Pública" loading="lazy" />
-      <img src="images/tecnologico.svg" alt="Tecnológico Nacional de México" loading="lazy" />
-      <img src="images/innovacion.png" alt="Secretaría de Innovación, Ciencia y Tecnología de Jalisco" loading="lazy" />
-      <img src="images/jalisco.png" alt="Gobierno de Jalisco" loading="lazy" />
-    </div>
-  </div>
-
-  <!-- SRI: genera los hashes en https://www.srihash.org/ con las URLs exactas -->
+  <!-- Scripts DataTables -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"
           integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
           crossorigin="anonymous" defer></script>
@@ -195,5 +136,5 @@ $msgFlash = $mensajesValidos[$msgKey] ?? null;
     }
   });
   </script>
-</body>
-</html>
+
+<?php require_once __DIR__ . '/../../shared/footer.php'; ?>

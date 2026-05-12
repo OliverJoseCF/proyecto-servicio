@@ -79,42 +79,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
     $conn->close();
 }
+<?php
+$tsj_module     = 'convenios';
+$tsj_title      = 'Convenios — Eliminar';
+$tsj_extra_css  = ['estilo/estilo.css'];
+$tsj_head_extra = '<style>
+    .confirm-container { max-width:600px; margin:50px auto; padding:30px; background:#fff; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,.1); text-align:center; }
+    .confirm-title   { color:#32129A; margin-bottom:20px; }
+    .confirm-message { margin-bottom:30px; font-size:18px; line-height:1.6; }
+    .btn-container   { display:flex; justify-content:center; gap:20px; }
+    .btn             { padding:10px 20px; border:none; border-radius:4px; cursor:pointer; font-weight:bold; text-decoration:none; display:inline-block; }
+    .btn-danger      { background-color:#dc3545; color:white; }
+    .btn-secondary   { background-color:#6c757d; color:white; }
+    .error-message   { color:#dc3545; margin-bottom:20px; padding:10px; background:#f8d7da; border:1px solid #f5c6cb; border-radius:4px; }
+</style>';
+require_once __DIR__ . '/../../shared/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eliminar Convenio — TecSJ</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="estilo/estilo.css">
-    <style>
-        .confirm-container { max-width:600px; margin:50px auto; padding:30px; background:#fff; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,.1); text-align:center; }
-        .confirm-title   { color:#32129A; margin-bottom:20px; }
-        .confirm-message { margin-bottom:30px; font-size:18px; line-height:1.6; }
-        .btn-container   { display:flex; justify-content:center; gap:20px; }
-        .btn             { padding:10px 20px; border:none; border-radius:4px; cursor:pointer; font-weight:bold; text-decoration:none; display:inline-block; }
-        .btn-danger      { background-color:#dc3545; color:white; }
-        .btn-secondary   { background-color:#6c757d; color:white; }
-        .error-message   { color:#dc3545; margin-bottom:20px; padding:10px; background:#f8d7da; border:1px solid #f5c6cb; border-radius:4px; }
-        .btn-cerrar-sesion { background-color:#d9534f; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-weight:bold; }
-    </style>
-</head>
-<body>
-    <div class="barra-rosa"></div>
-
-    <header class="barra-purpura">
-        <div class="logo-institucion">
-            <img src="images/Grupo_10491.svg" alt="Tecnológico Superior de Jalisco" />
-        </div>
-        <nav class="menu-principal" aria-label="Menú principal">
-            <a href="../index.php" style="color:white; text-decoration:none;">Inicio</a>
-            <form method="POST" action="cerrar_sesion.php" style="display:inline;">
-                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
-                <button type="submit" class="btn-cerrar-sesion">Cerrar Sesión</button>
-            </form>
-        </nav>
-    </header>
 
     <div class="fila-busqueda">
         <h2>Eliminar Convenio</h2>
@@ -147,5 +127,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             </form>
         </div>
     </div>
-</body>
-</html>
+
+<?php require_once __DIR__ . '/../../shared/footer.php'; ?>

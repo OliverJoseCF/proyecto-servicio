@@ -14,7 +14,7 @@ if ($usuario === 'admin' && $clave === '1234') {
 } else {
     echo "<script>
             alert('Usuario o contraseña incorrectos. Intenta de nuevo.');
-            window.location.href = '../login.html';
+            window.location.href = '../login.php';
           </script>";
     exit;
 }

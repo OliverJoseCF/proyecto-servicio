@@ -1,18 +1,15 @@
 <?php
-// CAPTURA DE DATOS DESDE LA URL
 $titulo = isset($_GET['titulo']) ? $_GET['titulo'] : '';
 $codigo = isset($_GET['codigo']) ? $_GET['codigo'] : '';
-?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Solicitud de Libro</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
+
+$tsj_module     = 'biblioteca';
+$tsj_title      = 'Biblioteca — Solicitud de Libro';
+$tsj_extra_css  = [
+    'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
+    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
+    'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap',
+];
+$tsj_head_extra = '<style>
     :root {
       --bg-deep: #1e1040;
       --bg-darker: #150b30;
@@ -271,20 +268,11 @@ $codigo = isset($_GET['codigo']) ? $_GET['codigo'] : '';
     @media (max-width: 400px) {
       .form-card { padding: 1.75rem 1.25rem; }
     }
-  </style>
-</head>
-<body>
+  </style>';
+require_once __DIR__ . '/../../shared/header.php';
+?>
 
   <div class="grain"></div>
-
-  <!-- ── Navbar ── -->
-  <nav class="navbar navbar-dark navbar-custom shadow-sm">
-    <div class="container">
-      <a class="navbar-brand" href="buscar.html">
-        <i class="fas fa-arrow-left"></i> Volver al catálogo
-      </a>
-    </div>
-  </nav>
 
   <!-- ── Form ── -->
   <div class="form-wrapper">
@@ -333,5 +321,4 @@ $codigo = isset($_GET['codigo']) ? $_GET['codigo'] : '';
     </div>
   </div>
 
-</body>
-</html>
+<?php require_once __DIR__ . '/../../shared/footer.php'; ?>

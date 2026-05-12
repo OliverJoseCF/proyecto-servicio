@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($stmt->execute()) {
         echo "<script>
                 alert('¡Solicitud enviada con éxito! El administrador la revisará pronto.');
-                window.location.href = '../buscar.html';
+                window.location.href = '../buscar.php';
               </script>";
     } else {
         echo "Error al procesar la solicitud: " . $conexion->error;
@@ -33,6 +33,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
     $conexion->close();
 } else {
-    header("Location: ../buscar.html");
+    header("Location: ../buscar.php");
 }
 ?>
