@@ -72,34 +72,34 @@ $nav_items = [
   align-items: center;
   justify-content: space-between;
   padding: 0 32px;
-  height: 68px;
-  box-shadow: 0 2px 16px rgba(0,0,0,.35);
+  height: 80px;
+  box-shadow: 0 2px 20px rgba(0,0,0,.4);
 }
 
-/* Bloque izquierdo: logo */
+/* Bloque izquierdo: logo + campus */
 .tsj-header-brand {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 3px;
+  align-items: center;
+  gap: 16px;
   text-decoration: none;
   flex-shrink: 0;
 }
 .tsj-header-logo {
-  height: 46px;
+  height: 54px;
   width: auto;
   filter: brightness(0) invert(1);
-  opacity: .9;
+  opacity: .92;
   transition: opacity .2s;
 }
 .tsj-header-brand:hover .tsj-header-logo { opacity: 1; }
 .tsj-brand-sub {
-  color: rgba(255,255,255,.45);
-  font-size: 10px;
+  color: rgba(255,255,255,.5);
+  font-size: 11px;
   font-weight: 400;
-  letter-spacing: 1.5px;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  padding-left: 2px;
+  border-left: 1px solid rgba(255,255,255,.2);
+  padding-left: 16px;
 }
 
 /* Divisor vertical */
@@ -176,7 +176,7 @@ $nav_items = [
 /* Panel lateral móvil */
 .tsj-menu-panel {
   position: fixed;
-  top: 71px;
+  top: 83px;
   left: -280px;
   width: 260px;
   height: calc(100vh - 71px);
@@ -207,7 +207,7 @@ $nav_items = [
 }
 
 /* Offset body */
-.tsj-body-offset { margin-top: 71px; }
+.tsj-body-offset { margin-top: 83px; }
 
 /* Responsive */
 @media (max-width: 820px) {
@@ -229,7 +229,7 @@ $nav_items = [
   <div class="tsj-top-bar"></div>
   <div class="tsj-toolbar">
 
-    <!-- Logo -->
+    <!-- Logo + campus -->
     <a class="tsj-header-brand" href="<?= $base ?>/" aria-label="Portal principal TSJ Chapala">
       <img class="tsj-header-logo"
            src="<?= $base ?>/shared/assets/img/logo.svg"
