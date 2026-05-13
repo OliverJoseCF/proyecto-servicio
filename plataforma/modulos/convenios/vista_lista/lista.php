@@ -27,7 +27,7 @@ $mensajesValidos = ['agregado' => 'El convenio ha sido agregado correctamente.',
                     'eliminado'=> 'El convenio ha sido eliminado correctamente.'];
 $msgKey   = $_GET['mensaje'] ?? '';
 $msgFlash = $mensajesValidos[$msgKey] ?? null;
-<?php
+
 $tsj_module     = 'convenios';
 $tsj_title      = 'Convenios — Lista';
 $tsj_extra_css  = ['estilo/estilo.css', 'https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css'];

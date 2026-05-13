@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
     $conn->close();
 }
-<?php
+
 $tsj_module     = 'convenios';
 $tsj_title      = 'Convenios — Eliminar';
 $tsj_extra_css  = ['estilo/estilo.css'];

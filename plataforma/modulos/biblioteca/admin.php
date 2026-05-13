@@ -16,7 +16,7 @@ $resultLibros = $conexion->query("SELECT * FROM libros ORDER BY id DESC");
 $resultControles = $conexion->query("SELECT * FROM solicitud_controles ORDER BY id DESC");
 $resultSolLibros = $conexion->query("SELECT * FROM solicitud_libros WHERE entregado = 0 ORDER BY id DESC");
 $resultHistorial = $conexion->query("SELECT * FROM solicitud_libros WHERE entregado = 1 OR estado = 'Rechazado' ORDER BY fecha_devolucion DESC LIMIT 30");
-<?php
+
 $tsj_module    = 'biblioteca';
 $tsj_title     = 'Biblioteca — Gestión Bibliotecaria';
 $tsj_extra_css = [

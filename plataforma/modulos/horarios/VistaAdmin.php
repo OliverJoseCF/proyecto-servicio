@@ -66,7 +66,7 @@ $sql  = "
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $datos = $stmt->fetchAll();
-<?php
+
 $tsj_module    = 'horarios';
 $tsj_title     = 'Horarios — Panel de Administración';
 $tsj_extra_css = ['css/normalize.css', 'css/admin.css'];

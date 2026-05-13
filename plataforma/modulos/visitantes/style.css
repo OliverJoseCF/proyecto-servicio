@@ -41,8 +41,7 @@ h2, h3 {
 
 /* ── Contenedor principal ────────────────────────────────── */
 .contenido,
-.content,
-.seccion {
+.content {
   max-width: 1100px;
   margin: 0 auto;
   padding: 24px;
@@ -51,7 +50,116 @@ h2, h3 {
 .container {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 24px;
+}
+
+/* Sección tipo formulario (comprobante, etc.) */
+.seccion {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  padding: 28px;
+  max-width: 560px;
+  margin: 20px auto;
+  text-align: left;
+}
+
+.seccion label {
+  display: block;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tsj-gray-700, #374151);
+  margin: 14px 0 6px;
+}
+
+.seccion input[type="text"],
+.seccion input[type="email"],
+.seccion input[type="number"],
+.seccion input[type="tel"],
+.seccion select,
+.seccion textarea {
+  width: 100%;
+  padding: 10px 14px;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-size: 14px;
+  color: var(--tsj-text, #1f2937);
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.seccion input:focus,
+.seccion select:focus,
+.seccion textarea:focus {
+  outline: none;
+  border-color: var(--tsj-blue, #32129a);
+  box-shadow: 0 0 0 3px rgba(50, 18, 154, 0.10);
+}
+
+.seccion .download-button { margin-top: 18px; }
+
+/* Egresados / Examen — tarjetas de contenido */
+.egresados,
+.examen {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  padding: 24px;
+  margin: 16px auto;
+  max-width: 720px;
+  text-align: left;
+}
+
+.egresados h2,
+.egresados h3,
+.examen h2,
+.examen h3 {
+  color: var(--tsj-blue, #32129a);
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.examen input[type="number"] {
+  display: inline-block;
+  width: 70px;
+  padding: 4px 8px;
+  font-size: 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 6px;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  margin: 0 4px;
+}
+.examen input[type="number"]:focus {
+  outline: none;
+  border-color: var(--tsj-blue, #32129a);
+}
+
+/* Form-grid (Directorio admin) */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.form-grid input,
+.form-grid select {
+  padding: 9px 12px;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-size: 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  transition: border-color 0.25s;
+}
+.form-grid input:focus,
+.form-grid select:focus {
+  outline: none;
+  border-color: var(--tsj-blue, #32129a);
+  box-shadow: 0 0 0 3px rgba(50, 18, 154, 0.10);
 }
 
 /* ── Tarjeta de tabla ────────────────────────────────────── */
@@ -237,7 +345,8 @@ tr:hover td { background: #f0edff !important; }
 }
 
 /* ── Admin panel ─────────────────────────────────────────── */
-.admin-panel {
+.admin-panel,
+#admin-panel {
   background: #fff;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
@@ -246,6 +355,79 @@ tr:hover td { background: #f0edff !important; }
   margin: 16px auto;
   max-width: 900px;
 }
+
+#admin-panel { display: none; }
+#admin-panel.is-open { display: block; }
+
+.admin-panel h3,
+#admin-panel h3 {
+  margin-bottom: 14px;
+  font-size: 1.05rem;
+  color: var(--tsj-blue, #32129a);
+}
+
+.btn-admin-toggle {
+  display: inline-block;
+  margin: 12px 8px;
+  padding: 9px 18px;
+  background: var(--tsj-pink, #ec5a68);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.25s, transform 0.2s;
+}
+.btn-admin-toggle:hover {
+  background: #d94655;
+  transform: translateY(-1px);
+}
+
+/* Aliases de botones admin */
+.btn-editar, .edit-btn {
+  background: var(--tsj-blue, #32129a);
+  color: #fff;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  border-radius: 6px;
+  border: none;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  text-decoration: none;
+  display: inline-block;
+  margin: 2px;
+}
+.btn-editar:hover, .edit-btn:hover {
+  background: var(--tsj-blue-dark, #1e0b6e);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.btn-borrar, .btn-del, .del-btn {
+  background: #dc2626;
+  color: #fff;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  border-radius: 6px;
+  border: none;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  text-decoration: none;
+  display: inline-block;
+  margin: 2px;
+}
+.btn-borrar:hover, .btn-del:hover, .del-btn:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
+
+.acciones-col { white-space: nowrap; }
 
 /* ── Docentes ────────────────────────────────────────────── */
 .docentes {

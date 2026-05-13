@@ -9,7 +9,8 @@ $tsj_extra_css  = [
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
     'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap',
 ];
-$tsj_head_extra = '<style>
+$tsj_head_extra = <<<'CSSBLOCK'
+<style>
     :root {
       --bg-deep: #1e1040;
       --bg-darker: #150b30;
@@ -268,7 +269,8 @@ $tsj_head_extra = '<style>
     @media (max-width: 400px) {
       .form-card { padding: 1.75rem 1.25rem; }
     }
-  </style>';
+  </style>
+CSSBLOCK;
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 
