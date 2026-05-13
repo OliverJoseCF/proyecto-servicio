@@ -28,8 +28,8 @@ body { background-color: #f5f5f5; font-family: \'Poppins\', \'Arial\', sans-seri
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 24px;
     max-width: 1100px;
-    margin: 0 auto 60px;
-    padding: 0 24px;
+    margin: 0 auto 0;
+    padding: 0 24px 40px;
 }
 
 .portal-card {
