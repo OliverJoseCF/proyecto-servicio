@@ -7,7 +7,7 @@ body { background-color: #f5f5f5; font-family: \'Poppins\', \'Arial\', sans-seri
 
 .portal-hero {
     text-align: center;
-    padding: 48px 24px 32px;
+    padding: 40px 24px 20px;
 }
 .portal-hero h1 {
     font-family: \'Poppins\', sans-serif;
@@ -29,7 +29,7 @@ body { background-color: #f5f5f5; font-family: \'Poppins\', \'Arial\', sans-seri
     gap: 24px;
     max-width: 1100px;
     margin: 0 auto 0;
-    padding: 0 24px 40px;
+    padding: 0 24px 8px;
 }
 
 .portal-card {
