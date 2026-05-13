@@ -28,7 +28,7 @@ $nav_items = [
     'biblioteca' => ['label' => 'Biblioteca',   'href' => $base . '/modulos/biblioteca/buscar.php'],
     'convenios'  => ['label' => 'Convenios',    'href' => $base . '/modulos/convenios/index.php'],
     'horarios'   => ['label' => 'Horarios',     'href' => $base . '/modulos/horarios/index.php'],
-    'pendiente'  => ['label' => '—',            'href' => '#'],  // slot del 5º módulo
+    'requisitos' => ['label' => 'Requisitos',   'href' => $base . '/modulos/requisitos/residencia.php'],
 ];
 ?>
 <!DOCTYPE html>
@@ -79,7 +79,6 @@ $nav_items = [
     <nav aria-label="Navegación principal">
       <ul class="tsj-nav">
         <?php foreach ($nav_items as $key => $item): ?>
-          <?php if ($key === 'pendiente') continue; ?>
           <li>
             <a href="<?= htmlspecialchars($item['href'], ENT_QUOTES, 'UTF-8') ?>"
                <?= $tsj_module === $key ? 'class="active" aria-current="page"' : '' ?>>

@@ -27,6 +27,7 @@ $base = PLATAFORMA_URL;
       <a class="tsj-footer-link" href="<?= $base ?>/modulos/biblioteca/buscar.php">Biblioteca</a>
       <a class="tsj-footer-link" href="<?= $base ?>/modulos/convenios/index.php">Convenios</a>
       <a class="tsj-footer-link" href="<?= $base ?>/modulos/horarios/index.php">Horarios</a>
+      <a class="tsj-footer-link" href="<?= $base ?>/modulos/requisitos/residencia.php">Requisitos</a>
       <a class="tsj-footer-link" href="https://consultapublicamx.plataformadetransparencia.org.mx/vut-web/faces/view/consultaPublica.xhtml?idEntidad=MTQ=&idSujetoObligado=MTM3OTE=#inicio"
          target="_blank" rel="noopener noreferrer">Plataforma Nacional de Transparencia</a>
     </div>

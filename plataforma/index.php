@@ -122,12 +122,11 @@ require_once __DIR__ . '/shared/header.php';
         <p>Búsqueda de maestros y consulta de horarios por carrera.</p>
     </a>
 
-    <div class="portal-card pending">
-        <div class="portal-card-icon">⏳</div>
-        <h2>Próximamente</h2>
-        <p>Módulo pendiente de integración.</p>
-        <span class="badge-pending">En desarrollo</span>
-    </div>
+    <a href="modulos/requisitos/residencia.php" class="portal-card">
+        <div class="portal-card-icon">📋</div>
+        <h2>Requisitos</h2>
+        <p>Residencia profesional y servicio social: checklist, documentos y descargas.</p>
+    </a>
 
 </div>
 
