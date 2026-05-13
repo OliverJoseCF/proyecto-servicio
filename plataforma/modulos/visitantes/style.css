@@ -93,6 +93,14 @@ body > * { position: relative; z-index: 1; }
 
 .header h1::after { display: none; }
 
+.header-sub {
+  color: rgba(255,255,255,0.72);
+  font-size: 14px;
+  font-weight: 400;
+  margin: 10px 0 0;
+  letter-spacing: 0.2px;
+}
+
 /* h1 fuera del .header (páginas de carrera/docentes/etc) */
 h1:not(.header h1) {
   font-family: var(--v-font);
@@ -130,41 +138,41 @@ h3 {
   font-size: 1rem;
 }
 
-/* ── Imagen portada del index ────────────────────────────── */
-.content {
-  max-width: 1100px;
+/* ── Contenedor de menús del index ──────────────────────── */
+.menu-wrapper {
+  max-width: 1060px;
   margin: 0 auto;
-  padding: 32px 24px 16px;
-  text-align: center;
+  padding: 36px 24px 48px;
 }
 
-.content img {
-  max-width: 100%;
-  width: 520px;
-  height: auto;
-  border-radius: var(--v-radius-lg);
-  box-shadow: var(--v-shadow-lg);
-  margin-bottom: 32px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+.menu-section-label {
+  font-family: var(--v-font);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--v-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin: 0 0 12px 4px;
+  padding-left: 12px;
+  border-left: 3px solid var(--v-pink);
 }
+
+.menu-section-label + .menu { margin-bottom: 32px; }
 
 /* ── Menú principal del index → cards de departamento ───── */
 .menu {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 14px;
-  padding: 0 0 40px;
-  max-width: 1000px;
-  margin: 0 auto;
+  gap: 12px;
+  padding: 0;
+  margin: 0 0 8px;
 }
 
 .menu a {
   background: var(--v-white);
   color: var(--v-blue);
   text-decoration: none;
-  padding: 18px 20px 18px 24px;
+  padding: 16px 18px 16px 20px;
   border-radius: var(--v-radius);
   border: 1px solid var(--v-border);
   border-left: 4px solid var(--v-blue);
@@ -177,12 +185,12 @@ h3 {
   justify-content: space-between;
   gap: 10px;
   box-shadow: var(--v-shadow-sm);
-  transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s, background 0.22s;
+  transition: transform 0.22s, box-shadow 0.22s, background 0.22s, color 0.22s;
 }
 
 .menu a::after {
   content: '›';
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   color: var(--v-pink);
   flex-shrink: 0;
   font-weight: 400;
@@ -198,17 +206,25 @@ h3 {
 }
 
 .menu a:hover::after {
-  color: #fff;
+  color: rgba(255,255,255,0.8);
   transform: translateX(3px);
 }
 
-/* Diferenciación visual para carreras vs administrativos */
-.menu a:nth-child(n+6) {
-  border-left-color: #5b8dee;
+/* Carreras: borde azul más vibrante */
+.menu--carreras a {
+  border-left-color: #4a6cf7;
 }
-.menu a:nth-child(n+6):hover {
-  background: #3d6fe0;
+
+.menu--carreras a:hover {
+  background: #2d4fd6;
   border-left-color: var(--v-pink);
+}
+
+/* Contenedor legacy (páginas con .content) */
+.content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
 }
 
 /* ── Botones de carrera → tarjetas de acción ─────────────── */
@@ -857,17 +873,16 @@ tr:hover td {
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 768px) {
   .header { padding: 36px 16px 32px; }
+  .header-sub { font-size: 13px; }
 
-  .menu {
-    grid-template-columns: 1fr;
-    padding: 0 0 28px;
-  }
+  .menu-wrapper { padding: 24px 16px 36px; }
+  .menu { grid-template-columns: 1fr; }
+  .menu a { padding: 14px 16px; }
 
   .botones { padding: 20px 16px 32px; }
   .botones .button { padding: 16px 20px; font-size: 14px; }
 
-  .content { padding: 20px 16px 12px; }
-  .content img { width: 100%; }
+  .content { padding: 20px 16px; }
 
   .docentes { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
 }
