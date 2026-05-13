@@ -14,7 +14,7 @@ $base = PLATAFORMA_URL;
 }
 .tsj-footer-inner {
   display: grid;
-  grid-template-columns: 1.6fr 1fr 1fr;
+  grid-template-columns: 1.8fr 1fr;
   gap: 40px;
   max-width: 1100px;
   margin: 0 auto 24px;
@@ -116,12 +116,11 @@ $base = PLATAFORMA_URL;
 }
 .tsj-footer-gov-inner img:hover { opacity: .75; }
 /* Responsive */
-@media (max-width: 860px) {
+@media (max-width: 640px) {
   .tsj-footer-inner {
-    grid-template-columns: 1fr 1fr;
-    gap: 28px;
+    grid-template-columns: 1fr;
+    gap: 22px;
   }
-  .tsj-footer-col--brand { grid-column: 1 / -1; }
 }
 @media (max-width: 520px) {
   .tsj-footer-inner {
@@ -150,18 +149,6 @@ $base = PLATAFORMA_URL;
           <img src="<?= $base ?>/shared/assets/img/youtube.svg" alt="" />
         </a>
       </div>
-    </div>
-
-    <div class="tsj-footer-col">
-      <span class="tsj-footer-heading">Módulos</span>
-      <nav aria-label="Módulos">
-        <a class="tsj-footer-link" href="<?= $base ?>/">Portal</a>
-        <a class="tsj-footer-link" href="<?= $base ?>/modulos/visitantes/index.php">Visitantes</a>
-        <a class="tsj-footer-link" href="<?= $base ?>/modulos/biblioteca/buscar.php">Biblioteca</a>
-        <a class="tsj-footer-link" href="<?= $base ?>/modulos/convenios/index.php">Convenios</a>
-        <a class="tsj-footer-link" href="<?= $base ?>/modulos/horarios/index.php">Horarios</a>
-        <a class="tsj-footer-link" href="<?= $base ?>/modulos/requisitos/residencia.php">Requisitos</a>
-      </nav>
     </div>
 
     <div class="tsj-footer-col">
