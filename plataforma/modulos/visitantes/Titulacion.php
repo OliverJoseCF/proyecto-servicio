@@ -2,61 +2,7 @@
 $tsj_module     = 'visitantes';
 $tsj_title      = 'Servicios Generales';
 $tsj_extra_css  = ['style.css'];
-$tsj_head_extra = '<style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #4B0082;
-            color: white;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100vh;
-            position: relative;
-        }
-        h1 {
-            background-color: #5757c0;
-            padding: 30px 0;
-            font-size: 30px;
-            font-weight: bold;
-        }
-        .contenido {
-            margin: 20px;
-        }
-        .egresados, .titulacion {
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-        .footer {
-            background: #333;
-            color: white;
-            text-align: center;
-            padding: 10px;
-            position: relative;
-            width: 100%;
-        }
-        .top-right {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-        .download-button {
-            background-color: #c72e2e;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 16px;
-            margin-top: 20px;
-            display: inline-block;
-        }
-    </style>';
+
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 

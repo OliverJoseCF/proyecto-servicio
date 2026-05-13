@@ -17,11 +17,6 @@
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--fondo);
-    background-image: url('../Imagenes/FondoTec.png');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
     min-height: 100vh;
     display: flex;
     flex-direction: column;

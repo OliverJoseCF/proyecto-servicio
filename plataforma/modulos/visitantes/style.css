@@ -1,21 +1,444 @@
-.button {
-    margin: 10px 0; /* Espacio entre botones */
-    padding: 12px 20px; /* Espaciado interno */
-    font-size: 6px; /* Tamaño de fuente */
-    background-color: #2A2A72; /* Color de fondo de los botones */
-    color: white; /* Color del texto de los botones */
-    border: none; /* Sin borde */
-    border-radius: 5px; /* Bordes redondeados */
-    cursor: pointer; /* Cambiar cursor al pasar el mouse */
-    transition: background-color 0.3s, transform 0.3s; /* Transiciones suaves */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra del botón */
+/* ================================================================
+   visitantes/style.css  —  Estilos del módulo de visitantes
+   Usa tokens de shared/assets/css/theme.css (--tsj-*)
+   ================================================================ */
+
+/* ── Base ────────────────────────────────────────────────── */
+body {
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  background: var(--tsj-bg, #f5f5f5);
+  color: var(--tsj-text, #1f2937);
+  min-height: 100vh;
 }
 
-.button:hover {
-    background-color: #4B0082; /* Color al pasar el mouse */
-    transform: translateY(-2px); /* Efecto de elevación al pasar el mouse */
+/* ── Headings de página ──────────────────────────────────── */
+h1 {
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 700;
+  color: var(--tsj-blue, #32129a);
+  text-align: center;
+  padding: 28px 24px 16px;
+  margin: 0;
+  background: none;
 }
 
-.button:active {
-    transform: translateY(0); /* Efecto de pulsación */
+h1::after {
+  content: '';
+  display: block;
+  width: 48px;
+  height: 3px;
+  background: var(--tsj-pink, #ec5a68);
+  border-radius: 2px;
+  margin: 10px auto 0;
+}
+
+h2, h3 {
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-weight: 700;
+  color: var(--tsj-blue, #32129a);
+}
+
+/* ── Contenedor principal ────────────────────────────────── */
+.contenido,
+.content,
+.seccion {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ── Tarjeta de tabla ────────────────────────────────────── */
+.table-container,
+.tabla-container,
+.tabla-scroll {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  border: 1px solid #e5e7eb;
+  margin: 16px auto 28px;
+  max-width: 1000px;
+  overflow: hidden;
+  padding: 0;
+}
+
+/* ── Tabla ───────────────────────────────────────────────── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-size: 14px;
+  background: #fff;
+}
+
+th {
+  background: var(--tsj-blue, #32129a);
+  color: #fff;
+  font-weight: 600;
+  text-align: left;
+  padding: 13px 16px;
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  color: #374151;
+  vertical-align: middle;
+  background: #fff;
+}
+
+tr:last-child td { border-bottom: none; }
+tr:nth-child(even) td { background: #f9f8ff; }
+tr:hover td { background: #f0edff !important; }
+
+.nombre {
+  font-weight: 600;
+  color: var(--tsj-blue, #32129a);
+  font-size: 14px;
+}
+
+.correo {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* ── Botones ─────────────────────────────────────────────── */
+.button,
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 22px;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--tsj-blue, #32129a);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
+  margin: 6px;
+}
+
+.button:hover,
+.btn:hover {
+  background: var(--tsj-blue-dark, #1e0b6e);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(50,18,154,0.22);
+  color: #fff;
+}
+
+.btn-edit, .btn-guardar, .btn-save, .save-button {
+  background: var(--tsj-blue, #32129a);
+  color: #fff;
+  padding: 7px 16px;
+  font-size: 13px;
+  border-radius: 8px;
+  border: none;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.25s, transform 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+.btn-edit:hover, .btn-guardar:hover, .btn-save:hover, .save-button:hover {
+  background: var(--tsj-blue-dark, #1e0b6e);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.btn-delete, .btn-accion {
+  background: transparent;
+  color: #dc2626;
+  border: 1.5px solid rgba(220,38,38,0.25);
+  background: rgba(220,38,38,0.06);
+  padding: 7px 14px;
+  font-size: 13px;
+  border-radius: 8px;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+.btn-delete:hover, .btn-accion:hover {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+}
+
+.btn-tabla, .btn-mini {
+  padding: 5px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+  background: var(--tsj-blue, #32129a);
+  color: #fff;
+  border: none;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s;
+  display: inline-block;
+}
+.btn-tabla:hover, .btn-mini:hover {
+  background: var(--tsj-blue-dark, #1e0b6e);
+  color: #fff;
+}
+
+.download-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background: var(--tsj-green, #5bc792);
+  color: #fff;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.25s, transform 0.2s;
+}
+.download-button:hover {
+  background: #43a97a;
+  transform: translateY(-1px);
+  color: #fff;
+}
+
+/* ── Contenedor de botones ───────────────────────────────── */
+.botones,
+.form-grid,
+.acciones-col {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+}
+
+/* ── Admin panel ─────────────────────────────────────────── */
+.admin-panel {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  padding: 24px;
+  margin: 16px auto;
+  max-width: 900px;
+}
+
+/* ── Docentes ────────────────────────────────────────────── */
+.docentes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.docentes > div,
+.cuadro {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 20px;
+  text-align: center;
+  width: 200px;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.docentes > div:hover,
+.cuadro:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(50,18,154,0.10);
+}
+
+.foto-perfil,
+.foto-lista,
+.foto-tabla,
+.foto-mini {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--tsj-blue, #32129a);
+}
+.foto-perfil { width: 80px; height: 80px; }
+.foto-lista  { width: 60px; height: 60px; }
+.foto-tabla  { width: 44px; height: 44px; }
+.foto-mini   { width: 36px; height: 36px; }
+
+/* ── Menú de navegación interno ──────────────────────────── */
+.menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.menu a {
+  color: var(--tsj-blue, #32129a);
+  text-decoration: none;
+  padding: 10px 22px;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 2px solid var(--tsj-blue, #32129a);
+  background: transparent;
+  transition: background 0.25s, color 0.25s, transform 0.2s;
+}
+
+.menu a:hover {
+  background: var(--tsj-blue, #32129a);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* ── Enlace "volver" flotante ────────────────────────────── */
+.top-right {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: var(--tsj-blue, #32129a);
+  border-radius: 50%;
+  box-shadow: 0 4px 14px rgba(50,18,154,0.30);
+  transition: background 0.25s, transform 0.2s;
+}
+
+.top-right:hover {
+  background: var(--tsj-blue-dark, #1e0b6e);
+  transform: translateY(-2px);
+}
+
+.top-right img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
+}
+
+/* ── Mapa / ubicación ────────────────────────────────────── */
+.map-container,
+.location {
+  max-width: 900px;
+  margin: 16px auto 28px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border: 1px solid #e5e7eb;
+}
+
+.map-container iframe,
+.location iframe {
+  display: block;
+  width: 100%;
+  border: none;
+}
+
+/* ── Sección con grid de inputs ──────────────────────────── */
+.grid-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 20px;
+}
+
+.grid-inputs input,
+.grid-inputs select {
+  padding: 10px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-size: 14px;
+  transition: border-color 0.25s;
+}
+.grid-inputs input:focus,
+.grid-inputs select:focus {
+  border-color: var(--tsj-blue, #32129a);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(50,18,154,0.10);
+}
+
+/* ── Imágenes de carrera ─────────────────────────────────── */
+.imagenes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px;
+}
+
+.imagenes img {
+  width: 200px;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* ── Texto de titulación / requisitos ───────────────────── */
+.titulacion,
+.requisitos {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+/* ── Nombre + contenedor ─────────────────────────────────── */
+.nombre-contenedor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nombre-texto {
+  font-weight: 600;
+  color: var(--tsj-blue, #32129a);
+  font-size: 14px;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 640px) {
+  h1 { padding: 20px 16px 12px; font-size: 1.4rem; }
+  .contenido, .content, .seccion, .container { padding: 16px; }
+  .table-container, .tabla-container { margin: 12px; border-radius: 10px; }
+  th, td { padding: 10px 12px; font-size: 13px; }
+  .menu { padding: 12px 16px; }
+  .menu a { padding: 8px 16px; font-size: 13px; }
+  .docentes > div, .cuadro { width: 160px; padding: 14px; }
+  .top-right { bottom: 16px; right: 16px; width: 42px; height: 42px; }
+  .admin-panel { padding: 16px; margin: 12px; }
 }

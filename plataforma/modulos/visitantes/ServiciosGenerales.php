@@ -2,71 +2,7 @@
 $tsj_module     = 'visitantes';
 $tsj_title      = 'Servicios Generales';
 $tsj_extra_css  = ['style.css'];
-$tsj_head_extra = '<style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #4B0082;
-            color: white;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100vh;
-            position: relative; /* Necesario para posicionar la casita dentro */
-        }
 
-        h1 {
-            background-color: #5757c0;
-            padding: 30px 0;
-            font-size: 30px;
-            font-weight: bold;
-        }
-
-        .contenido {
-            padding: 20px;
-        }
-
-        .seccion {
-            margin-bottom: 25px;
-        }
-
-        .seccion h2 {
-            font-size: 22px;
-            margin-bottom: 10px;
-            color: #ffd700;
-        }
-
-        .seccion p, .seccion ul {
-            font-size: 18px;
-            margin: 0 auto;
-            max-width: 600px;
-        }
-
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        ul li::before {
-            content: "• ";
-            color: #ffd700;
-        }
-
-        .footer {
-            background: #333;
-            color: white;
-            text-align: center;
-            padding: 15px;
-        }
-
-        .top-right {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-    </style>';
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 

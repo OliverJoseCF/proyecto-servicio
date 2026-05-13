@@ -2,54 +2,7 @@
 $tsj_module     = 'visitantes';
 $tsj_title      = 'Ubicacion del campus';
 $tsj_extra_css  = ['style.css'];
-$tsj_head_extra = '<style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #4B0082;
-            color: white;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            height: 100vh;
-            position: relative;
-        }
-        h1 {
-            background-color: #5757c0;
-            padding: 30px 0;
-            font-size: 30px;
-            font-weight: bold;
-        }
-        .top-right {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-        .footer {
-            background: #333;
-            color: white;
-            text-align: center;
-            padding: 10px;
-            position: relative;
-            width: 100%;
-            margin-top: auto;
-        }
-        .footer img {
-            margin: 5px;
-        }
-        .location {
-            margin: 20px 0;
-            font-size: 18px;
-        }
-        .map-container {
-            width: 100%;
-            max-width: 600px; /* Limitar el ancho del mapa */
-            height: 300px; /* Altura del mapa */
-            margin: 20px auto; /* Centrar el mapa */
-        }
-    </style>';
+
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 

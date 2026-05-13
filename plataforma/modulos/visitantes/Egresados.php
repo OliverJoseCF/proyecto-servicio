@@ -2,53 +2,7 @@
 $tsj_module     = 'visitantes';
 $tsj_title      = 'Comprobante de Reinscripción';
 $tsj_extra_css  = ['style.css'];
-$tsj_head_extra = '<style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #4B0082;
-            color: white;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-        h1 {
-            background-color: #5757c0;
-            padding: 20px;
-            font-size: 30px;
-        }
-        .container {
-            margin: 30px;
-        }
-        .seccion {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-        label, input, select {
-            display: block;
-            margin: 10px auto;
-            font-size: 16px;
-            width: 80%;
-            max-width: 400px;
-        }
-        input, select {
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-        }
-        .download-button {
-            background-color: #c72e2e;
-            color: white;
-            padding: 15px 25px;
-            text-decoration: none;
-            font-size: 18px;
-            border-radius: 8px;
-            margin-top: 20px;
-            cursor: pointer;
-            border: none;
-        }
-    </style>';
+
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 

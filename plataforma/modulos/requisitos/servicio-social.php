@@ -5,12 +5,6 @@ $tsj_extra_css  = [
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css',
     'assets/css/style.css',
 ];
-$tsj_head_extra = '<style>
-  header.tsj-header, header.tsj-header::before { all: unset; }
-  header.tsj-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; font-family: var(--tsj-font); }
-  header.tsj-header .tsj-top-bar { display: block; height: 10px; background: var(--tsj-pink); width: 100%; }
-  header.tsj-header .tsj-toolbar { background: var(--tsj-blue); box-shadow: 0 3px 9px rgba(0,0,0,.16); color: #fff; padding: 10px 20px; display: flex; justify-content: center; align-items: center; gap: 40px; }
-</style>';
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 

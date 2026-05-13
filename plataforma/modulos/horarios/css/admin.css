@@ -18,11 +18,6 @@
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--fondo);
-    background-image: url('../Imagenes/FondoTec.png');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
     color: var(--texto);
     overflow-x: hidden;
     min-height: 100vh;
@@ -122,7 +117,6 @@ img { max-width: 100%; height: auto; vertical-align: middle; }
     font-size: clamp(1.4rem, 3vw, 1.9rem);
     text-align: center;
     margin-bottom: 4px;
-    text-shadow: 0 1px 3px rgba(255,255,255,.6);
 }
 .section-subtitle {
     font-family: 'Poppins', sans-serif;
@@ -156,7 +150,7 @@ img { max-width: 100%; height: auto; vertical-align: middle; }
     font-size: .9rem;
     border: 2px solid #ccc;
     border-radius: 8px;
-    background: rgba(255,255,255,.9);
+    background: #ffffff;
     transition: border-color .2s;
 }
 .form-busqueda input[type="text"]:focus {
@@ -172,7 +166,7 @@ img { max-width: 100%; height: auto; vertical-align: middle; }
     font-size: .9rem;
     border: 2px solid #ccc;
     border-radius: 8px;
-    background: rgba(255,255,255,.9);
+    background: #ffffff;
     cursor: pointer;
     transition: border-color .2s;
 }
@@ -203,7 +197,7 @@ img { max-width: 100%; height: auto; vertical-align: middle; }
     overflow-x: auto;
     border-radius: 10px;
     box-shadow: 0 4px 20px rgba(0,0,0,.12);
-    background: rgba(255,255,255,.95);
+    background: #ffffff;
 }
 
 table {
@@ -228,7 +222,7 @@ tbody td {
     padding: 12px 18px;
     border-bottom: 1px solid #eee;
     vertical-align: middle;
-    background: rgba(255,255,255,.9);
+    background: #ffffff;
 }
 tbody tr:last-child td { border-bottom: none; }
 tbody tr:nth-child(even) td { background: rgba(247,245,255,.9); }

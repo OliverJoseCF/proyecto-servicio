@@ -2,73 +2,7 @@
 $tsj_module     = 'visitantes';
 $tsj_title      = 'Solicitar una Cita';
 $tsj_extra_css  = ['style.css'];
-$tsj_head_extra = '<style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #4B0082;
-      color: white;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      height: 100vh;
-      position: relative;
-    }
-    h1 {
-      background-color: #5757c0;
-      padding: 30px 0;
-      font-size: 30px;
-      font-weight: bold;
-    }
-    .table-container {
-      background-color: #5757c0;
-      padding: 20px;
-      border-radius: 10px;
-      margin: 20px auto;
-      max-width: 90%;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      color: white;
-      font-size: 16px;
-    }
-    th, td {
-      padding: 12px;
-      border: 1px solid white;
-      background-color: #6f6fd7;
-    }
-    th {
-      background-color: #4d4dc2;
-    }
-    .top-right {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-    }
-    .footer {
-      background: #333;
-      color: white;
-      text-align: center;
-      padding: 10px;
-      width: 100%;
-      margin-top: auto;
-    }
-    .footer img {
-      margin: 5px;
-    }
-    .nombre {
-      font-size: 18px;
-      font-weight: bold;
-    }
-    .correo {
-      font-size: 17px;
-      font-style: italic;
-    }
-  </style>';
+
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 
