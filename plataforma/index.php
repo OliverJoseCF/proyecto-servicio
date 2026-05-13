@@ -23,17 +23,23 @@ body { margin: 0; padding: 0; background: #f0f2f7; font-family: \'Poppins\', Ari
     pointer-events: none;
 }
 .portal-hero-label {
-    display: inline-block;
-    background: rgba(236,90,104,.18);
-    border: 1px solid rgba(236,90,104,.35);
-    color: #f08090;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    color: rgba(255,255,255,.45);
     font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 2.5px;
+    font-weight: 500;
+    letter-spacing: 3px;
     text-transform: uppercase;
-    padding: 5px 16px;
-    border-radius: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
+}
+.portal-hero-label::before,
+.portal-hero-label::after {
+    content: \'\';
+    width: 40px;
+    height: 1px;
+    background: rgba(255,255,255,.2);
 }
 .portal-hero h1 {
     font-size: clamp(2rem, 4.5vw, 3rem);
