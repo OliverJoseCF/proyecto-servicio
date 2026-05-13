@@ -76,39 +76,30 @@ $nav_items = [
   box-shadow: 0 2px 16px rgba(0,0,0,.35);
 }
 
-/* Bloque izquierdo: logo + nombre */
+/* Bloque izquierdo: logo */
 .tsj-header-brand {
   display: flex;
-  align-items: center;
-  gap: 14px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
   text-decoration: none;
   flex-shrink: 0;
 }
 .tsj-header-logo {
-  height: 42px;
+  height: 46px;
   width: auto;
   filter: brightness(0) invert(1);
-  opacity: .92;
+  opacity: .9;
   transition: opacity .2s;
 }
 .tsj-header-brand:hover .tsj-header-logo { opacity: 1; }
-.tsj-header-brand-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-}
-.tsj-brand-main {
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: .5px;
-  text-transform: uppercase;
-}
 .tsj-brand-sub {
-  color: rgba(255,255,255,.55);
-  font-size: 11px;
+  color: rgba(255,255,255,.45);
+  font-size: 10px;
   font-weight: 400;
-  letter-spacing: .3px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding-left: 2px;
 }
 
 /* Divisor vertical */
@@ -223,7 +214,6 @@ $nav_items = [
   .tsj-nav { display: none; }
   .tsj-menu-btn { display: block; }
   .tsj-toolbar { padding: 0 20px; }
-  .tsj-brand-main { font-size: 12px; }
   .tsj-brand-sub { display: none; }
   .tsj-header-divider { display: none; }
 }
@@ -239,15 +229,12 @@ $nav_items = [
   <div class="tsj-top-bar"></div>
   <div class="tsj-toolbar">
 
-    <!-- Logo + nombre institución -->
+    <!-- Logo -->
     <a class="tsj-header-brand" href="<?= $base ?>/" aria-label="Portal principal TSJ Chapala">
       <img class="tsj-header-logo"
            src="<?= $base ?>/shared/assets/img/logo.svg"
            alt="Tecnológico Superior de Jalisco" />
-      <div class="tsj-header-brand-text">
-        <span class="tsj-brand-main">Tecnológico Superior de Jalisco</span>
-        <span class="tsj-brand-sub">Campus Chapala · Sistema de Servicios</span>
-      </div>
+      <span class="tsj-brand-sub">Campus Chapala</span>
     </a>
 
     <div class="tsj-header-divider"></div>
