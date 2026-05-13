@@ -161,77 +161,161 @@
 
 /* ── Footer ─────────────────────────────────────────────────── */
 .tsj-footer {
-  background-color: var(--tsj-dark);
-  padding: 40px 20px;
-  margin-top: 40px;
+  background: linear-gradient(135deg, #1e0b6e 0%, #32129a 60%, #3d1fb5 100%);
+  padding: 56px 24px 32px;
+  margin-top: 0;
   font-family: var(--tsj-font);
+  position: relative;
+}
+
+/* Línea decorativa superior */
+.tsj-footer::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--tsj-pink), #f5a623, var(--tsj-pink));
 }
 
 .tsj-footer-inner {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 48px;
   max-width: 1200px;
   margin: 0 auto;
-  gap: 24px;
 }
 
-.tsj-footer-logo img {
-  width: 220px;
+/* Columna 1: marca */
+.tsj-footer-col--brand .tsj-footer-logo {
+  width: 190px;
   height: auto;
+  margin-bottom: 14px;
+  display: block;
+  filter: brightness(0) invert(1);
+}
+
+.tsj-footer-tagline {
+  color: rgba(255,255,255,0.65);
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0 0 20px;
 }
 
 .tsj-footer-social {
   display: flex;
-  gap: 20px;
+  gap: 12px;
   align-items: center;
 }
 
-.tsj-footer-social img {
-  width: 72px;
-  height: auto;
+.tsj-social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  transition: background 0.25s, transform 0.2s;
 }
 
-.tsj-footer-links {
+.tsj-social-btn:hover {
+  background: var(--tsj-pink);
+  transform: translateY(-2px);
+}
+
+.tsj-social-btn img {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1);
+}
+
+/* Columnas 2 y 3 */
+.tsj-footer-heading {
+  color: var(--tsj-white);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin: 0 0 18px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--tsj-pink);
+  display: inline-block;
+}
+
+.tsj-footer-col nav {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  align-items: flex-end;
+  gap: 10px;
 }
 
 .tsj-footer-link {
-  color: var(--tsj-white);
+  color: rgba(255,255,255,0.75);
   text-decoration: none;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 400;
-  transition: color 0.2s;
+  transition: color 0.2s, padding-left 0.2s;
+  position: relative;
+  padding-left: 0;
 }
 
-.tsj-footer-link:hover {
+.tsj-footer-link::before {
+  content: '›';
+  position: absolute;
+  left: -14px;
+  opacity: 0;
+  transition: opacity 0.2s, left 0.2s;
   color: var(--tsj-pink);
 }
 
-/* ── Logos institucionales (barra inferior del footer) ──────── */
-.tsj-footer-gov {
-  background-color: #1a1a1c;
-  padding: 16px 20px;
+.tsj-footer-link:hover {
+  color: var(--tsj-white);
+  padding-left: 14px;
 }
 
+.tsj-footer-link:hover::before {
+  opacity: 1;
+  left: 0;
+}
+
+.tsj-footer-copy {
+  color: rgba(255,255,255,0.45);
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 20px 0 0;
+}
+
+/* Divisor */
+.tsj-footer-divider {
+  max-width: 1200px;
+  margin: 36px auto 28px;
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+}
+
+/* ── Logos institucionales ───────────────────────────────────── */
 .tsj-footer-gov-inner {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  gap: 40px;
+  gap: 36px;
   max-width: 1200px;
   margin: 0 auto;
+  padding-bottom: 8px;
 }
 
 .tsj-footer-gov-inner img {
-  height: 52px;
+  height: 44px;
   width: auto;
   object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.75;
+  transition: opacity 0.2s;
+}
+
+.tsj-footer-gov-inner img:hover {
+  opacity: 1;
 }
 
 /* ── Responsive ─────────────────────────────────────────────── */
@@ -255,13 +339,25 @@
   }
 
   .tsj-footer-inner {
-    flex-direction: column;
-    align-items: center;
+    grid-template-columns: 1fr;
+    gap: 32px;
     text-align: center;
   }
 
-  .tsj-footer-links {
+  .tsj-footer-col--brand .tsj-footer-logo {
+    margin: 0 auto 14px;
+  }
+
+  .tsj-footer-social {
+    justify-content: center;
+  }
+
+  .tsj-footer-col nav {
     align-items: center;
+  }
+
+  .tsj-footer-link:hover {
+    padding-left: 0;
   }
 
   .tsj-footer-gov-inner {
