@@ -3,7 +3,7 @@ $tsj_module    = '';
 $tsj_title     = 'Portal';
 $tsj_extra_css = [];
 $tsj_head_extra = '<style>
-body { background-color: #f5f5f5; font-family: \'Poppins\', \'Arial\', sans-serif; }
+body { margin: 0; padding: 0; background-color: #f5f5f5; font-family: \'Poppins\', \'Arial\', sans-serif; }
 
 .portal-hero {
     text-align: center;

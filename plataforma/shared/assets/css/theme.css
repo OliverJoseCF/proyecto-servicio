@@ -4,6 +4,10 @@
    Prefijo "tsj-" para todos los componentes comunes.
    ================================================================ */
 
+/* ── Reset base ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; padding: 0; }
+
 /* ── Tokens ─────────────────────────────────────────────────── */
 :root {
   --tsj-blue:       #32129a;
