@@ -51,7 +51,7 @@ $stmt->bindValue(':limit',  $items_por_pagina, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset,           PDO::PARAM_INT);
 $stmt->execute();
 $horarios_paginados = $stmt->fetchAll();
-<?php
+
 $tsj_module    = 'horarios';
 $tsj_title     = 'Maestros y Horarios';
 $tsj_extra_css = ['css/normalize.css', 'css/Principal.css'];
