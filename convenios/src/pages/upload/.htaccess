@@ -1,8 +1,0 @@
-# Deshabilitar ejecución de PHP en esta carpeta (solo Apache)
-php_flag engine off
-
-# Denegar acceso a scripts ejecutables
-<FilesMatch "(?i)\.(php\d?|phtml|pl|py|cgi|sh|asp|aspx)$">
-    Order allow,deny
-    Deny from all
-</FilesMatch>

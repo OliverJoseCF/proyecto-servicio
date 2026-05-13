@@ -1,9 +1,0 @@
---- SISTEMA DE BIBLIOTECA - GUÍA DE INSTALACIÓN ---
-
-1. Copiar la carpeta 'biblioteca' en C:/xampp/htdocs/
-2. Iniciar Apache y MySQL desde el Panel de Control de XAMPP.
-3. Entrar a http://localhost/phpmyadmin/ y crear una base de datos llamada 'biblioteca_escolar'.
-4. Seleccionar la base de datos 'biblioteca_escolar', ir a la pestaña 'Importar' y subir el archivo 'Dump20260414.sql'.
-5. Acceso al sistema:
-   - Catálogo de búsqueda: http://localhost/biblioteca/buscar.html
-   - Panel de Admin: http://localhost/biblioteca/login.php

@@ -8,7 +8,6 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Mostrar error de guardarConvenio.php si existe
 $formError = $_SESSION['form_error'] ?? null;
 unset($_SESSION['form_error']);
 
@@ -20,26 +19,31 @@ $carreras = [
     'LG'    => 'Gastronomía',
     'IGE'   => 'Ingeniería en Gestión Empresarial',
 ];
+
+$tsj_module     = 'convenios';
+$tsj_title      = 'Convenios — Registro de Convenio';
+$tsj_extra_css  = ['../../output.css', 'formulario.css'];
+$tsj_head_extra = '<style>
+body { background-color: #f3f4f6; }
+.form-page-wrapper {
+    min-height: calc(100vh - 103px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    position: relative;
+}
+</style>';
+require_once __DIR__ . '/../../../../../shared/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Convenio — TecSJ</title>
-    <!-- Tailwind compilado del proyecto. Si algún estilo falta, regenerar con:
-         npx tailwindcss -i ./src/css/styles.css -o ./src/output.css --content "./src/pages/form/formulario.php" -->
-    <link rel="stylesheet" href="../../output.css">
-    <link rel="stylesheet" href="formulario.css">
-    <link rel="icon" type="image/png" href="../../../assets/images/logo/favicon.png" />
-</head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4 relative">
-    <div class="absolute inset-0 z-0">
-        <img src="../../../assets/images/logo/imagenes/chapala01-2.webp" alt="" role="presentation" class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm"></div>
+
+<div class="form-page-wrapper">
+    <div class="absolute inset-0 z-0" style="position:absolute;inset:0;z-index:0;">
+        <img src="../../../assets/images/logo/imagenes/chapala01-2.webp" alt="" role="presentation" class="w-full h-full object-cover" style="width:100%;height:100%;object-fit:cover;">
+        <div class="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm" style="position:absolute;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);"></div>
     </div>
 
-    <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl relative z-10">
+    <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl relative z-10" style="background:#fff;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.15);padding:2rem;width:100%;max-width:672px;position:relative;z-index:10;">
         <div class="flex items-center justify-center mb-4">
             <img src="../../../assets/images/logo/favicon.png" alt="Logo Tecnológico Superior de Jalisco" class="h-20 w-auto">
             <div class="ml-3 text-sm leading-tight" style="color: #32129A;">
@@ -202,7 +206,8 @@ $carreras = [
             </div>
         </form>
     </div>
+</div>
 
-    <script src="script.js"></script>
-</body>
-</html>
+<script src="script.js"></script>
+
+<?php require_once __DIR__ . '/../../../../../shared/footer.php'; ?>
