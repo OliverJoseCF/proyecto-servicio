@@ -1,5 +1,6 @@
 # Configuración sensible — NUNCA commitear
-plataforma/shared/config.local.php       # overrides de producción (credenciales reales)
+# (overrides de producción con credenciales reales)
+plataforma/shared/config.local.php
 plataforma/modulos/convenios/src/config.php
 plataforma/modulos/biblioteca/tools/setup_password.php
 plataforma/modulos/horarios/tools/setup_password.php
