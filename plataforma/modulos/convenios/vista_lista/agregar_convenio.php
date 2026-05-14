@@ -85,6 +85,7 @@ $tsj_head_extra = '<style>
     .form-row .form-group { flex:1; }
     @media(max-width:768px){ .form-row{ flex-direction:column; gap:0; } }
 </style>';
+$tsj_no_security_headers = true;
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 

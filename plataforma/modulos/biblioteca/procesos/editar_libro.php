@@ -1,7 +1,14 @@
 <?php
+require_once __DIR__ . '/../../../shared/lib/auth.php';
+requireAuth('biblioteca', '../login.php');
 include '../config/conexion.php';
 
-$codigo = $_GET['codigo'] ?? '';
+$codigo = trim($_GET['codigo'] ?? '');
+if ($codigo === '') {
+    header("Location: ../admin.php");
+    exit;
+}
+
 $stmt = $conexion->prepare("SELECT * FROM libros WHERE codigo = ?");
 $stmt->bind_param("s", $codigo);
 $stmt->execute();
@@ -9,7 +16,8 @@ $resultado = $stmt->get_result();
 $libro = $resultado->fetch_assoc();
 
 if (!$libro) {
-    die("Libro no encontrado.");
+    header("Location: ../admin.php");
+    exit;
 }
 
 $tsj_module     = 'biblioteca';
@@ -23,27 +31,27 @@ require_once __DIR__ . '/../../../shared/header.php';
     <div class="card shadow p-4">
         <h2 class="mb-4 fw-bold" style="color: #3D2E81;">Editar Libro</h2>
         <form method="POST" action="actualizar_libro.php">
-            <input type="hidden" name="codigo_original" value="<?= htmlspecialchars($libro['codigo']) ?>">
+            <input type="hidden" name="codigo_original" value="<?= htmlspecialchars($libro['codigo'], ENT_QUOTES, 'UTF-8') ?>">
 
             <div class="mb-3">
                 <label class="form-label fw-bold">Nombre</label>
-                <input type="text" name="nombre" class="form-control" value="<?= htmlspecialchars($libro['nombre']) ?>" required>
+                <input type="text" name="nombre" class="form-control" value="<?= htmlspecialchars($libro['nombre'], ENT_QUOTES, 'UTF-8') ?>" required maxlength="255">
             </div>
             <div class="mb-3">
                 <label class="form-label fw-bold">Editorial</label>
-                <input type="text" name="editorial" class="form-control" value="<?= htmlspecialchars($libro['editorial']) ?>" required>
+                <input type="text" name="editorial" class="form-control" value="<?= htmlspecialchars($libro['editorial'], ENT_QUOTES, 'UTF-8') ?>" required maxlength="255">
             </div>
             <div class="mb-3">
                 <label class="form-label fw-bold">Clasificación</label>
-                <input type="text" name="clasificacion" class="form-control" value="<?= htmlspecialchars($libro['clasificacion']) ?>" required>
+                <input type="text" name="clasificacion" class="form-control" value="<?= htmlspecialchars($libro['clasificacion'], ENT_QUOTES, 'UTF-8') ?>" required maxlength="100">
             </div>
             <div class="mb-3">
                 <label class="form-label fw-bold">Autor</label>
-                <input type="text" name="autor" class="form-control" value="<?= htmlspecialchars($libro['autor']) ?>" required>
+                <input type="text" name="autor" class="form-control" value="<?= htmlspecialchars($libro['autor'], ENT_QUOTES, 'UTF-8') ?>" required maxlength="255">
             </div>
             <div class="mb-3">
                 <label class="form-label fw-bold">Código</label>
-                <input type="text" name="codigo" class="form-control" value="<?= htmlspecialchars($libro['codigo']) ?>" required>
+                <input type="text" name="codigo" class="form-control" value="<?= htmlspecialchars($libro['codigo'], ENT_QUOTES, 'UTF-8') ?>" required maxlength="50">
             </div>
 
             <div class="d-flex gap-2">

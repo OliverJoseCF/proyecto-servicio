@@ -1,9 +1,6 @@
 ﻿<?php
-session_start();
-if (!isset($_SESSION['logueado']) || $_SESSION['logueado'] !== true) {
-    header("Location: login.php");
-    exit;
-}
+require_once __DIR__ . '/../../shared/lib/auth.php';
+requireAuth('biblioteca', 'login.php');
 include 'config/conexion.php';
 
 // Consultas para las tarjetas
@@ -25,6 +22,7 @@ $tsj_extra_css = [
     'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css',
     'assets/css/admin.css',
 ];
+$tsj_head_extra = '<meta name="_csrf" content="' . htmlspecialchars(csrfToken(), ENT_QUOTES, 'UTF-8') . '">';
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 <!-- estilos en assets/css/admin.css -->
@@ -249,6 +247,24 @@ require_once __DIR__ . '/../../shared/header.php';
         rows.forEach(row => { row.style.display = row.innerText.toLowerCase().includes(input) ? "" : "none"; });
     }
 
+    const CSRF = document.querySelector('meta[name="_csrf"]')?.content || '';
+
+    function postAction(url, data) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = url;
+        data['_csrf'] = CSRF;
+        for (const [k, v] of Object.entries(data)) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = k;
+            input.value = v;
+            form.appendChild(input);
+        }
+        document.body.appendChild(form);
+        form.submit();
+    }
+
     function cambiarEstado(id, n) {
         Swal.fire({
             title: n === 'Aceptado' ? '¿Aceptar solicitud?' : '¿Rechazar solicitud?',
@@ -261,7 +277,7 @@ require_once __DIR__ . '/../../shared/header.php';
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = `procesos/estado_libro.php?id=${id}&accion=${n}`;
+                postAction('procesos/estado_libro.php', { id, accion: n });
             }
         });
     }
@@ -279,7 +295,7 @@ require_once __DIR__ . '/../../shared/header.php';
             customClass: { popup: 'swal2-popup' }
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = `procesos/marcar_devuelto.php?id=${id}`;
+                postAction('procesos/marcar_devuelto.php', { id });
             }
         });
     }
@@ -296,9 +312,20 @@ require_once __DIR__ . '/../../shared/header.php';
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Aquí tu lógica de eliminación original
-                // Ejemplo: fetch o redirect
-                Swal.fire({ title: 'Eliminado', text: 'El libro ha sido eliminado.', icon: 'success', timer: 1500, showConfirmButton: false });
+                fetch('procesos/eliminar_Libro.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `id=${encodeURIComponent(id)}&_csrf=${encodeURIComponent(CSRF)}`
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({ title: 'Eliminado', text: 'El libro ha sido eliminado.', icon: 'success', timer: 1500, showConfirmButton: false });
+                        setTimeout(() => location.reload(), 1200);
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Error', text: data.error || 'No se pudo eliminar.' });
+                    }
+                });
             }
         });
     }

@@ -41,6 +41,7 @@ $tsj_head_extra = '<style>
   .alerta-exito { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
   .btn-cerrar-sesion { background-color: #d9534f; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
 </style>';
+$tsj_no_security_headers = true;
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 

@@ -65,6 +65,7 @@ $tsj_extra_css = [
     'src/css/styles.css',
     'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css',
 ];
+$tsj_no_security_headers = true;
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 

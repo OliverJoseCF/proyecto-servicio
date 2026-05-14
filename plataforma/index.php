@@ -2,13 +2,14 @@
 $tsj_module    = '';
 $tsj_title     = 'Portal de Servicios';
 $tsj_extra_css = [];
+$tsj_no_offset = true;
 $tsj_head_extra = '<style>
 body { margin: 0; padding: 0; background: #f0f2f7; font-family: \'Poppins\', Arial, sans-serif; }
 
 /* ── Hero ─────────────────────────────────────────────── */
 .portal-hero {
     background: linear-gradient(135deg, #0d0640 0%, #1a0960 45%, #2a1080 100%);
-    padding: 64px 32px 72px;
+    padding: 144px 32px 72px;
     text-align: center;
     position: relative;
     overflow: hidden;

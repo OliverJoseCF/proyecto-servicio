@@ -1,7 +1,3 @@
-
 <?php
-session_start();
-session_destroy();
-header("Location: ../login.php");
-exit;
-?>
+require_once __DIR__ . '/../../../shared/lib/auth.php';
+authLogout('../login.php');

@@ -1,17 +1,13 @@
 <?php
-session_start();
-
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    header('Location: login.php');
-    exit;
-}
-
+require_once __DIR__ . '/../../shared/lib/auth.php';
+requireAuth('horarios', 'login.php');
 require_once __DIR__ . '/config.php';
 
 try {
     $pdo = getDB();
 } catch (PDOException $e) {
-    die("Error de conexión: " . $e->getMessage());
+    error_log('Horarios DB error: ' . $e->getMessage());
+    die("Error de conexión. Contacta al administrador.");
 }
 
 $carreras = $pdo->query("SELECT id_carrera, nombre_carrera FROM Carreras")->fetchAll();
@@ -19,20 +15,20 @@ $carreras = $pdo->query("SELECT id_carrera, nombre_carrera FROM Carreras")->fetc
 $busqueda   = isset($_GET['busqueda'])   ? trim($_GET['busqueda'])   : '';
 $id_carrera = isset($_GET['id_carrera']) ? (int)$_GET['id_carrera'] : 0;
 
-// --- ELIMINAR MAESTRO ---
-if (isset($_GET['eliminar'])) {
-    $id = (int)$_GET['eliminar'];
+// --- ELIMINAR MAESTRO (POST + CSRF) ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar_id'])) {
+    if (!csrfVerify()) {
+        die('Petición inválida.');
+    }
+    $id = (int)$_POST['eliminar_id'];
 
-    // Obtener la ruta del archivo antes de borrar el registro
     $stmtRuta = $pdo->prepare("SELECT imagen_horario FROM Horarios WHERE id_profesor = :id");
     $stmtRuta->execute(['id' => $id]);
     $rutaArchivo = $stmtRuta->fetchColumn();
 
-    // Borrar registros de BD
     $pdo->prepare("DELETE FROM Horarios   WHERE id_profesor = :id")->execute(['id' => $id]);
     $pdo->prepare("DELETE FROM Profesores WHERE id_profesor = :id")->execute(['id' => $id]);
 
-    // Borrar archivo físico del servidor si existe
     if ($rutaArchivo && file_exists(__DIR__ . '/' . $rutaArchivo)) {
         @unlink(__DIR__ . '/' . $rutaArchivo);
     }
@@ -84,13 +80,13 @@ require_once __DIR__ . '/../../shared/header.php';
             <form method="GET" action="" class="form-busqueda">
                 <input type="text" name="busqueda"
                        placeholder="Buscar por nombre o apellido"
-                       value="<?= htmlspecialchars($busqueda) ?>">
+                       value="<?= htmlspecialchars($busqueda, ENT_QUOTES, 'UTF-8') ?>">
                 <select name="id_carrera" onchange="this.form.submit()">
                     <option value="0">Todas las carreras</option>
                     <?php foreach ($carreras as $c): ?>
-                        <option value="<?= $c['id_carrera'] ?>"
+                        <option value="<?= (int)$c['id_carrera'] ?>"
                             <?= $id_carrera == $c['id_carrera'] ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($c['nombre_carrera']) ?>
+                            <?= htmlspecialchars($c['nombre_carrera'], ENT_QUOTES, 'UTF-8') ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -117,16 +113,17 @@ require_once __DIR__ . '/../../shared/header.php';
                         <?php else: ?>
                             <?php foreach ($datos as $dato): ?>
                                 <tr>
-                                    <td><?= htmlspecialchars($dato['nombre']) ?></td>
-                                    <td><?= htmlspecialchars($dato['apellido']) ?></td>
+                                    <td><?= htmlspecialchars($dato['nombre'],        ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td><?= htmlspecialchars($dato['apellido'],       ENT_QUOTES, 'UTF-8') ?></td>
                                     <td>
-                                        <a href="<?= htmlspecialchars($dato['imagen_horario']) ?>"
+                                        <a href="<?= htmlspecialchars($dato['imagen_horario'], ENT_QUOTES, 'UTF-8') ?>"
                                            class="open-modal btn-horario">Ver Horario</a>
                                     </td>
-                                    <td><?= htmlspecialchars($dato['nombre_carrera']) ?></td>
+                                    <td><?= htmlspecialchars($dato['nombre_carrera'], ENT_QUOTES, 'UTF-8') ?></td>
                                     <td class="acciones">
-                                        <a href="AgregarMaestro.php?editar=<?= $dato['id_profesor'] ?>" class="btn-editar">Editar</a>
-                                        <a href="#" class="btn-eliminar" onclick="confirmarEliminacion('<?= $dato['id_profesor'] ?>')">Eliminar</a>
+                                        <a href="AgregarMaestro.php?editar=<?= (int)$dato['id_profesor'] ?>" class="btn-editar">Editar</a>
+                                        <button type="button" class="btn-eliminar"
+                                                onclick="confirmarEliminacion(<?= (int)$dato['id_profesor'] ?>)">Eliminar</button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -140,6 +137,14 @@ require_once __DIR__ . '/../../shared/header.php';
             <a href="AgregarMaestro.php" class="boton-agregar">+ Agregar Maestro</a>
         </div>
 
+        <!-- Logout -->
+        <div style="text-align:right; padding: 1rem 2rem;">
+            <form method="POST" action="Logout.php" style="display:inline;">
+                <?= csrfField() ?>
+                <button type="submit" style="background:#ec5a68;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:bold;">Cerrar sesión</button>
+            </form>
+        </div>
+
     </main>
 
     <!-- MODAL -->
@@ -150,6 +155,12 @@ require_once __DIR__ . '/../../shared/header.php';
             <div id="modalContent" class="modal-content"></div>
         </div>
     </div>
+
+    <!-- Formulario oculto para borrado POST+CSRF -->
+    <form id="formEliminar" method="POST" action="VistaAdmin.php" style="display:none;">
+        <?= csrfField() ?>
+        <input type="hidden" name="eliminar_id" id="eliminar_id_input">
+    </form>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="js/modal.js"></script>
@@ -164,7 +175,12 @@ require_once __DIR__ . '/../../shared/header.php';
             cancelButtonColor: '#ec5a68',
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar'
-        }).then(r => { if (r.isConfirmed) window.location.href = 'VistaAdmin.php?eliminar=' + id; });
+        }).then(r => {
+            if (r.isConfirmed) {
+                document.getElementById('eliminar_id_input').value = id;
+                document.getElementById('formEliminar').submit();
+            }
+        });
     }
     </script>
 

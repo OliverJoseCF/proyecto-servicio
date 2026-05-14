@@ -7,16 +7,22 @@
  *   $tsj_title      — texto del <title>
  *   $tsj_extra_css  — ruta(s) adicional(es) de CSS del módulo (string o array)
  *   $tsj_head_extra — HTML arbitrario a inyectar en <head>
+ *   $tsj_no_security_headers — true para omitir security_headers (Convenios ya los emite propio)
  */
 
 if (!defined('PLATAFORMA_URL')) {
     require_once __DIR__ . '/config.php';
 }
 
+if (empty($tsj_no_security_headers)) {
+    require_once __DIR__ . '/security_headers.php';
+}
+
 $tsj_module     = $tsj_module     ?? '';
 $tsj_title      = $tsj_title      ?? 'Tecnológico Superior de Jalisco';
 $tsj_extra_css  = $tsj_extra_css  ?? [];
 $tsj_head_extra = $tsj_head_extra ?? '';
+$tsj_no_offset  = $tsj_no_offset  ?? false;
 if (is_string($tsj_extra_css)) {
     $tsj_extra_css = [$tsj_extra_css];
 }
@@ -59,21 +65,32 @@ $nav_items = [
   font-family: 'Poppins', Arial, sans-serif;
 }
 
-/* Franja superior rosa */
+/* Franja superior: oculta para replicar TECMM */
 .tsj-top-bar {
-  height: 3px;
-  background: linear-gradient(90deg, #ec5a68 0%, #f5a623 50%, #ec5a68 100%);
+  display: none;
 }
 
-/* Barra principal */
+/* Barra principal — transparente sobre hero */
 .tsj-toolbar {
-  background: #1a0960;
+  background: rgba(26, 9, 96, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 32px;
   height: 80px;
-  box-shadow: 0 2px 20px rgba(0,0,0,.4);
+  box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2),
+              0px 4px 5px  0px rgba(0,0,0,0.14),
+              0px 1px 10px 0px rgba(0,0,0,0.12);
+  transition: background .25s ease;
+}
+/* Sólido en páginas de módulo (sin hero) */
+.tsj-header--solid .tsj-toolbar {
+  background: #1a0960;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: 0 2px 12px rgba(0,0,0,.35);
 }
 
 /* Bloque izquierdo: logo + campus */
@@ -115,43 +132,43 @@ $nav_items = [
 .tsj-nav {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0;
   list-style: none;
   margin: 0;
   padding: 0;
   flex: 1;
+  justify-content: flex-end;
 }
 .tsj-nav li a {
   display: block;
-  color: rgba(255,255,255,.7);
+  color: rgba(255,255,255,.85);
   text-decoration: none;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: .3px;
-  padding: 8px 14px;
-  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  padding: 10px 13px;
   transition: color .2s, background .2s;
   position: relative;
   white-space: nowrap;
 }
 .tsj-nav li a:hover {
   color: #fff;
-  background: rgba(255,255,255,.08);
+  background: rgba(255,255,255,.1);
 }
 .tsj-nav li a.active {
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
   background: rgba(255,255,255,.12);
 }
 .tsj-nav li a.active::after {
   content: '';
   position: absolute;
-  bottom: 4px;
-  left: 14px;
-  right: 14px;
-  height: 2px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
   background: #ec5a68;
-  border-radius: 2px;
 }
 
 /* Hamburguesa */
@@ -225,7 +242,7 @@ $nav_items = [
 </head>
 <body>
 
-<header class="tsj-header" id="tsj-header">
+<header class="tsj-header <?= $tsj_no_offset ? '' : 'tsj-header--solid' ?>" id="tsj-header">
   <div class="tsj-top-bar"></div>
   <div class="tsj-toolbar">
 
@@ -275,5 +292,7 @@ $nav_items = [
   </div>
 </nav>
 
-<!-- Offset para header fixed -->
+<!-- Offset para header fixed (omitido en páginas con hero) -->
+<?php if (!$tsj_no_offset): ?>
 <div class="tsj-body-offset"></div>
+<?php endif; ?>

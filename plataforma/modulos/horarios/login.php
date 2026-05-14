@@ -1,22 +1,38 @@
 <?php
-session_start();
+require_once __DIR__ . '/../../shared/lib/auth.php';
+require_once __DIR__ . '/../../shared/lib/RateLimit.php';
 
-const ADMIN_EMAIL    = 'admin@admin.com';
-const ADMIN_PASSWORD = 'admin123';
+// Hash de la contraseña de admin — para cambiarla:
+//   php -r "echo password_hash('TuNuevaClaveSegura', PASSWORD_BCRYPT, ['cost'=>12]);"
+// Copia el hash resultante aquí abajo.
+// Hash por defecto de 'horarios2024!':
+define('HORARIOS_ADMIN_EMAIL', 'admin@tecsj.edu.mx');
+define('HORARIOS_ADMIN_HASH', '$2y$12$tcY3G0HqLg.7VXpqG4VPGekGJTrQO7CRa9z2V08uT.BhS7Rk7MVnS'); // horarios2024!
 
 $error = '';
+$rl    = new RateLimit(5, 900);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email    = trim($_POST['email']    ?? '');
-    $password = trim($_POST['password'] ?? '');
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
 
-    if ($email === ADMIN_EMAIL && $password === ADMIN_PASSWORD) {
-        $_SESSION['logged_in']  = true;
-        $_SESSION['user_email'] = $email;
-        header('Location: VistaAdmin.php');
-        exit;
+    if (!csrfVerify()) {
+        $error = 'Petición inválida. Recarga la página e inténtalo de nuevo.';
+    } elseif ($rl->isBlocked($ip)) {
+        $error = 'Demasiados intentos. Espera 15 minutos antes de intentar de nuevo.';
+    } else {
+        $email    = trim($_POST['email']    ?? '');
+        $password = $_POST['password'] ?? '';
+
+        if ($email === HORARIOS_ADMIN_EMAIL && password_verify($password, HORARIOS_ADMIN_HASH)) {
+            $rl->reset($ip);
+            authLogin('horarios');
+            header('Location: VistaAdmin.php');
+            exit;
+        }
+        usleep(300000);
+        $rl->record($ip);
+        $error = 'Correo o contraseña incorrectos.';
     }
-    $error = 'Correo o contraseña incorrectos.';
 }
 
 $tsj_module    = 'horarios';
@@ -32,10 +48,11 @@ require_once __DIR__ . '/../../shared/header.php';
             <p class="login-subtitle">Acceso al panel de administración</p>
 
             <?php if ($error): ?>
-                <div class="error-message" role="alert"><?= htmlspecialchars($error) ?></div>
+                <div class="error-message" role="alert"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
             <?php endif; ?>
 
             <form method="POST" action="">
+                <?= csrfField() ?>
                 <div class="form-group">
                     <label for="email">Correo electrónico:</label>
                     <div class="input-wrap">
@@ -46,7 +63,7 @@ require_once __DIR__ . '/../../shared/header.php';
                             <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
                         </svg>
                         <input type="email" id="email" name="email" required
-                               autocomplete="email" placeholder="USUARIO">
+                               autocomplete="email" placeholder="admin@tecsj.edu.mx">
                     </div>
                 </div>
                 <div class="form-group">

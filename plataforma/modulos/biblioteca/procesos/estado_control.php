@@ -1,20 +1,33 @@
 <?php
+require_once __DIR__ . '/../../../shared/lib/auth.php';
+requireAuth('biblioteca', '../login.php');
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header("Location: ../admin.php");
+    exit;
+}
+
+if (!csrfVerify()) {
+    header("Location: ../admin.php?error=csrf");
+    exit;
+}
+
 include '../config/conexion.php';
 
-if (isset($_GET['id']) && isset($_GET['accion'])) {
-    $id = $_GET['id'];
-    $accion = $_GET['accion']; // Recibe 'Aceptado' o 'Rechazado'
+$id     = isset($_POST['id'])     ? (int)$_POST['id']     : 0;
+$accion = trim($_POST['accion']   ?? '');
 
-    $stmt = $conexion->prepare("UPDATE solicitud_controles SET estado = ? WHERE id = ?");
-    $stmt->bind_param("si", $accion, $id);
-
-    if ($stmt->execute()) {
-        // Regresamos al admin.php
-        header("Location: ../admin.php");
-    } else {
-        echo "Error al actualizar estado: " . $conexion->error;
-    }
-    $stmt->close();
+$accionesValidas = ['Aceptado', 'Rechazado'];
+if ($id <= 0 || !in_array($accion, $accionesValidas, true)) {
+    header("Location: ../admin.php?error=datos_invalidos");
+    exit;
 }
+
+$stmt = $conexion->prepare("UPDATE solicitud_controles SET estado = ? WHERE id = ?");
+$stmt->bind_param("si", $accion, $id);
+$stmt->execute();
+$stmt->close();
 $conexion->close();
-?>
+
+header("Location: ../admin.php");
+exit;

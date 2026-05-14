@@ -42,6 +42,7 @@ $tsj_module     = 'convenios';
 $tsj_title      = 'Convenios' . ($tituloCarrera ? ' — ' . $tituloCarrera : '');
 $tsj_extra_css  = ['estilo/estilo.css', 'https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css'];
 $tsj_head_extra = '<style>.data-row td { cursor: pointer; } .btn-volver { cursor: pointer; }</style>';
+$tsj_no_security_headers = true;
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 

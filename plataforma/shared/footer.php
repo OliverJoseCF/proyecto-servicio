@@ -5,172 +5,121 @@ if (!defined('PLATAFORMA_URL')) {
 $base = PLATAFORMA_URL;
 ?>
 <style>
+/* ── Footer TECMM-style ──────────────────────────────────── */
+
+/* Neutraliza estilos heredados de theme.css */
 .tsj-footer {
-  background: #1f2128;
-  padding: 36px 24px 20px;
+  background: none !important;
+  padding: 0 !important;
   font-family: 'Poppins', Arial, sans-serif;
-  position: relative;
-  border-top: 3px solid #ec5a68;
 }
-.tsj-footer-inner {
-  display: grid;
-  grid-template-columns: 1.8fr 1fr;
-  gap: 40px;
-  max-width: 1100px;
-  margin: 0 auto 24px;
-  align-items: start;
+.tsj-footer::before {
+  display: none !important;
 }
-/* Col 1 */
-.tsj-footer-logo {
-  width: 150px;
-  height: auto;
-  display: block;
-  margin-bottom: 8px;
-  filter: brightness(0) invert(1);
-  opacity: .9;
+
+/* Franja oscura: motto + 3 logos principales */
+.tsj-footer-dark {
+  background: #2a2d36;
+  padding: 28px 40px;
 }
-.tsj-footer-tagline {
-  color: rgba(255,255,255,.45);
-  font-size: 12px;
-  line-height: 1.6;
-  margin: 0 0 14px;
-}
-.tsj-footer-social {
-  display: flex;
-  gap: 8px;
-}
-.tsj-social-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 6px;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.12);
-  transition: background .2s, transform .15s;
-  text-decoration: none;
-}
-.tsj-social-btn:hover {
-  background: #ec5a68;
-  transform: translateY(-2px);
-}
-.tsj-social-btn img {
-  width: 17px;
-  height: 17px;
-  filter: brightness(0) invert(1);
-}
-/* Cols 2–3 */
-.tsj-footer-heading {
-  color: rgba(255,255,255,.9);
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.8px;
-  margin: 0 0 12px;
-  display: block;
-}
-.tsj-footer-col nav {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-.tsj-footer-link {
-  color: rgba(255,255,255,.52);
-  text-decoration: none;
-  font-size: 13px;
-  transition: color .18s;
-}
-.tsj-footer-link:hover { color: #ec5a68; }
-.tsj-footer-copy {
-  color: rgba(255,255,255,.28);
-  font-size: 11px;
-  line-height: 1.6;
-  margin: 14px 0 0;
-}
-/* Divisor */
-.tsj-footer-divider {
-  max-width: 1100px;
-  margin: 0 auto 16px;
-  height: 1px;
-  background: rgba(255,255,255,.08);
-}
-/* Logos */
-.tsj-footer-gov-inner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 28px;
+.tsj-footer-dark-inner {
   max-width: 1100px;
   margin: 0 auto;
-  padding-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
-.tsj-footer-gov-inner img {
-  height: 34px;
+.tsj-footer-motto {
+  color: rgba(255,255,255,.9);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+  margin: 0;
+}
+.tsj-footer-logos-dark {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.tsj-footer-logos-dark img {
+  height: 52px;
   width: auto;
   object-fit: contain;
   filter: brightness(0) invert(1);
-  opacity: .45;
+  opacity: .85;
   transition: opacity .2s;
 }
-.tsj-footer-gov-inner img:hover { opacity: .75; }
+.tsj-footer-logos-dark img:hover { opacity: 1; }
+
+/* Franja blanca: logos institucionales secundarios */
+.tsj-footer-white {
+  background: #ffffff;
+  padding: 20px 40px;
+  border-top: 1px solid #e5e7eb;
+}
+.tsj-footer-white-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+.tsj-footer-white-inner img {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+  opacity: .85;
+  transition: opacity .2s;
+}
+.tsj-footer-white-inner img:hover { opacity: 1; }
+
 /* Responsive */
 @media (max-width: 640px) {
-  .tsj-footer-inner {
-    grid-template-columns: 1fr;
-    gap: 22px;
-  }
-}
-@media (max-width: 520px) {
-  .tsj-footer-inner {
-    grid-template-columns: 1fr;
-    gap: 22px;
-    text-align: center;
-  }
-  .tsj-footer-social { justify-content: center; }
-  .tsj-footer-col nav { align-items: center; }
-  .tsj-footer-logo { margin: 0 auto 8px; }
-  .tsj-footer-gov-inner { gap: 16px; }
+  .tsj-footer-dark { padding: 24px 20px; }
+  .tsj-footer-white { padding: 18px 20px; }
+  .tsj-footer-logos-dark { gap: 28px; }
+  .tsj-footer-white-inner { gap: 28px; }
+  .tsj-footer-logos-dark img { height: 40px; }
+  .tsj-footer-white-inner img { height: 32px; }
+  .tsj-footer-motto { font-size: 12px; letter-spacing: 1.2px; }
 }
 </style>
 
 <footer class="tsj-footer" role="contentinfo">
-  <div class="tsj-footer-inner">
 
-    <div class="tsj-footer-col tsj-footer-col--brand">
-      <img src="<?= $base ?>/shared/assets/img/logo.svg" alt="Tecnológico Superior de Jalisco" class="tsj-footer-logo" loading="lazy" />
-      <p class="tsj-footer-tagline">Tecnológico Superior de Jalisco · Campus Chapala</p>
-      <div class="tsj-footer-social">
-        <a href="https://www.facebook.com/TecSJ" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="tsj-social-btn">
-          <img src="<?= $base ?>/shared/assets/img/facebook.svg" alt="" />
-        </a>
-        <a href="https://www.youtube.com/@TecSJ" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="tsj-social-btn">
-          <img src="<?= $base ?>/shared/assets/img/youtube.svg" alt="" />
-        </a>
+  <!-- Franja oscura -->
+  <div class="tsj-footer-dark">
+    <div class="tsj-footer-dark-inner">
+      <p class="tsj-footer-motto">Innovar para transformar a Mexico</p>
+      <div class="tsj-footer-logos-dark">
+        <img src="<?= $base ?>/shared/assets/img/logo.svg"
+             alt="Tecnologico Superior de Jalisco" loading="lazy" />
+        <img src="<?= $base ?>/shared/assets/img/tecnologico.svg"
+             alt="Tecnologico Nacional de Mexico" loading="lazy" />
+        <img src="<?= $base ?>/shared/assets/img/jalisco.png"
+             alt="Jalisco Gobierno del Estado" loading="lazy" />
       </div>
     </div>
+  </div>
 
-    <div class="tsj-footer-col">
-      <span class="tsj-footer-heading">Información</span>
-      <nav aria-label="Información">
-        <a class="tsj-footer-link"
-           href="https://consultapublicamx.plataformadetransparencia.org.mx/vut-web/faces/view/consultaPublica.xhtml?idEntidad=MTQ=&idSujetoObligado=MTM3OTE=#inicio"
-           target="_blank" rel="noopener noreferrer">Plataforma de Transparencia</a>
-      </nav>
-      <p class="tsj-footer-copy">&copy; <?= date('Y') ?> Tecnológico Superior de Jalisco.<br>Todos los derechos reservados.</p>
+  <!-- Franja blanca -->
+  <div class="tsj-footer-white">
+    <div class="tsj-footer-white-inner">
+      <img src="<?= $base ?>/shared/assets/img/educacion.png"
+           alt="Secretaria de Educacion Publica" loading="lazy" />
+      <img src="<?= $base ?>/shared/assets/img/innovacion.png"
+           alt="Innovacion Ciencia y Tecnologia" loading="lazy" />
     </div>
-
   </div>
 
-  <div class="tsj-footer-divider"></div>
-
-  <div class="tsj-footer-gov-inner">
-    <img src="<?= $base ?>/shared/assets/img/educacion.png" alt="SEP" loading="lazy" />
-    <img src="<?= $base ?>/shared/assets/img/tecnologico.svg" alt="TecNM" loading="lazy" />
-    <img src="<?= $base ?>/shared/assets/img/innovacion.png" alt="SICYT" loading="lazy" />
-    <img src="<?= $base ?>/shared/assets/img/jalisco.png" alt="Jalisco" loading="lazy" />
-  </div>
 </footer>
 
 <script src="<?= $base ?>/shared/assets/js/nav.js"></script>

@@ -47,6 +47,7 @@ $fechaVenc = ($t = strtotime($fila['vencimiento'])) ? date('d/m/Y', $t) : '—';
 $tsj_module    = 'convenios';
 $tsj_title     = h($fila['nombre']) . ' — Convenios';
 $tsj_extra_css = ['src/output.css', 'src/css/styles.css'];
+$tsj_no_security_headers = true;
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 

@@ -1,19 +1,35 @@
 <?php
-session_start();
+require_once __DIR__ . '/../../../shared/lib/auth.php';
+requireAuth('biblioteca', '../login.php');
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header("Location: ../admin.php");
+    exit;
+}
+
+if (!csrfVerify()) {
+    header("Location: ../admin.php?error=csrf");
+    exit;
+}
+
 include '../config/conexion.php';
 
-if (isset($_GET['id'])) {
-    $id = $_GET['id'];
-    
-    // Sincronizamos con el cambio de Workbench: entregado=1 y grabamos la fecha actual
-    $sql = "UPDATE solicitud_libros SET entregado = 1, fecha_devolucion = NOW() WHERE id = ?";
-    $stmt = $conexion->prepare($sql);
-    $stmt->bind_param("i", $id);
-
-    if ($stmt->execute()) {
-        header("Location: ../admin.php?status=success");
-    } else {
-        echo "Error: " . $conexion->error;
-    }
+$id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+if ($id <= 0) {
+    header("Location: ../admin.php?error=id_invalido");
+    exit;
 }
-?>
+
+$sql  = "UPDATE solicitud_libros SET entregado = 1, fecha_devolucion = NOW() WHERE id = ?";
+$stmt = $conexion->prepare($sql);
+$stmt->bind_param("i", $id);
+
+if ($stmt->execute()) {
+    header("Location: ../admin.php?status=success");
+} else {
+    error_log("marcar_devuelto error: " . $conexion->error);
+    header("Location: ../admin.php?error=db");
+}
+$stmt->close();
+$conexion->close();
+exit;
