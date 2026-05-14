@@ -86,7 +86,7 @@ $tsj_head_extra = '<style>
     @media(max-width:768px){ .form-row{ flex-direction:column; gap:0; } }
 </style>';
 $tsj_no_security_headers = true;
-require_once __DIR__ . '/../../shared/header.php';
+require_once __DIR__ . '/../../../shared/header.php';
 ?>
 
     <div class="fila-busqueda">
@@ -194,4 +194,4 @@ require_once __DIR__ . '/../../shared/header.php';
         </form>
     </div>
 
-<?php require_once __DIR__ . '/../../shared/footer.php'; ?>
+<?php require_once __DIR__ . '/../../../shared/footer.php'; ?>

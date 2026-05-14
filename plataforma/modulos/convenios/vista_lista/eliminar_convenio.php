@@ -94,7 +94,7 @@ $tsj_head_extra = '<style>
     .error-message   { color:#dc3545; margin-bottom:20px; padding:10px; background:#f8d7da; border:1px solid #f5c6cb; border-radius:4px; }
 </style>';
 $tsj_no_security_headers = true;
-require_once __DIR__ . '/../../shared/header.php';
+require_once __DIR__ . '/../../../shared/header.php';
 ?>
 
     <div class="fila-busqueda">
@@ -129,4 +129,4 @@ require_once __DIR__ . '/../../shared/header.php';
         </div>
     </div>
 
-<?php require_once __DIR__ . '/../../shared/footer.php'; ?>
+<?php require_once __DIR__ . '/../../../shared/footer.php'; ?>

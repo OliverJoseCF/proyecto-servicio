@@ -48,7 +48,7 @@ $tsj_module    = 'convenios';
 $tsj_title     = h($fila['nombre']) . ' — Convenios';
 $tsj_extra_css = ['src/output.css', 'src/css/styles.css'];
 $tsj_no_security_headers = true;
-require_once __DIR__ . '/../../shared/header.php';
+require_once __DIR__ . '/../../../shared/header.php';
 ?>
 
     <div class="w-full p-4" style="background-color: #f5f5f5">
@@ -142,4 +142,4 @@ require_once __DIR__ . '/../../shared/header.php';
 
     <script src="src/js/script.js"></script>
 
-<?php require_once __DIR__ . '/../../shared/footer.php'; ?>
+<?php require_once __DIR__ . '/../../../shared/footer.php'; ?>

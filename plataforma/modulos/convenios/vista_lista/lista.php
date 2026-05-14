@@ -18,7 +18,12 @@ $sql = 'SELECT id, nombre, convenio, logo, contacto, telefono, correo, vencimien
         FROM convenios
         ORDER BY id DESC';
 
-$resultado = $conn->query($sql);
+try {
+    $resultado = $conn->query($sql);
+} catch (mysqli_sql_exception $e) {
+    error_log('lista.php convenios query error: ' . $e->getMessage());
+    $resultado = false;
+}
 $conn->close();
 
 // Mensaje flash por URL — solo valores conocidos para evitar XSS
@@ -42,7 +47,7 @@ $tsj_head_extra = '<style>
   .btn-cerrar-sesion { background-color: #d9534f; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
 </style>';
 $tsj_no_security_headers = true;
-require_once __DIR__ . '/../../shared/header.php';
+require_once __DIR__ . '/../../../shared/header.php';
 ?>
 
   <?php if ($msgFlash !== null): ?>
@@ -58,6 +63,10 @@ require_once __DIR__ . '/../../shared/header.php';
         <img src="img/icono-regresar.png" alt="" aria-hidden="true" class="btn-volver" />
       </a>
       <a href="agregar_convenio.php" class="btn-agregar">Agregar Convenio</a>
+      <form method="POST" action="cerrar_sesion.php" style="display:inline; margin-left:8px;">
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+        <button type="submit" class="btn-cerrar-sesion">Cerrar Sesión</button>
+      </form>
     </div>
   </div>
 
@@ -138,4 +147,4 @@ require_once __DIR__ . '/../../shared/header.php';
   });
   </script>
 
-<?php require_once __DIR__ . '/../../shared/footer.php'; ?>
+<?php require_once __DIR__ . '/../../../shared/footer.php'; ?>

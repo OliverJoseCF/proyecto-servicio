@@ -35,7 +35,7 @@ body { background-color: #f3f4f6; }
 }
 </style>';
 $tsj_no_security_headers = true;
-require_once __DIR__ . '/../../shared/header.php';
+require_once __DIR__ . '/../../../../../shared/header.php';
 ?>
 
 <div class="form-page-wrapper">

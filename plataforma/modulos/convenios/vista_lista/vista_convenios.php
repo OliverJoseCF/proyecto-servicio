@@ -43,7 +43,7 @@ $tsj_title      = 'Convenios' . ($tituloCarrera ? ' — ' . $tituloCarrera : '')
 $tsj_extra_css  = ['estilo/estilo.css', 'https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css'];
 $tsj_head_extra = '<style>.data-row td { cursor: pointer; } .btn-volver { cursor: pointer; }</style>';
 $tsj_no_security_headers = true;
-require_once __DIR__ . '/../../shared/header.php';
+require_once __DIR__ . '/../../../shared/header.php';
 ?>
 
   <div class="fila-busqueda">
@@ -110,4 +110,4 @@ require_once __DIR__ . '/../../shared/header.php';
   <script src="https://cdn.datatables.net/buttons/3.2.0/js/buttons.print.min.js" defer></script>
   <script src="script_convenios.js" defer></script>
 
-<?php require_once __DIR__ . '/../../shared/footer.php'; ?>
+<?php require_once __DIR__ . '/../../../shared/footer.php'; ?>
