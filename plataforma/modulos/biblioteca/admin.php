@@ -4,15 +4,20 @@ requireAuth('biblioteca', 'login.php');
 include 'config/conexion.php';
 
 // Consultas para las tarjetas
-$totalLibros = $conexion->query("SELECT COUNT(*) as total FROM libros")->fetch_assoc()['total'];
-$prestados = $conexion->query("SELECT COUNT(*) as total FROM solicitud_libros WHERE estado='Aceptado' AND entregado=0")->fetch_assoc()['total'];
-$pendientes = $conexion->query("SELECT COUNT(*) as total FROM solicitud_libros WHERE estado='Pendiente'")->fetch_assoc()['total'];
+try {
+    $totalLibros = $conexion->query("SELECT COUNT(*) as total FROM libros")->fetch_assoc()['total'];
+    $prestados   = $conexion->query("SELECT COUNT(*) as total FROM solicitud_libros WHERE estado='Aceptado' AND entregado=0")->fetch_assoc()['total'];
+    $pendientes  = $conexion->query("SELECT COUNT(*) as total FROM solicitud_libros WHERE estado='Pendiente'")->fetch_assoc()['total'];
 
-// Consultas para Tablas
-$resultLibros = $conexion->query("SELECT * FROM libros ORDER BY id DESC");
-$resultControles = $conexion->query("SELECT * FROM solicitud_controles ORDER BY id DESC");
-$resultSolLibros = $conexion->query("SELECT * FROM solicitud_libros WHERE entregado = 0 ORDER BY id DESC");
-$resultHistorial = $conexion->query("SELECT * FROM solicitud_libros WHERE entregado = 1 OR estado = 'Rechazado' ORDER BY fecha_devolucion DESC LIMIT 30");
+    // Consultas para Tablas
+    $resultLibros    = $conexion->query("SELECT * FROM libros ORDER BY id DESC");
+    $resultControles = $conexion->query("SELECT * FROM solicitud_controles ORDER BY id DESC");
+    $resultSolLibros = $conexion->query("SELECT * FROM solicitud_libros WHERE entregado = 0 ORDER BY id DESC");
+    $resultHistorial = $conexion->query("SELECT * FROM solicitud_libros WHERE entregado = 1 OR estado = 'Rechazado' ORDER BY fecha_devolucion DESC LIMIT 30");
+} catch (Exception $e) {
+    error_log('admin.php error: ' . $e->getMessage());
+    die('Error al cargar los datos. Contacta al administrador.');
+}
 
 $tsj_module    = 'biblioteca';
 $tsj_title     = 'Biblioteca — Gestión Bibliotecaria';
@@ -131,16 +136,16 @@ require_once __DIR__ . '/../../shared/header.php';
             <tbody>
               <?php while ($sl = $resultSolLibros->fetch_assoc()): ?>
               <tr>
-                <td><?= $sl['fecha_solicitud'] ?></td>
+                <td><?= htmlspecialchars($sl['fecha_solicitud'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
                 <td class="fw-bold"><?= htmlspecialchars($sl['nombre_usuario']) ?></td>
                 <td><?= htmlspecialchars($sl['nombre_libro']) ?></td>
                 <td>
                   <?php if ($sl['estado'] === 'Aceptado'): ?>
-                    <span class="badge-status badge-accepted"><?= $sl['estado'] ?></span>
+                    <span class="badge-status badge-accepted"><?= htmlspecialchars($sl['estado'], ENT_QUOTES, 'UTF-8') ?></span>
                   <?php elseif ($sl['estado'] === 'Pendiente'): ?>
-                    <span class="badge-status badge-pending"><?= $sl['estado'] ?></span>
+                    <span class="badge-status badge-pending"><?= htmlspecialchars($sl['estado'], ENT_QUOTES, 'UTF-8') ?></span>
                   <?php else: ?>
-                    <span class="badge-status badge-rejected"><?= $sl['estado'] ?></span>
+                    <span class="badge-status badge-rejected"><?= htmlspecialchars($sl['estado'], ENT_QUOTES, 'UTF-8') ?></span>
                   <?php endif; ?>
                 </td>
                 <td>
@@ -173,10 +178,10 @@ require_once __DIR__ . '/../../shared/header.php';
               <tr>
                 <td class="fw-bold"><?= htmlspecialchars($h['nombre_usuario']) ?></td>
                 <td><?= htmlspecialchars($h['nombre_libro']) ?></td>
-                <td><small class="text-muted"><?= $h['fecha_solicitud'] ?></small></td>
+                <td><small class="text-muted"><?= htmlspecialchars($h['fecha_solicitud'] ?? '', ENT_QUOTES, 'UTF-8') ?></small></td>
                 <td>
                   <?php if ($h['fecha_devolucion']): ?>
-                    <span class="text-returned"><i class="fas fa-check-circle me-1"></i><?= $h['fecha_devolucion'] ?></span>
+                    <span class="text-returned"><i class="fas fa-check-circle me-1"></i><?= htmlspecialchars($h['fecha_devolucion'], ENT_QUOTES, 'UTF-8') ?></span>
                   <?php else: ?>
                     <span class="text-rejected"><i class="fas fa-ban me-1"></i>Rechazado</span>
                   <?php endif; ?>
@@ -201,6 +206,7 @@ require_once __DIR__ . '/../../shared/header.php';
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <form id="formAgregarLibro">
+        <?= csrfField() ?>
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">Título del Libro</label>

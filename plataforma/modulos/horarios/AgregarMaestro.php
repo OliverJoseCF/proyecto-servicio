@@ -220,7 +220,7 @@ require_once __DIR__ . '/../../shared/header.php';
                         <?php
                         $ext = strtolower(pathinfo($profesor['imagen_horario'], PATHINFO_EXTENSION));
                         if ($ext === 'pdf'): ?>
-                            <p><a href="<?= htmlspecialchars($profesor['imagen_horario'], ENT_QUOTES, 'UTF-8') ?>" target="_blank">Ver PDF actual</a></p>
+                            <p><a href="<?= htmlspecialchars($profesor['imagen_horario'], ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer">Ver PDF actual</a></p>
                         <?php else: ?>
                             <img src="<?= htmlspecialchars($profesor['imagen_horario'], ENT_QUOTES, 'UTF-8') ?>"
                                  alt="Horario actual" class="preview-horario">

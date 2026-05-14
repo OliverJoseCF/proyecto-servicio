@@ -12,7 +12,7 @@ require_once __DIR__ . '/../../shared/header.php';
     <div class="botones">
         <a href="MateriasIndustrial.php" class="button">MATERIAS</a>
         <a href="DocentesIndustrial.php" class="button">DOCENTES</a>
-        <a href="CordinadorIndustrial.php" class="button">CORDINADOR/A</a>
+        <a href="CordinadorIndustrial.php" class="button">COORDINADOR/A</a>
     </div>
 
     <!-- Imagen en la esquina superior derecha como botón -->

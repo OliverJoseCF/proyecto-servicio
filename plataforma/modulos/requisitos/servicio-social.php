@@ -105,16 +105,16 @@ require_once __DIR__ . '/../../shared/header.php';
             <div class="tarjeta">
                 <h3><i class="fas fa-download"></i> Documentos para Descargar</h3>
                 <div class="descargas-servicio">
-                    <a href="assets/docs/servicio-social/Evaluación cualitativa .pdf" target="_blank" class="boton-descarga">
+                    <a href="assets/docs/servicio-social/Evaluación cualitativa .pdf" target="_blank" rel="noopener noreferrer" class="boton-descarga">
                         <i class="fas fa-file-pdf"></i> Evaluación Cualitativa
                     </a>
-                    <a href="assets/docs/servicio-social/carta compromiso.pdf" target="_blank" class="boton-descarga">
+                    <a href="assets/docs/servicio-social/carta compromiso.pdf" target="_blank" rel="noopener noreferrer" class="boton-descarga">
                         <i class="fas fa-file-pdf"></i> Carta Compromiso
                     </a>
-                    <a href="assets/docs/servicio-social/Reporte bimestral 1.pdf" target="_blank" class="boton-descarga">
+                    <a href="assets/docs/servicio-social/Reporte bimestral 1.pdf" target="_blank" rel="noopener noreferrer" class="boton-descarga">
                         <i class="fas fa-file-pdf"></i> Reporte Bimestral
                     </a>
-                    <a href="assets/docs/servicio-social/formato evaluacion.pdf" target="_blank" class="boton-descarga">
+                    <a href="assets/docs/servicio-social/formato evaluacion.pdf" target="_blank" rel="noopener noreferrer" class="boton-descarga">
                         <i class="fas fa-file-pdf"></i> Formato Evaluación
                     </a>
                 </div>

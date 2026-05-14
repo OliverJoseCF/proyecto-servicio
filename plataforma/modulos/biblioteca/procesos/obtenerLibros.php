@@ -28,7 +28,8 @@ try {
     echo json_encode($libros);
 
 } catch (Exception $e) {
+    error_log('obtenerLibros error: ' . $e->getMessage());
     header('Content-Type: application/json');
-    echo json_encode(["error" => $e->getMessage()]);
+    echo json_encode(["error" => "Error al cargar los libros. Contacta al administrador."]);
 }
 ?>

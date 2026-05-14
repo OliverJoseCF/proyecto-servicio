@@ -1,6 +1,11 @@
 <?php
+require_once __DIR__ . '/../../shared/lib/auth.php';
+
 $titulo = isset($_GET['titulo']) ? $_GET['titulo'] : '';
 $codigo = isset($_GET['codigo']) ? $_GET['codigo'] : '';
+
+$flash_ok    = $_SESSION['flash_ok']    ?? null; unset($_SESSION['flash_ok']);
+$flash_error = $_SESSION['flash_error'] ?? null; unset($_SESSION['flash_error']);
 
 $tsj_module     = 'biblioteca';
 $tsj_title      = 'Biblioteca — Solicitud de Libro';
@@ -288,7 +293,11 @@ require_once __DIR__ . '/../../shared/header.php';
         <p class="card-header-sub">Verifica los datos del libro y completa tu información</p>
       </div>
 
+      <?php if ($flash_ok): ?><div style="background:#dcfce7;border-left:4px solid #16a34a;color:#065f46;padding:12px 16px;border-radius:6px;margin-bottom:16px;"><?= htmlspecialchars($flash_ok, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
+      <?php if ($flash_error): ?><div style="background:#fef2f2;border-left:4px solid #dc2626;color:#991b1b;padding:12px 16px;border-radius:6px;margin-bottom:16px;"><?= htmlspecialchars($flash_error, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
+
       <form action="procesos/guardar_solicitud_libro.php" method="POST">
+        <?= csrfField() ?>
 
         <!-- Libro seleccionado (readonly) -->
         <div class="mb-3">

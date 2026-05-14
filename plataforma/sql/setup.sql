@@ -4,8 +4,15 @@
 -- ============================================================
 
 -- 1. Crear usuario de aplicación (mínimos privilegios)
---    Cambia 'CambiaEstaClaveSegura2024!' por una contraseña real antes de ejecutar.
-CREATE USER IF NOT EXISTS 'tsjplat'@'127.0.0.1' IDENTIFIED BY 'CambiaEstaClaveSegura2024!';
+--
+--    INSTRUCCIÓN: Sustituye TU_CLAVE_SEGURA por una contraseña real (≥16 chars)
+--    antes de ejecutar. NUNCA dejes el placeholder.
+--
+--    Ejemplo (en terminal):
+--      mysql -u root -e "CREATE USER IF NOT EXISTS 'tsjplat'@'127.0.0.1' IDENTIFIED BY 'MiClaveSegura123!';"
+--
+-- Si ejecutas este archivo directamente, edita la línea siguiente primero:
+CREATE USER IF NOT EXISTS 'tsjplat'@'127.0.0.1' IDENTIFIED BY 'TU_CLAVE_SEGURA';
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON `biblioteca_escolar`.* TO 'tsjplat'@'127.0.0.1';
 GRANT SELECT, INSERT, UPDATE, DELETE ON `convenios_db`.*       TO 'tsjplat'@'127.0.0.1';
@@ -25,6 +32,10 @@ WHERE `imagen_horario` LIKE '/buscarMaterias-main/horarios/%';
 
 -- ============================================================
 -- Tras ejecutar este script:
--- 1. Actualiza shared/config.php: DB_USER='tsjplat', DB_PASS='<tu_clave>'
--- 2. Revoca el acceso de root desde la aplicación (solo para CLI/herramientas)
+-- 1. Pon en shared/config.local.php:
+--      define('DB_USER', 'tsjplat');
+--      define('DB_PASS', 'TU_CLAVE_SEGURA');
+-- 2. Genera los hashes de admin con los scripts tools/setup_password.php
+--    de biblioteca y horarios, y añádelos también a config.local.php.
+-- 3. Revoca el acceso de root a la aplicación (solo para CLI/herramientas).
 -- ============================================================

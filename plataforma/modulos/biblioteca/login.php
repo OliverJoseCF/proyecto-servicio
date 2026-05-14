@@ -3,13 +3,14 @@ require_once __DIR__ . '/../../shared/lib/auth.php';
 require_once __DIR__ . '/../../shared/lib/RateLimit.php';
 require_once __DIR__ . '/../../shared/config.php';
 
-// Credenciales admin — cambia la contraseña ejecutando:
-//   php tools/setup_password.php
-// y copia el hash resultante en shared/config.php como BIBLIOTECA_ADMIN_HASH.
-// Por defecto se usa el hash de 'admin1234' hasta que lo cambies.
-if (!defined('BIBLIOTECA_ADMIN_USER')) {
-    define('BIBLIOTECA_ADMIN_USER', 'admin');
-    define('BIBLIOTECA_ADMIN_HASH', '$2y$12$LQv3c1yqBWVHxkd0LHAkCOYz6TqrWJcWMcY4VlVhqp7aMu.SLf5yy'); // admin1234
+// BIBLIOTECA_ADMIN_USER y BIBLIOTECA_ADMIN_HASH se cargan desde shared/config.php
+// (que a su vez carga shared/config.local.php si existe).
+// Genera el hash con:  php tools/setup_password.php
+// Luego ponlo en shared/config.local.php:
+//   define('BIBLIOTECA_ADMIN_HASH', '$2y$12$...');
+if (BIBLIOTECA_ADMIN_HASH === '') {
+    error_log('[biblioteca/login] BIBLIOTECA_ADMIN_HASH no configurado. Define el hash en shared/config.local.php');
+    die('El sistema aún no está configurado. Contacta al administrador.');
 }
 
 $error = '';

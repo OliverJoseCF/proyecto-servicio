@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../shared/lib/auth.php';
 requireAuth('biblioteca', '../login.php');
+requirePost();
 include '../config/conexion.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

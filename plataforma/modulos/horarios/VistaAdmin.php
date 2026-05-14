@@ -26,11 +26,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar_id'])) {
     $stmtRuta->execute(['id' => $id]);
     $rutaArchivo = $stmtRuta->fetchColumn();
 
-    $pdo->prepare("DELETE FROM Horarios   WHERE id_profesor = :id")->execute(['id' => $id]);
-    $pdo->prepare("DELETE FROM Profesores WHERE id_profesor = :id")->execute(['id' => $id]);
+    try {
+        $pdo->beginTransaction();
+        $pdo->prepare("DELETE FROM Horarios   WHERE id_profesor = :id")->execute(['id' => $id]);
+        $pdo->prepare("DELETE FROM Profesores WHERE id_profesor = :id")->execute(['id' => $id]);
+        $pdo->commit();
 
-    if ($rutaArchivo && file_exists(__DIR__ . '/' . $rutaArchivo)) {
-        @unlink(__DIR__ . '/' . $rutaArchivo);
+        // Eliminar archivo SOLO si la BD se actualizó correctamente
+        // basename() como defensa en profundidad frente a rutas manipuladas en BD
+        if ($rutaArchivo) {
+            $safeFile = HORARIOS_DIR . basename($rutaArchivo);
+            if (file_exists($safeFile)) {
+                @unlink($safeFile);
+            }
+        }
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        error_log('VistaAdmin eliminar error: ' . $e->getMessage());
     }
 
     header("Location: VistaAdmin.php");
@@ -117,7 +129,8 @@ require_once __DIR__ . '/../../shared/header.php';
                                     <td><?= htmlspecialchars($dato['apellido'],       ENT_QUOTES, 'UTF-8') ?></td>
                                     <td>
                                         <a href="<?= htmlspecialchars($dato['imagen_horario'], ENT_QUOTES, 'UTF-8') ?>"
-                                           class="open-modal btn-horario">Ver Horario</a>
+                                           class="open-modal btn-horario"
+                                           rel="noopener noreferrer">Ver Horario</a>
                                     </td>
                                     <td><?= htmlspecialchars($dato['nombre_carrera'], ENT_QUOTES, 'UTF-8') ?></td>
                                     <td class="acciones">

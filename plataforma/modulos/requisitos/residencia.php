@@ -143,11 +143,11 @@ require_once __DIR__ . '/../../shared/header.php';
         <h3><i class="fas fa-download"></i> Documentos para Descargar</h3>
         <div class="descargas-servicio">
           <a href="https://drive.google.com/file/d/1oJR4zSpAX6o99eMSuqot4T2DOYhlbAFX/view?usp=sharing"
-             target="_blank" class="boton-descarga">
+             target="_blank" rel="noopener noreferrer" class="boton-descarga">
             <i class="fas fa-file-pdf"></i> Solicitud de Residencia
           </a>
           <a href="https://drive.google.com/file/d/1oMtGJNoBKg2Z8n6q1hL04VrRIbzKaWNC/view?usp=sharing"
-             target="_blank" class="boton-descarga">
+             target="_blank" rel="noopener noreferrer" class="boton-descarga">
             <i class="fas fa-file-pdf"></i> Seguimiento y Evaluación
           </a>
         </div>

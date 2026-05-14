@@ -31,6 +31,7 @@ require_once __DIR__ . '/../../../shared/header.php';
     <div class="card shadow p-4">
         <h2 class="mb-4 fw-bold" style="color: #3D2E81;">Editar Libro</h2>
         <form method="POST" action="actualizar_libro.php">
+            <?= csrfField() ?>
             <input type="hidden" name="codigo_original" value="<?= htmlspecialchars($libro['codigo'], ENT_QUOTES, 'UTF-8') ?>">
 
             <div class="mb-3">

@@ -1,13 +1,17 @@
 <?php
 require_once __DIR__ . '/../../shared/lib/auth.php';
 require_once __DIR__ . '/../../shared/lib/RateLimit.php';
+require_once __DIR__ . '/../../shared/config.php';
 
-// Hash de la contraseña de admin — para cambiarla:
-//   php -r "echo password_hash('TuNuevaClaveSegura', PASSWORD_BCRYPT, ['cost'=>12]);"
-// Copia el hash resultante aquí abajo.
-// Hash por defecto de 'horarios2024!':
-define('HORARIOS_ADMIN_EMAIL', 'admin@tecsj.edu.mx');
-define('HORARIOS_ADMIN_HASH', '$2y$12$tcY3G0HqLg.7VXpqG4VPGekGJTrQO7CRa9z2V08uT.BhS7Rk7MVnS'); // horarios2024!
+// HORARIOS_ADMIN_EMAIL y HORARIOS_ADMIN_HASH se cargan desde shared/config.php
+// (que a su vez carga shared/config.local.php si existe).
+// Genera el hash con:  php tools/setup_password.php
+// Luego ponlo en shared/config.local.php:
+//   define('HORARIOS_ADMIN_HASH', '$2y$12$...');
+if (HORARIOS_ADMIN_HASH === '') {
+    error_log('[horarios/login] HORARIOS_ADMIN_HASH no configurado. Define el hash en shared/config.local.php');
+    die('El sistema aún no está configurado. Contacta al administrador.');
+}
 
 $error = '';
 $rl    = new RateLimit(5, 900);

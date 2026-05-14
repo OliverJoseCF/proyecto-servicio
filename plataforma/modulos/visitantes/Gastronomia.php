@@ -10,9 +10,9 @@ require_once __DIR__ . '/../../shared/header.php';
     <h1>Gastronomía</h1>
 
     <div class="botones">
-        <a href="GastronimiaMaterias.php" class="button">MATERIAS</a>
+        <a href="GastronomiaMaterias.php" class="button">MATERIAS</a>
         <a href="GastronomiaDocentes.php" class="button">DOCENTES</a>
-        <a href="CordinadorGastronomia.php" class="button">CORDINADOR/A</a>
+        <a href="CordinadorGastronomia.php" class="button">COORDINADOR/A</a>
     </div>
 
     <!-- Imagen en la esquina superior derecha como botón -->

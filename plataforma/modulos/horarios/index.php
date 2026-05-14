@@ -4,7 +4,8 @@ require_once __DIR__ . '/config.php';
 try {
     $pdo = getDB();
 } catch (PDOException $e) {
-    die("Error de conexión: " . $e->getMessage());
+    error_log('horarios/index DB error: ' . $e->getMessage());
+    die("Error de conexión. Contacta al administrador.");
 }
 
 $carreras = $pdo->query("SELECT id_carrera, nombre_carrera FROM Carreras")->fetchAll();
@@ -120,7 +121,8 @@ require_once __DIR__ . '/../../shared/header.php';
                                     <td><?= htmlspecialchars($h['nombre_profesor'].' '.$h['apellido_profesor']) ?></td>
                                     <td>
                                         <a href="<?= htmlspecialchars($h['imagen_horario']) ?>"
-                                           class="open-modal btn-horario">Ver Horario</a>
+                                           class="open-modal btn-horario"
+                                           rel="noopener noreferrer">Ver Horario</a>
                                     </td>
                                     <td><?= htmlspecialchars($h['nombre_carrera']) ?></td>
                                 </tr>

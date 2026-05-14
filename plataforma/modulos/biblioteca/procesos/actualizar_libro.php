@@ -7,6 +7,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+if (!csrfVerify()) {
+    header("Location: ../admin.php?error=csrf");
+    exit;
+}
+
 include '../config/conexion.php';
 
 $codigo_original = trim($_POST['codigo_original'] ?? '');
