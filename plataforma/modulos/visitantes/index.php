@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $tsj_module     = 'visitantes';
 $tsj_title      = 'Tecnológico Superior de Chapala';
 $tsj_extra_css  = ['style.css'];
@@ -30,5 +30,17 @@ require_once __DIR__ . '/../../shared/header.php';
       <a href="Gestion.php">Ingeniería en Gestión Empresarial</a>
       <a href="Gastronomia.php">Gastronomía</a>
     </nav>
+
+    <p class="menu-section-label">Servicios al estudiante</p>
+    <nav class="menu menu--servicios">
+      <a href="Titulacion.php">Titulación</a>
+      <a href="Egresados.php">Comprobante de Reinscripción</a>
+      <a href="nuevoIngreso.php">Nuevo Ingreso</a>
+      <a href="comprobante.php">Comprobantes</a>
+      <a href="SolicitarCita.php">Secretarías</a>
+      <a href="Ubicacion.php">Ubicación del Campus</a>
+      <a href="DatosContacto.php">Datos de Contacto</a>
+    </nav>
   </div>
+
 <?php require_once __DIR__ . '/../../shared/footer.php'; ?>
