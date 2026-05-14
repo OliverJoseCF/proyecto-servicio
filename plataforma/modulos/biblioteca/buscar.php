@@ -56,17 +56,23 @@ require_once __DIR__ . '/../../shared/header.php';
   </div>
 
   <script>
+    function esc(str) {
+        const d = document.createElement('div');
+        d.textContent = String(str ?? '');
+        return d.innerHTML;
+    }
+
     window.onload = function() {
         fetch('procesos/obtenerLibros.php')
             .then(res => res.json())
             .then(data => {
-                if(data.error) throw new Error(data.error);
+                if(data.error) throw new Error(esc(data.error));
                 window.todosLosLibros = data;
                 filtrarLibros();
             })
             .catch(err => {
                 document.querySelector("#tablaLibros tbody").innerHTML =
-                    `<tr><td colspan="5" class="empty-state"><i class="fas fa-exclamation-circle d-block"></i>Error: ${err.message}</td></tr>`;
+                    '<tr><td colspan="5" class="empty-state"><i class="fas fa-exclamation-circle d-block"></i>Error al cargar los libros.</td></tr>';
             });
     };
 
@@ -83,30 +89,30 @@ require_once __DIR__ . '/../../shared/header.php';
         });
 
         if (filtrados.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="empty-state"><i class="fas fa-book-open d-block"></i>No se encontraron libros</td></tr>`;
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-book-open d-block"></i>No se encontraron libros</td></tr>';
             return;
         }
 
         filtrados.forEach(l => {
             const ocupado = l.ocupado > 0;
-            const fila    = document.createElement("tr");
-            const url     = `solicitudDeLibros.php?titulo=${encodeURIComponent(l.titulo)}&codigo=${encodeURIComponent(l.folio)}`;
-            fila.innerHTML = `
-                <td class="text-muted">${l.id}</td>
-                <td><span class="badge-code">${l.folio}</span></td>
-                <td class="text-start">
-                    <div class="book-title">${l.titulo}</div>
-                    <span class="status-badge ${ocupado ? 'status-busy' : 'status-available'}">
-                        ${ocupado ? 'En Préstamo' : 'Disponible'}
-                    </span>
-                </td>
-                <td>${l.autor}</td>
-                <td>
-                    ${ocupado
-                        ? `<button class="btn-disabled" disabled>Ocupado</button>`
-                        : `<a href="${url}" class="btn btn-gold btn-sm">Solicitar</a>`
-                    }
-                </td>`;
+            const url     = 'solicitudDeLibros.php?titulo=' + encodeURIComponent(l.titulo) + '&codigo=' + encodeURIComponent(l.folio);
+
+            const fila = document.createElement("tr");
+
+            const tdId    = document.createElement("td"); tdId.className = "text-muted"; tdId.textContent = l.id;
+            const tdCod   = document.createElement("td"); const badge = document.createElement("span"); badge.className = "badge-code"; badge.textContent = l.folio; tdCod.appendChild(badge);
+            const tdTit   = document.createElement("td"); tdTit.className = "text-start";
+            const divTit  = document.createElement("div"); divTit.className = "book-title"; divTit.textContent = l.titulo;
+            const spanSt  = document.createElement("span"); spanSt.className = "status-badge " + (ocupado ? "status-busy" : "status-available"); spanSt.textContent = ocupado ? "En Préstamo" : "Disponible";
+            tdTit.appendChild(divTit); tdTit.appendChild(spanSt);
+            const tdAut   = document.createElement("td"); tdAut.textContent = l.autor;
+            const tdAcc   = document.createElement("td");
+            if (ocupado) {
+                const btn = document.createElement("button"); btn.className = "btn-disabled"; btn.disabled = true; btn.textContent = "Ocupado"; tdAcc.appendChild(btn);
+            } else {
+                const a = document.createElement("a"); a.href = url; a.className = "btn btn-gold btn-sm"; a.textContent = "Solicitar"; tdAcc.appendChild(a);
+            }
+            fila.appendChild(tdId); fila.appendChild(tdCod); fila.appendChild(tdTit); fila.appendChild(tdAut); fila.appendChild(tdAcc);
             tbody.appendChild(fila);
         });
     }

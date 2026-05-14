@@ -1,25 +1,17 @@
-﻿<?php
+<?php
 $tsj_module     = 'visitantes';
-$tsj_title      = 'CORDINADOR/A “lSC”';
+$tsj_title      = 'Coordinador — Ingeniería en Gestión Empresarial';
 $tsj_extra_css  = ['style.css'];
-
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 
+    <a href="index.php" class="top-right"><img src="imagenes/casa.png" alt="Inicio" style="width:80px;height:auto;"></a>
 
-    <h1>CORDINADOR/A “lSC”</h1>
+    <h1>Coordinador — Ingeniería en Gestión Empresarial</h1>
 
     <div class="docentes">
-        <h2>CORDINADOR</h2>
-        <ul>
-            <li contenteditable="true">PabloRojas@chapala.tecmm.edu.mx</li>
-        </ul>
+        <h2>Contacto</h2>
+        <p><a href="mailto:pablo.rojas@chapala.tecmm.edu.mx">pablo.rojas@chapala.tecmm.edu.mx</a></p>
     </div>
 
-    <!-- Imagen en la esquina superior derecha como botón -->
-    <a href="index.php" class="top-right">
-        <img src="imagenes/casa.png" alt="Ir a otra página" style="width: 80px; height: auto;"> <!-- Ajusta el tamaño según sea necesario -->
-    </a>
-
-    
 <?php require_once __DIR__ . '/../../shared/footer.php'; ?>

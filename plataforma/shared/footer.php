@@ -98,7 +98,7 @@ $base = PLATAFORMA_URL;
   <!-- Franja oscura -->
   <div class="tsj-footer-dark">
     <div class="tsj-footer-dark-inner">
-      <p class="tsj-footer-motto">Innovar para transformar a Mexico</p>
+      <p class="tsj-footer-motto">Innovar para transformar a México</p>
       <div class="tsj-footer-logos-dark">
         <img src="<?= $base ?>/shared/assets/img/logo.svg"
              alt="Tecnologico Superior de Jalisco" loading="lazy" />

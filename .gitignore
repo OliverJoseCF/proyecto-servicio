@@ -1,0 +1,22 @@
+# Configuración sensible — NUNCA commitear
+plataforma/shared/config.local.php
+plataforma/modulos/convenios/src/config.php
+plataforma/modulos/biblioteca/tools/setup_password.php
+plataforma/modulos/horarios/tools/setup_password.php
+
+# Uploads de usuarios
+plataforma/modulos/convenios/src/pages/upload/
+plataforma/modulos/horarios/horarios/
+
+# Vendor (instalar con composer install)
+plataforma/modulos/biblioteca/vendor/
+
+# Rate limit (temp files)
+/tmp/tecsj_rl/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
