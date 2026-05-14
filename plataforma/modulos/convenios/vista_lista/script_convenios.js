@@ -1,14 +1,19 @@
 document.addEventListener('DOMContentLoaded', function () {
-    if (typeof $ === 'undefined') return;
+  'use strict';
 
-    $('#example').DataTable({
-        dom: 'Bfrtip',
-        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-        language: { url: '//cdn.datatables.net/plug-ins/2.2.2/i18n/es-ES.json' }
-    });
+  if (typeof $ === 'undefined') return;
 
-    $(document).on('click', '.data-row', function () {
-        var href = $(this).data('href');
-        if (href) window.location.href = href;
-    });
+  $('#example').DataTable({
+    dom: 'Bfrtip',
+    buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+    language: {
+      url: 'https://cdn.datatables.net/plug-ins/2.2.2/i18n/es-ES.json'
+    }
+  });
+
+  /* Filas clickables */
+  $(document).on('click', '.data-row', function () {
+    var href = $(this).data('href');
+    if (href) window.location.href = href;
+  });
 });

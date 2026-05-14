@@ -3,11 +3,6 @@ require_once __DIR__ . '/../../shared/lib/auth.php';
 require_once __DIR__ . '/../../shared/lib/RateLimit.php';
 require_once __DIR__ . '/../../shared/config.php';
 
-// BIBLIOTECA_ADMIN_USER y BIBLIOTECA_ADMIN_HASH se cargan desde shared/config.php
-// (que a su vez carga shared/config.local.php si existe).
-// Genera el hash con:  php tools/setup_password.php
-// Luego ponlo en shared/config.local.php:
-//   define('BIBLIOTECA_ADMIN_HASH', '$2y$12$...');
 if (BIBLIOTECA_ADMIN_HASH === '') {
     error_log('[biblioteca/login] BIBLIOTECA_ADMIN_HASH no configurado. Define el hash en shared/config.local.php');
     die('El sistema aún no está configurado. Contacta al administrador.');
@@ -49,33 +44,44 @@ $tsj_extra_css = [
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 
-  <div class="login-page">
-    <div class="login-card">
-      <div class="login-brand">
-        <div class="login-icon-wrap">
-          <i class="fas fa-book-open"></i>
-        </div>
-        <h2 class="login-title">Biblioteca</h2>
-        <p class="login-subtitle">Acceso Administrativo</p>
+<main id="main" class="lib-login-page">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="login-icon-wrap" aria-hidden="true">
+        <i class="fas fa-book-open" aria-hidden="true"></i>
       </div>
-
-      <?php if ($error): ?>
-        <div class="error-msg"><i class="fas fa-exclamation-circle"></i> <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
-      <?php endif; ?>
-
-      <form method="POST" action="">
-        <?= csrfField() ?>
-        <div class="input-group">
-          <i class="fas fa-user"></i>
-          <input type="text" name="usuario" placeholder="Usuario" required autocomplete="username">
-        </div>
-        <div class="input-group">
-          <i class="fas fa-lock"></i>
-          <input type="password" name="clave" placeholder="Contraseña" required autocomplete="current-password">
-        </div>
-        <button type="submit" class="btn-submit">Ingresar al Sistema</button>
-      </form>
+      <h1 class="login-title">Biblioteca</h1>
+      <p class="login-subtitle">Acceso Administrativo</p>
     </div>
+
+    <?php if ($error): ?>
+      <div class="error-msg" role="alert">
+        <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+        <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?>
+      </div>
+    <?php endif; ?>
+
+    <form method="POST" action="">
+      <?= csrfField() ?>
+      <div class="lib-input-group">
+        <label for="bib-usuario">Usuario</label>
+        <div class="lib-input-wrap">
+          <i class="fas fa-user" aria-hidden="true"></i>
+          <input type="text" id="bib-usuario" name="usuario"
+                 required autocomplete="username" placeholder="Administrador">
+        </div>
+      </div>
+      <div class="lib-input-group">
+        <label for="bib-clave">Contraseña</label>
+        <div class="lib-input-wrap">
+          <i class="fas fa-lock" aria-hidden="true"></i>
+          <input type="password" id="bib-clave" name="clave"
+                 required autocomplete="current-password" placeholder="••••••••••">
+        </div>
+      </div>
+      <button type="submit" class="btn-submit">Ingresar al Sistema</button>
+    </form>
   </div>
+</main>
 
 <?php require_once __DIR__ . '/../../shared/footer.php'; ?>

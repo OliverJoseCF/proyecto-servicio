@@ -15,7 +15,7 @@ $tsj_extra_css = [
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 
-  <div class="grain"></div>
+<main id="main">
 
   <?php if ($flash_ok): ?>
   <div class="container" style="padding-top:16px;">
@@ -29,27 +29,28 @@ require_once __DIR__ . '/../../shared/header.php';
 
   <!-- Encabezado de página -->
   <div class="page-header">
-    <div class="page-header-line"></div>
-    <h1>Catálogo de <span class="gold">Libros</span></h1>
+    <div class="page-header-line" aria-hidden="true"></div>
+    <h1>Catálogo de <span class="accent">Libros</span></h1>
     <p class="page-header-sub">Busca y solicita préstamos del acervo bibliotecario</p>
   </div>
 
   <div class="container pb-5">
 
     <!-- Búsqueda -->
-    <div class="search-card">
+    <div class="search-card" role="search">
       <div class="row g-3 align-items-end">
         <div class="col-md-3 col-sm-4">
-          <label class="search-label">Filtrar por</label>
-          <select id="filterField" class="form-select">
+          <label for="filterField" class="search-label">Filtrar por</label>
+          <select id="filterField" class="form-select" onchange="filtrarLibros()">
             <option value="all">Todos los campos</option>
             <option value="titulo">Título</option>
             <option value="autor">Autor</option>
           </select>
         </div>
         <div class="col-md-9 col-sm-8">
-          <label class="search-label">Buscar libro</label>
-          <input type="text" id="searchInput" class="form-control" placeholder="Escriba título o autor..." onkeyup="filtrarLibros()">
+          <label for="searchInput" class="search-label">Buscar libro</label>
+          <input type="text" id="searchInput" class="form-control"
+                 placeholder="Escriba título o autor..." oninput="filtrarLibros()">
         </div>
       </div>
     </div>
@@ -60,77 +61,128 @@ require_once __DIR__ . '/../../shared/header.php';
         <table class="table align-middle text-center" id="tablaLibros">
           <thead>
             <tr>
-              <th>ID</th><th>Código</th><th class="text-start">Título / Estado</th><th>Autor</th><th>Acción</th>
+              <th scope="col">ID</th>
+              <th scope="col">Código</th>
+              <th scope="col" class="text-start">Título / Estado</th>
+              <th scope="col">Autor</th>
+              <th scope="col">Acción</th>
             </tr>
           </thead>
-          <tbody></tbody>
+          <tbody>
+            <tr>
+              <td colspan="5" class="empty-state">
+                <i class="fas fa-spinner fa-spin d-block" aria-hidden="true"></i>
+                Cargando catálogo…
+              </td>
+            </tr>
+          </tbody>
         </table>
       </div>
     </div>
 
   </div>
 
-  <script>
-    function esc(str) {
-        const d = document.createElement('div');
-        d.textContent = String(str ?? '');
-        return d.innerHTML;
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  function esc(str) {
+    var d = document.createElement('div');
+    d.textContent = String(str ?? '');
+    return d.innerHTML;
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    fetch('procesos/obtenerLibros.php')
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        if (data.error) throw new Error(data.error);
+        window.todosLosLibros = data;
+        filtrarLibros();
+      })
+      .catch(function () {
+        document.querySelector('#tablaLibros tbody').innerHTML =
+          '<tr><td colspan="5" class="empty-state">' +
+          '<i class="fas fa-exclamation-circle d-block" aria-hidden="true"></i>' +
+          'Error al cargar los libros. Intenta recargar la página.' +
+          '</td></tr>';
+      });
+  });
+
+  function filtrarLibros() {
+    var text  = document.getElementById('searchInput').value.toLowerCase();
+    var field = document.getElementById('filterField').value;
+    var tbody = document.querySelector('#tablaLibros tbody');
+    tbody.innerHTML = '';
+
+    if (!window.todosLosLibros) return;
+
+    var camposBusqueda = ['titulo', 'autor', 'folio'];
+    var filtrados = window.todosLosLibros.filter(function (l) {
+      if (field === 'all') {
+        return camposBusqueda.some(function (k) {
+          return l[k] && l[k].toString().toLowerCase().includes(text);
+        });
+      }
+      return l[field] && l[field].toString().toLowerCase().includes(text);
+    });
+
+    if (filtrados.length === 0) {
+      tbody.innerHTML =
+        '<tr><td colspan="5" class="empty-state">' +
+        '<i class="fas fa-book-open d-block" aria-hidden="true"></i>' +
+        'No se encontraron libros</td></tr>';
+      return;
     }
 
-    window.onload = function() {
-        fetch('procesos/obtenerLibros.php')
-            .then(res => res.json())
-            .then(data => {
-                if(data.error) throw new Error(esc(data.error));
-                window.todosLosLibros = data;
-                filtrarLibros();
-            })
-            .catch(err => {
-                document.querySelector("#tablaLibros tbody").innerHTML =
-                    '<tr><td colspan="5" class="empty-state"><i class="fas fa-exclamation-circle d-block"></i>Error al cargar los libros.</td></tr>';
-            });
-    };
+    filtrados.forEach(function (l) {
+      var ocupado = l.ocupado > 0;
+      var url = 'solicitudDeLibros.php?titulo=' + encodeURIComponent(l.titulo) +
+                '&codigo=' + encodeURIComponent(l.folio);
 
-    function filtrarLibros() {
-        const text  = document.getElementById('searchInput').value.toLowerCase();
-        const field = document.getElementById('filterField').value;
-        const tbody = document.querySelector("#tablaLibros tbody");
-        tbody.innerHTML = "";
-        if (!window.todosLosLibros) return;
+      var fila = document.createElement('tr');
 
-        const filtrados = window.todosLosLibros.filter(l => {
-            if (field === 'all') return Object.values(l).some(v => v && v.toString().toLowerCase().includes(text));
-            return l[field] && l[field].toString().toLowerCase().includes(text);
-        });
+      var tdId  = document.createElement('td'); tdId.className = 'text-muted'; tdId.textContent = l.id;
+      var tdCod = document.createElement('td');
+      var badge = document.createElement('span'); badge.className = 'badge-code'; badge.textContent = l.folio;
+      tdCod.appendChild(badge);
 
-        if (filtrados.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-book-open d-block"></i>No se encontraron libros</td></tr>';
-            return;
-        }
+      var tdTit   = document.createElement('td'); tdTit.className = 'text-start';
+      var divTit  = document.createElement('div'); divTit.className = 'book-title'; divTit.textContent = l.titulo;
+      var spanSt  = document.createElement('span');
+      spanSt.className = 'status-badge ' + (ocupado ? 'status-busy' : 'status-available');
+      spanSt.textContent = ocupado ? 'En Préstamo' : 'Disponible';
+      tdTit.appendChild(divTit); tdTit.appendChild(spanSt);
 
-        filtrados.forEach(l => {
-            const ocupado = l.ocupado > 0;
-            const url     = 'solicitudDeLibros.php?titulo=' + encodeURIComponent(l.titulo) + '&codigo=' + encodeURIComponent(l.folio);
+      var tdAut = document.createElement('td'); tdAut.textContent = l.autor;
+      var tdAcc = document.createElement('td');
 
-            const fila = document.createElement("tr");
+      if (ocupado) {
+        var btn = document.createElement('button');
+        btn.className = 'btn-disabled'; btn.disabled = true; btn.textContent = 'Ocupado';
+        btn.setAttribute('aria-label', 'Libro ' + l.titulo + ' no disponible');
+        tdAcc.appendChild(btn);
+      } else {
+        var a = document.createElement('a');
+        a.href = url; a.className = 'btn btn-gold btn-sm';
+        a.textContent = 'Solicitar';
+        a.setAttribute('aria-label', 'Solicitar préstamo de ' + l.titulo);
+        tdAcc.appendChild(a);
+      }
 
-            const tdId    = document.createElement("td"); tdId.className = "text-muted"; tdId.textContent = l.id;
-            const tdCod   = document.createElement("td"); const badge = document.createElement("span"); badge.className = "badge-code"; badge.textContent = l.folio; tdCod.appendChild(badge);
-            const tdTit   = document.createElement("td"); tdTit.className = "text-start";
-            const divTit  = document.createElement("div"); divTit.className = "book-title"; divTit.textContent = l.titulo;
-            const spanSt  = document.createElement("span"); spanSt.className = "status-badge " + (ocupado ? "status-busy" : "status-available"); spanSt.textContent = ocupado ? "En Préstamo" : "Disponible";
-            tdTit.appendChild(divTit); tdTit.appendChild(spanSt);
-            const tdAut   = document.createElement("td"); tdAut.textContent = l.autor;
-            const tdAcc   = document.createElement("td");
-            if (ocupado) {
-                const btn = document.createElement("button"); btn.className = "btn-disabled"; btn.disabled = true; btn.textContent = "Ocupado"; tdAcc.appendChild(btn);
-            } else {
-                const a = document.createElement("a"); a.href = url; a.className = "btn btn-gold btn-sm"; a.textContent = "Solicitar"; tdAcc.appendChild(a);
-            }
-            fila.appendChild(tdId); fila.appendChild(tdCod); fila.appendChild(tdTit); fila.appendChild(tdAut); fila.appendChild(tdAcc);
-            tbody.appendChild(fila);
-        });
-    }
-  </script>
+      fila.appendChild(tdId); fila.appendChild(tdCod); fila.appendChild(tdTit);
+      fila.appendChild(tdAut); fila.appendChild(tdAcc);
+      tbody.appendChild(fila);
+    });
+  }
+
+  window.filtrarLibros = filtrarLibros;
+})();
+</script>
 
 <?php require_once __DIR__ . '/../../shared/footer.php'; ?>

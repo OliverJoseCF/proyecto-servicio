@@ -1,24 +1,20 @@
-﻿<?php
-$tsj_module     = 'visitantes';
-$tsj_title      = 'Ingeniería Sistemas Computacionales';
-$tsj_extra_css  = ['style.css'];
-
+<?php
+$tsj_module    = 'visitantes';
+$tsj_title     = 'Ingeniería en Sistemas Computacionales — TSJ Chapala';
+$tsj_extra_css = ['style.css'];
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 
+<main id="main">
+  <h1 class="vis-page-title">Ingeniería en Sistemas Computacionales</h1>
+  <div class="botones">
+    <a href="MateriasSistemas.php" class="button">Materias</a>
+    <a href="DocentesSistemas.php" class="button">Docentes</a>
+    <a href="CoordinadorSistemas.php" class="button">Coordinador/a</a>
+  </div>
+  <a href="index.php" class="top-right" aria-label="Volver al menú principal">
+    <img src="imagenes/casa.png" alt="">
+  </a>
+</main>
 
-    <h1>Ingeniería Sistemas Computacionales</h1>
-
-    <div class="botones">
-        <a href="MateriasSistemas.php" class="button">MATERIAS</a>
-        <a href="DocentesSistemas.php" class="button">DOCENTES</a>
-        <a href="CordinadorSistemas.php" class="button">COORDINADOR/A</a>
-    </div>
-
-    <!-- Imagen en la esquina superior derecha como botón -->
-    <a href="index.php" class="top-right">
-        <img src="imagenes/casa.png" alt="Ir a otra página" style="width: 80px; height: auto;"> <!-- Ajusta el tamaño según sea necesario -->
-    </a>
-
-    
 <?php require_once __DIR__ . '/../../shared/footer.php'; ?>

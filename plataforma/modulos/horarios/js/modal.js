@@ -1,47 +1,73 @@
 // js/modal.js  —  Lógica del modal de horarios (compartida)
-
 (function () {
-    const modal      = document.getElementById('modalHorario');
-    const contentDiv = document.getElementById('modalContent');
-    const closeBtn   = modal?.querySelector('.modal-close');
-    const overlay    = modal?.querySelector('.modal-overlay');
+  'use strict';
 
-    function openModal(url) {
-        contentDiv.innerHTML = '';
-        if (/\.pdf$/i.test(url)) {
-            const obj   = document.createElement('object');
-            obj.data    = url;
-            obj.type    = 'application/pdf';
-            obj.width   = '100%';
-            obj.height  = '600px';
-            contentDiv.appendChild(obj);
-        } else {
-            const img   = document.createElement('img');
-            img.src     = url;
-            img.alt     = 'Horario del maestro';
-            contentDiv.appendChild(img);
-        }
-        modal.classList.add('is-open');
-        document.body.style.overflow = 'hidden';
+  var modal      = document.getElementById('modalHorario');
+  var contentDiv = document.getElementById('modalContent');
+  var closeBtn   = modal ? modal.querySelector('.modal-close') : null;
+  var overlay    = modal ? modal.querySelector('.modal-overlay') : null;
+
+  if (!modal || !contentDiv) return;
+
+  function openModal(url) {
+    contentDiv.innerHTML = '';
+
+    if (/\.pdf$/i.test(url)) {
+      var obj   = document.createElement('object');
+      obj.data  = url;
+      obj.type  = 'application/pdf';
+      obj.width = '100%';
+      obj.height = '600px';
+      obj.title = 'Horario del maestro (PDF)';
+      /* Fallback para navegadores sin visor PDF */
+      var fallback = document.createElement('p');
+      fallback.style.padding = '1rem';
+      fallback.innerHTML = 'No se pudo mostrar el PDF. <a href="' + url + '" target="_blank" rel="noopener noreferrer">Descargarlo aquí</a>.';
+      obj.appendChild(fallback);
+      contentDiv.appendChild(obj);
+    } else {
+      var img = document.createElement('img');
+      img.src = url;
+      img.alt = 'Horario del maestro';
+      img.style.width = '100%';
+      contentDiv.appendChild(img);
     }
 
-    function closeModal() {
-        modal.classList.remove('is-open');
-        contentDiv.innerHTML = '';
-        document.body.style.overflow = '';
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+
+    /* Mover foco al botón de cierre para accesibilidad */
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function closeModal() {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    contentDiv.innerHTML = '';
+    document.body.style.overflow = '';
+
+    /* Devolver el foco al enlace que abrió el modal */
+    if (window._modalOpener) {
+      window._modalOpener.focus();
+      window._modalOpener = null;
     }
+  }
 
-    document.querySelectorAll('.open-modal').forEach(link => {
-        link.addEventListener('click', function (e) {
-            e.preventDefault();
-            openModal(this.href);
-        });
+  document.querySelectorAll('.open-modal').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      window._modalOpener = link;
+      openModal(this.href);
     });
+  });
 
-    closeBtn?.addEventListener('click', closeModal);
-    overlay?.addEventListener('click', closeModal);
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (overlay)  overlay.addEventListener('click', closeModal);
 
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') closeModal();
-    });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+      closeModal();
+    }
+  });
 })();

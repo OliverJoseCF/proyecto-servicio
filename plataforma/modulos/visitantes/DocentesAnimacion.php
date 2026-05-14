@@ -1,29 +1,37 @@
 <?php
-$tsj_module     = 'visitantes';
-$tsj_title      = 'Docentes — Animación Digital y Efectos Visuales';
-$tsj_extra_css  = ['style.css'];
+$tsj_module    = 'visitantes';
+$tsj_title     = 'Docentes — Animación Digital y Efectos Visuales — TSJ Chapala';
+$tsj_extra_css = ['style.css'];
 require_once __DIR__ . '/../../shared/header.php';
 ?>
-    <a href="index.php" class="top-right"><img src="imagenes/casa.png" alt="Inicio" style="width:70px;"></a>
-    <h1>Docentes de Animación Digital y Efectos Visuales</h1>
-    <div class="tabla-container">
-        <table><thead><tr><th>Docente</th></tr></thead><tbody id="lista-docentes"></tbody></table>
-    </div>
-    <script>
-        const docentes = [
-            { nombre: "Miguel Delgado",      foto: "miguel.png" },
-            { nombre: "María Gómez",         foto: "user.png"   },
-            { nombre: "Rodolfo Rojas",       foto: "user.png"   },
-            { nombre: "Francisco Luis Juan", foto: "user.png"   },
-            { nombre: "Julio Chávez",        foto: "user.png"   },
-            { nombre: "José Gamas",          foto: "user.png"   }
-        ];
-        const tbody = document.getElementById("lista-docentes");
-        docentes.forEach(d => {
-            const tr=document.createElement("tr"), td=document.createElement("td");
-            const img=document.createElement("img"); img.src="imagenes/"+d.foto; img.alt=d.nombre; img.className="foto-mini"; img.onerror=function(){this.src="imagenes/user.png";};
-            const b=document.createElement("b"); b.textContent=d.nombre;
-            td.appendChild(img); td.append(" "); td.appendChild(b); tr.appendChild(td); tbody.appendChild(tr);
-        });
-    </script>
+<main id="main">
+  <a href="index.php" class="top-right" aria-label="Volver al menú principal"><img src="imagenes/casa.png" alt=""></a>
+  <h1 class="vis-page-title">Docentes de Animación Digital y Efectos Visuales</h1>
+  <div class="container"><div class="tabla-container">
+    <table><thead><tr><th scope="col">Docente</th></tr></thead><tbody id="lista-docentes"></tbody></table>
+  </div></div>
+</main>
+<script>
+(function(){
+  'use strict';
+  var docentes = [
+    { nombre:"Miguel Delgado",      foto:"miguel.png" },
+    { nombre:"María Gómez",         foto:"user.png" },
+    { nombre:"Rodolfo Rojas",       foto:"user.png" },
+    { nombre:"Francisco Luis Juan", foto:"user.png" },
+    { nombre:"Julio Chávez",        foto:"user.png" },
+    { nombre:"José Gamas",          foto:"user.png" }
+  ];
+  var tbody=document.getElementById("lista-docentes");
+  docentes.forEach(function(d){
+    var tr=document.createElement("tr"), td=document.createElement("td");
+    var img=document.createElement("img");
+    img.src="imagenes/"+d.foto; img.alt=d.nombre;
+    img.className="foto-mini"; img.width=36; img.height=36;
+    img.onerror=function(){this.src="imagenes/user.png";};
+    var b=document.createElement("b"); b.textContent=d.nombre;
+    td.appendChild(img); td.append(" "); td.appendChild(b); tr.appendChild(td); tbody.appendChild(tr);
+  });
+})();
+</script>
 <?php require_once __DIR__ . '/../../shared/footer.php'; ?>

@@ -1,734 +1,158 @@
-/* Reset básico */
-* {
-  margin: 0;  /* Elimina márgenes predeterminados de todos los elementos */
-  padding: 0; /* Elimina el relleno predeterminado */
-  box-sizing: border-box; /* Hace que width y height incluyan padding y border */
-}
+/* ================================================================
+   convenios/vista_lista/estilo/estilo.css
+   Usa tokens de shared/assets/css/theme.css (--tsj-*)
+   ================================================================ */
 
-body {
-  
-  font-family: Arial, sans-serif; /* Fuente de texto */
-  background-color: #ffffff; /* Fondo blanco */
-  color: #000000; /* Texto negro */
-}
-
-/* Barra rosa superior */
-.barra-rosa {
-  background-color: #FF4D7E; /* Color rosa */
-  height: 8px; /* Altura de la barra */
-  width: 100%; /* Ocupar todo el ancho de la pantalla */
-}
-
-
-/* Barra morada que contiene logo y menú */
-.barra-purpura {
-  background-color: #32129a;
-  display: flex; 
-  align-items: center; 
-  justify-content: space-between; 
-  padding: 10px 50px; 
-}
-
-/* Menú principal (Modulos, Contacto, Edcore) */
-.menu-principal {
-  display: flex;
-  align-items: center;
-  gap: 100px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* Media query for responsive views */
-@media (max-width: 768px) {
-  .barra-purpura {
-    padding: 10px 20px;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .menu-principal {
-    gap: 30px;
-    margin: 10px 0;
-    justify-content: center;
-    width: 100%;
-  }
-}
-
-.logo-institucion img {
-  height: 70px; 
-  
-}
-
-
-.menu-principal {
-  display: flex; 
-  align-items: center;
-  gap: 100px; 
- 
-}
-
-.menu-principal button {
-  background: none;
-  border: none;
-  color: #ffffff; /* Color de texto */
-  font-size: 16px; /* Tamaño del texto */
-  cursor: pointer;
-}
-
-.menu-principal button:hover {
-  text-decoration: underline; /* Subraya el texto cuando el cursor pasa sobre él */
-}
-
-/* Ícono de búsqueda en la esquina derecha (botón con fondo blanco y bordes redondeados) */
-.icono-busqueda button {
-  background-color: #32129a;
-  border: 1px solid #cccccc;
-  border-radius: 35px;
-  padding: 3px 100px 3px 70px; /* Changed: less padding on left (20px), keep right padding (100px) */
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  position: relative;
-}
-
-.icono-busqueda img {
-  width: 18px; /* Tamaño del ícono */
-  height: auto;
-  transform: translateY(-50%);
-  transform: translateX(-300%);
-}
-
-/* Fila con ícono de retroceso e ícono de búsqueda adicional */
+/* ── Fila de búsqueda / header de sección ─────────────────── */
 .fila-busqueda {
   display: flex;
   align-items: center;
   padding: 16px;
   background-color: #f7f7f7;
   position: relative;
+  min-height: 56px;
 }
-
 .fila-busqueda h2 {
   flex: 1;
   text-align: center;
-  width: 100%;
   position: absolute;
-  left: 0;
-  right: 0;
+  left: 0; right: 0;
   margin: auto;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-size: 1.15rem;
+  color: var(--tsj-blue, #32129a);
 }
-
 .botones-container {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  z-index: 1;
+  display: flex; align-items: center; gap: 20px; z-index: 1;
 }
-
 .btn-volver {
-  width: 32px;
-  height: auto;
-  cursor: pointer;
-  padding: 5px;
-  border-radius: 50%;
+  width: 32px; height: auto; cursor: pointer;
+  padding: 5px; border-radius: 50%;
   transition: all 0.3s ease;
 }
+.btn-volver:hover { background-color: #ccc; transform: scale(1.1); }
 
-.btn-volver:hover {
-  background-color: #cccccc;
-  transform: scale(1.1);
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
-}
-
-.btn-buscar {
-  background-color: #cccccc;
-  border-radius: 35px;
-  padding: 15px 20px 15px 50px;
-  width: 120px;
-  position: relative;
-  border: 1px solid #32129a;
-  text-align: center;
-}
-
-.btn-buscar img {
-  position: absolute;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
-}
-
-@media (max-width: 576px) {
-  .fila-busqueda {
-    flex-direction: column;
-    padding: 15px;
-    align-items: center;
-  }
-  
-  .fila-busqueda h2 {
-    position: static;
-    font-size: 20px;
-    margin-bottom: 15px;
-    text-align: center;
-    width: 100%;
-    order: -1;
-  }
-  
-  .botones-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    width: 100%;
-  }
-}
-.btn-buscar img {
-  width: 24px; /* Tamaño del ícono de lupa */
-  height: 24px;
-}
-
-/* Contenedor de empresas, con scroll si son muchas */
-.contenedor-empresas {
-  
-  padding: 16px; 
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
-  justify-content: center; 
-}
-
-.empresa {
-  display: flex; 
-  align-items: center;
-  background-color: #E0E0E0; 
-  border-radius: 35px; 
-  padding: 10px 20px;
-  margin-bottom: 10px; 
-  gap: 10px; 
-  max-width: 1000px; 
-  width: 100%;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: left;
-}
-
-.empresa:hover {
-  background-color: #32129a;
-  transform: translateX(5px);
-}
-
-.empresa:hover .empresa-nombre {
-  color: white;
-}
-
-.empresa-nombre {
-  font-size: 16px;
-  color: #000000;
-  flex: 1;
-  transition: color 0.3s ease;
-}
-
-.logo-empresa {
-  width: 50px;
-  height: 50px;
-  object-fit: contain;
-}
-
-
-.empresa button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  color: #000000;
-  text-align: left;
-  flex: 1;
-  transition: all 0.3s ease; /* Add smooth transition */
-  padding: 8px 12px;
-  border-radius: 4px;
-}
-
-.empresa button:hover {
-  background-color: #32129a;
-  color: white;
-  transform: translateX(5px);
-}
-
-
-.contenedor-empresas::-webkit-scrollbar {
-  width: 8px; 
-}
-.contenedor-empresas::-webkit-scrollbar-track {
-  background: #f0f0f0; 
-}
-.contenedor-empresas::-webkit-scrollbar-thumb {
-  background: #888; 
-}
-.contenedor-empresas::-webkit-scrollbar-thumb:hover {
-  background: #555; 
-}
-
-
-.footer {
-  background-color: #39383b;
-  margin-top: 40px;
-  padding: 40px 0;
-}
-
-.footer-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.footer-img {
-  display: flex;
-  align-items: center;
-}
-
-.footer-img img {
-  width: 250px;
-  height: auto;
-}
-
-.footer-links {
-  display: flex;
-  gap: 20px; 
-}
-
-.footer-links .footer-img img {
-  width: 80px;
-  height: auto;
-  margin: 0 20px;
-}
-
-.footer-text-links {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px; 
-}
-
-.footer-link {
-  font-family: "Poppins", sans-serif;
-  color: white;
-  text-decoration: none;
-  font-size: 18px;
-}
-
-.extra-info {
-  padding: 20px 0;
-  margin-top: 20px;
-  color: white;
-  text-align: center;
-}
-
-.extra-info .additional-images {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 80px; 
-  margin-top: -10px;
-  height: 100%;
-}
-
-.extra-info .additional-images img {
-  width: auto;
-  height: 60px;
-  object-fit: cover;
-}
-
-/* Media Queries para Responsividad */
-@media (max-width: 1024px) {
-  .barra-purpura {
-    padding: 10px 30px;
-  }
-  
-  .menu-principal {
-    gap: 50px;
-  }
-  
-  .icono-busqueda button {
-    padding: 3px 60px 3px 40px;
-  }
-  
-  .empresa {
-    max-width: 800px;
-  }
-}
-
-@media (max-width: 768px) {
-  .barra-purpura {
-    padding: 10px 20px;
-    flex-wrap: wrap;
-  }
-  
-  .menu-principal {
-    gap: 30px;
-    margin: 10px 0;
-    justify-content: center;
-    width: 100%;
-    order: 3;
-  }
-  
-  .logo-institucion {
-    order: 1;
-  }
-  
-  
-  .empresa {
-    max-width: 600px;
-  }
-}
-
-@media (max-width: 576px) {
-  .barra-purpura {
-    flex-direction: column;
-    padding: 10px;
-  }
-  
-  .logo-institucion {
-    margin-bottom: 10px;
-  }
-  
-  .menu-principal {
-    gap: 15px;
-    margin-bottom: 10px;
-  }
-  
-  
-  
-  .fila-busqueda {
-    flex-direction: column;
-    padding: 15px;
-    align-items: center;
-  }
-  
-  .fila-busqueda h2 {
-    font-size: 20px;
-    margin-bottom: 15px;
-    text-align: center;
-    width: 100%;
-    order: -1;
-  }
-  
-  .botones-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    width: 100%;
-  }
-  
-  .btn-volver {
-    width: 40px;
-    height: 40px;
-    position: static;
-  }
-  
-  .btn-buscar {
-    width: 150px;
-  }
-  
-  .empresa {
-    max-width: 100%;
-    padding: 8px 15px;
-  }
-  
-  .logo-empresa {
-    width: 40px;
-    height: 40px;
-  }
-  
-  .empresa button {
-    font-size: 14px;
-  }
-  
-  .contenedor-empresas {
-    padding: 10px;
-  }
-}
-
-/* Responsividad del Footer */
-@media (max-width: 600px) {
-  .footer-container {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .footer-img img {
-    max-width: 150px;
-  }
-  
-  .footer-links {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .footer-links .footer-img img {
-    width: 20px;
-  }
-  
-  .footer-text-links {
-    gap: 10px;
-  }
-
-  .footer-link {
-    font-size: 16px;
-  }
-
-  .extra-info .additional-images {
-    flex-direction: column;
-    gap: 40px; /* Increased from 20px to 40px for more spacing in mobile view */
-  }
-  
-  .extra-info .additional-images img {
-    width: 292px;
-    height: 60px;
-    object-fit: contain;
-  }
-}
-
-/* DataTables specific styling */
+/* ── Contenedor DataTable ─────────────────────────────────── */
 .datatable-container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 20px; max-width: 1200px; margin: 0 auto;
+  overflow-x: auto;
 }
-
-/* Button styling */
-.dt-buttons-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 15px;
-  flex: 1;
-}
-
-.dt-buttons {
-  margin-bottom: 15px;
-  display: flex;
-  justify-content: center;
-}
-
-.dt-buttons button {
-  margin-right: 5px;
-  padding: 6px 12px;
-  border-radius: 4px;
-  background-color: #32129a;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-.dt-buttons button:hover {
-  background-color: #260e77;
-}
-
-/* Card view styling */
-.table-bordered.card {
-  border: 0 !important;
-}
-
-.card thead {
-  display: none;
-}
-
-.card tbody tr {
-  float: left;
-  width: 25em;
-  margin: 0.5em;
-  border: 1px solid #bfbfbf;
-  border-radius: 0.5em;
-  background-color: transparent !important;
-  box-shadow: 0.25rem 0.25rem 0.5rem rgba(0, 0, 0, 0.25);
-}
-
-.card tbody tr td {
-  display: block;
-  border: 0;
-}
-
-.colHeader {
-  font-weight: bold;
-  margin-right: 5px;
-  color: #32129a;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .card tbody tr {
-    width: 100%;
-    margin: 0.5em 0;
-  }
-  
-  .dt-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-  }
-  
-  .dt-buttons button {
-    margin-right: 0;
-  }
-}
-
-/* DataTable entries controls styling */
-.dataTables_length {
-  margin-bottom: 15px;
-  font-family: "Poppins", sans-serif;
-}
-
-.dataTables_length select {
-  padding: 6px 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin: 0 5px;
-  background-color: white;
-}
-
-.dataTables_info {
-  margin-top: 15px;
-  font-family: "Poppins", sans-serif;
-  color: #666;
-}
-
-/* Reposition the length control above the table */
-.dt-top {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-  width: 100%;
-}
-
-.dt-length {
-  order: 1;
-  flex: 0 0 25%;
-}
-
-.dt-search {
-  order: 3;
-  flex: 0 0 25%;
-  text-align: right;
-}
-
-.dt-buttons-container {
-  display: flex;
-  justify-content: center;
-  order: 2;
-  flex: 0 0 50%;
-}
-
-.dt-buttons {
-  margin-bottom: 15px;
-  display: flex;
-  justify-content: center;
-}
-
-.dt-buttons button {
-  margin-right: 5px;
-  padding: 6px 12px;
-  border-radius: 4px;
-  background-color: #32129a;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-.dt-buttons button:hover {
-  background-color: #260e77;
-}
-
-/* Make the search input look nicer */
-.dataTables_filter input {
-  padding: 6px 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-left: 8px;
-}
-
-/* Pagination styling */
-.dataTables_paginate {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  margin-top: 15px;
-}
-
-/* Remove the order properties that were causing vertical stacking */
-.dataTables_paginate .previous,
-.dataTables_paginate .paginate_button:not(.previous):not(.next),
-.dataTables_paginate .next {
-  order: unset;
-}
-
-.paginate_button {
-  padding: 6px 12px;
-  margin: 0 2px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  cursor: pointer;
-  color: #333;
-  background-color: #fff;
-  text-decoration: none;
-  display: inline-block;
-}
-
-.paginate_button:hover {
-  background-color: #f5f5f5;
-}
-
-.paginate_button.current {
-  background-color: #32129a;
-  color: white;
-  border-color: #32129a;
-  width: 100%;
-  height: 100%;
-}
-
-.paginate_button.disabled {
-  color: #999;
-  cursor: not-allowed;
-}
-
-/* Table styling with vertical borders */
 .datatable-container table.dataTable {
-  border-collapse: collapse;
-  width: 100%;
+  border-collapse: collapse; width: 100%;
 }
-
 .datatable-container table.dataTable th,
 .datatable-container table.dataTable td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
+  border: 1px solid #ddd; padding: 8px; text-align: left;
 }
-
 .datatable-container table.dataTable th {
-  background-color: #f2f2f2;
-  color: #333;
-  font-weight: bold;
+  background-color: var(--tsj-blue, #32129a);
+  color: #fff; font-weight: 600;
+}
+.datatable-container table.dataTable tr:nth-child(odd)  { background-color: #f9f9f9; }
+.datatable-container table.dataTable tr:nth-child(even) { background-color: #e8e8e8; }
+.datatable-container table.dataTable tr:hover td { background-color: var(--tsj-blue-50, #f0edff); }
+
+/* ── DataTables UI ───────────────────────────────────────── */
+.dataTables_length { margin-bottom: 15px; font-family: var(--tsj-font, 'Poppins', sans-serif); }
+.dataTables_length select {
+  padding: 6px 10px; border: 1px solid #ccc;
+  border-radius: 4px; margin: 0 5px;
+}
+.dataTables_info { margin-top: 15px; font-family: var(--tsj-font, 'Poppins', sans-serif); color: #666; }
+.dataTables_filter input {
+  padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; margin-left: 8px;
+}
+.dataTables_filter input:focus {
+  outline: 2px solid var(--tsj-blue, #32129a); outline-offset: 1px;
+}
+.dataTables_paginate {
+  display: flex; flex-direction: row; justify-content: flex-end; margin-top: 15px;
+}
+.paginate_button {
+  padding: 6px 12px; margin: 0 2px;
+  border: 1px solid #ddd; border-radius: 4px;
+  cursor: pointer; color: #333; background-color: #fff;
+  text-decoration: none; display: inline-block;
+}
+.paginate_button:hover  { background-color: var(--tsj-blue-50, #f0edff); }
+.paginate_button.current {
+  background-color: var(--tsj-blue, #32129a);
+  color: white; border-color: var(--tsj-blue, #32129a);
+}
+.paginate_button.disabled { color: #999; cursor: not-allowed; }
+
+/* ── Botones DataTables ──────────────────────────────────── */
+.dt-buttons { margin-bottom: 15px; display: flex; justify-content: center; }
+.dt-buttons button {
+  margin-right: 5px; padding: 6px 12px; border-radius: 4px;
+  background-color: var(--tsj-blue, #32129a); color: white; border: none; cursor: pointer;
+}
+.dt-buttons button:hover { background-color: var(--tsj-blue-dark, #1e0b6e); }
+.dt-buttons button:focus-visible { outline: 2px solid var(--tsj-pink, #ec5a68); outline-offset: 2px; }
+
+.dt-top {
+  display: flex; flex-wrap: wrap;
+  justify-content: space-between; align-items: center;
+  margin-bottom: 15px; width: 100%;
+}
+.dt-length  { order: 1; flex: 0 0 25%; }
+.dt-search  { order: 3; flex: 0 0 25%; text-align: right; }
+.dt-buttons-container { display: flex; justify-content: center; order: 2; flex: 0 0 50%; }
+
+/* ── Filas clickables ────────────────────────────────────── */
+.data-row td:not(.actions-cell) { cursor: pointer; }
+.data-row:hover td { background-color: var(--tsj-blue-50, #f0edff) !important; }
+.actions-cell { white-space: nowrap; text-align: center; }
+
+/* ── Botones de acción ───────────────────────────────────── */
+.btn-editar, .btn-eliminar-btn {
+  display: inline-block; margin: 0 5px; font-size: 18px;
+  text-decoration: none; background: none; border: none; cursor: pointer; padding: 4px;
+  min-width: 44px; min-height: 44px;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.btn-editar:hover, .btn-eliminar-btn:hover { transform: scale(1.2); }
+.btn-editar:focus-visible, .btn-eliminar-btn:focus-visible {
+  outline: 2px solid var(--tsj-pink, #ec5a68); outline-offset: 2px;
 }
 
-/* Alternating row colors (instead of columns) */
-.datatable-container table.dataTable tr:nth-child(odd) {
-  background-color: #f9f9f9;
+/* ── Alertas flash ───────────────────────────────────────── */
+.alerta { padding: 15px; margin-bottom: 20px; border-radius: 4px; text-align: center; }
+.alerta-exito { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+
+/* ── Botones de gestión ──────────────────────────────────── */
+.btn-agregar {
+  background-color: var(--tsj-blue, #32129a); color: white;
+  padding: 8px 16px; border-radius: 4px; text-decoration: none;
+  font-weight: bold; display: inline-block; margin-left: 10px;
+  transition: background 0.2s;
 }
+.btn-agregar:hover { background-color: var(--tsj-blue-dark, #1e0b6e); }
+.btn-agregar:focus-visible { outline: 2px solid var(--tsj-pink, #ec5a68); outline-offset: 2px; }
 
-.datatable-container table.dataTable tr:nth-child(even) {
-  background-color: #e6e6e6;
+.btn-cerrar-sesion {
+  background-color: var(--tsj-danger, #dc2626); color: white;
+  border: none; padding: 6px 12px; border-radius: 4px;
+  cursor: pointer; font-weight: bold; transition: background 0.2s;
 }
+.btn-cerrar-sesion:hover { background-color: #b91c1c; }
 
-.datatable-container table.dataTable tr:hover td {
-  background-color: #d9d9d9;
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 576px) {
+  .fila-busqueda {
+    flex-direction: column; padding: 15px; align-items: center;
+  }
+  .fila-busqueda h2 {
+    position: static; font-size: 18px;
+    margin-bottom: 15px; text-align: center; width: 100%; order: -1;
+  }
+  .botones-container {
+    flex-direction: row; align-items: center;
+    justify-content: center; gap: 20px; width: 100%;
+  }
+  .dt-buttons { flex-wrap: wrap; gap: 5px; }
+  .dt-buttons button { margin-right: 0; }
 }
-
-
+@media (max-width: 768px) {
+  .dt-buttons { flex-wrap: wrap; gap: 5px; }
+}

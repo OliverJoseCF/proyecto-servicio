@@ -3,17 +3,6 @@
    Usa tokens de shared/assets/css/theme.css (--tsj-*)
    ================================================================ */
 
-/* ── Base ────────────────────────────────────────────────── */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  font-family: var(--tsj-font, 'Poppins', sans-serif);
-  background: var(--tsj-bg, #f5f5f5);
-  color: var(--tsj-text, #1f2937);
-  min-height: 100vh;
-  line-height: 1.6;
-}
-
 /* ── Contenedor principal ────────────────────────────────── */
 .contenedor {
   display: flex;
@@ -42,7 +31,7 @@ body {
   background: transparent;
   color: var(--tsj-blue, #32129a);
   border: 2px solid var(--tsj-blue, #32129a);
-  border-radius: 8px;
+  border-radius: var(--tsj-radius, 8px);
   font-family: var(--tsj-font, 'Poppins', sans-serif);
   font-weight: 600;
   font-size: 14px;
@@ -50,36 +39,18 @@ body {
   transition: background 0.25s, color 0.25s, transform 0.2s;
   display: inline-block;
 }
-
 .boton-navegacion:hover {
   background: var(--tsj-blue, #32129a);
   color: #fff;
   transform: translateY(-1px);
 }
-
 .boton-navegacion.active {
   background: var(--tsj-blue, #32129a);
   color: #fff;
 }
-
-/* ── Botones generales ───────────────────────────────────── */
-button {
-  margin: 8px 8px 16px 0;
-  padding: 10px 20px;
-  background: var(--tsj-blue, #32129a);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-family: var(--tsj-font, 'Poppins', sans-serif);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.25s, transform 0.2s;
-}
-
-button:hover {
-  background: var(--tsj-blue-dark, #1e0b6e);
-  transform: translateY(-1px);
+.boton-navegacion:focus-visible {
+  outline: 2px solid var(--tsj-pink, #ec5a68);
+  outline-offset: 2px;
 }
 
 /* ── Botón de descarga ───────────────────────────────────── */
@@ -93,25 +64,28 @@ button:hover {
   color: #fff;
   text-decoration: none;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--tsj-radius, 8px);
   font-family: var(--tsj-font, 'Poppins', sans-serif);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.25s, transform 0.2s;
 }
-
 .boton-descarga:hover {
   background: var(--tsj-blue-dark, #1e0b6e);
   color: #fff;
   transform: translateY(-1px);
 }
+.boton-descarga:focus-visible {
+  outline: 2px solid var(--tsj-pink, #ec5a68);
+  outline-offset: 2px;
+}
 
 /* ── Tarjetas ────────────────────────────────────────────── */
 .tarjeta {
   background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 14px;
+  border: 1px solid var(--tsj-gray-200, #e5e7eb);
+  border-radius: var(--tsj-radius-lg, 14px);
   padding: 28px;
   margin-bottom: 24px;
   box-shadow: 0 2px 12px rgba(50, 18, 154, 0.06);
@@ -119,7 +93,6 @@ button:hover {
   position: relative;
   overflow: hidden;
 }
-
 .tarjeta::before {
   content: '';
   position: absolute;
@@ -129,12 +102,10 @@ button:hover {
   opacity: 0;
   transition: opacity 0.25s;
 }
-
 .tarjeta:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 28px rgba(50, 18, 154, 0.12);
 }
-
 .tarjeta:hover::before { opacity: 1; }
 
 .tarjeta h3 {
@@ -150,31 +121,20 @@ button:hover {
   max-width: 720px;
   margin: 0 auto;
 }
-
-.servicio-contenido h2 {
-  color: var(--tsj-blue, #32129a);
-  border-bottom: 2px solid var(--tsj-pink, #ec5a68);
-  padding-bottom: 8px;
-  margin-top: 28px;
-  margin-bottom: 14px;
-  font-size: 1.15rem;
-  font-weight: 700;
-}
-
 .servicio-contenido p {
   margin-bottom: 14px;
   line-height: 1.75;
-  color: #374151;
+  color: var(--tsj-gray-700, #374151);
 }
 
-ul {
+/* ── Listas (scoped) ─────────────────────────────────────── */
+.contenido-centrado ul {
   margin-bottom: 1.5rem;
   padding-left: 1.5rem;
   text-align: left;
-  color: #374151;
+  color: var(--tsj-gray-700, #374151);
 }
-
-ul ul { margin-top: 0.5rem; }
+.contenido-centrado ul ul { margin-top: 0.5rem; }
 
 /* ── Sección de descargas ────────────────────────────────── */
 .descargas-servicio {
@@ -183,24 +143,22 @@ ul ul { margin-top: 0.5rem; }
   gap: 14px;
   margin-top: 18px;
 }
-
 .descargas-servicio .boton-descarga {
   justify-content: center;
   padding: 14px 20px;
 }
-
 .descargas-servicio .boton-descarga i { font-size: 1.1rem; }
 
 /* ── Barra de progreso ───────────────────────────────────── */
 .progress-container {
   width: 100%;
-  background: #e5e7eb;
+  background: var(--tsj-gray-200, #e5e7eb);
   border-radius: 10px;
   margin: 18px 0;
   overflow: hidden;
   height: 24px;
+  position: relative;
 }
-
 .progress-bar {
   height: 100%;
   background: linear-gradient(90deg, var(--tsj-blue, #32129a), var(--tsj-blue-dark, #1e0b6e));
@@ -212,6 +170,7 @@ ul ul { margin-top: 0.5rem; }
   color: #fff;
   font-weight: 700;
   font-size: 13px;
+  min-width: 2.5rem;
 }
 
 /* ── Checklist ───────────────────────────────────────────── */
@@ -220,18 +179,16 @@ ul ul { margin-top: 0.5rem; }
   align-items: center;
   padding: 12px 14px;
   margin: 6px 0;
-  background: #f9f8ff;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  background: var(--tsj-blue-50, #f0edff);
+  border-radius: var(--tsj-radius, 8px);
+  border: 1px solid var(--tsj-gray-200, #e5e7eb);
   transition: background 0.2s, transform 0.15s;
-  color: #374151;
+  color: var(--tsj-gray-700, #374151);
 }
-
 .checklist-item:hover {
-  background: #f0edff;
+  background: var(--tsj-blue-100, #ddd5ff);
   transform: translateX(4px);
 }
-
 .checklist-item input[type="checkbox"] {
   margin-right: 12px;
   width: 18px;
@@ -239,37 +196,22 @@ ul ul { margin-top: 0.5rem; }
   accent-color: var(--tsj-blue, #32129a);
   flex-shrink: 0;
 }
-
 .checklist-item label {
   cursor: pointer;
   flex: 1;
-  color: #374151;
+  color: var(--tsj-gray-700, #374151);
 }
-
 .checklist-item.completed label {
-  color: #6b7280;
+  color: var(--tsj-gray-400, #9ca3af);
   text-decoration: line-through;
 }
 
 /* ── Timeline ────────────────────────────────────────────── */
-/*
-  Diseño de columna única:
-  - línea vertical en left: 19px (dentro del padding de 44px)
-  - punto (.timeline-dot) centrado exactamente sobre la línea
-  - tarjeta (.timeline-item) a la derecha de la línea
-
-  Matemática de alineación:
-    padding-left del .timeline = 44px
-    línea en left: 19px  → centro de la línea = 20px
-    punto width = 12px   → left: -30px desde .timeline-item
-    centro del punto = 44 - 30 + 6 = 20px  ✓
-*/
 .timeline {
   position: relative;
   padding-left: 44px;
   margin: 24px 0 8px;
 }
-
 .timeline::before {
   content: '';
   position: absolute;
@@ -282,52 +224,42 @@ ul ul { margin-top: 0.5rem; }
     var(--tsj-pink, #ec5a68) 100%);
   border-radius: 2px;
 }
-
 .timeline-item {
   position: relative;
   margin-bottom: 16px;
   padding: 18px 20px;
   background: #fff;
   border-radius: 10px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--tsj-gray-200, #e5e7eb);
   border-left: 3px solid var(--tsj-blue, #32129a);
   box-shadow: 0 2px 10px rgba(0,0,0,0.06);
   transition: transform 0.2s, box-shadow 0.2s;
 }
-
 .timeline-item:last-child { margin-bottom: 0; }
-
 .timeline-item:hover {
   transform: translateX(3px);
   box-shadow: 0 4px 16px rgba(50,18,154,0.10);
 }
-
 .timeline-dot {
   position: absolute;
-  left: -30px;       /* centro = 44 - 30 + 6 = 20px desde el inicio del .timeline ✓ */
+  left: -30px;
   top: 20px;
   width: 12px;
   height: 12px;
-  background: var(--tsj-blue, #32129a);
   border-radius: 50%;
   border: 3px solid #fff;
-  box-shadow: 0 0 0 2px var(--tsj-blue, #32129a);
   z-index: 1;
 }
-
-/* Alterna el color del punto según la fase */
-.timeline-item:nth-child(odd) .timeline-dot  { background: var(--tsj-blue, #32129a); box-shadow: 0 0 0 2px var(--tsj-blue, #32129a); }
+.timeline-item:nth-child(odd)  .timeline-dot { background: var(--tsj-blue, #32129a); box-shadow: 0 0 0 2px var(--tsj-blue, #32129a); }
 .timeline-item:nth-child(even) .timeline-dot { background: var(--tsj-pink, #ec5a68); box-shadow: 0 0 0 2px var(--tsj-pink, #ec5a68); }
-
 .timeline-item h4 {
   font-weight: 700;
   color: var(--tsj-blue, #32129a);
   font-size: 0.95rem;
   margin: 0 0 5px;
 }
-
 .timeline-item p {
-  color: #4b5563;
+  color: var(--tsj-gray-600, #4b5563);
   font-size: 14px;
   margin: 0;
   line-height: 1.55;
@@ -336,15 +268,15 @@ ul ul { margin-top: 0.5rem; }
 /* ── FAQ ─────────────────────────────────────────────────── */
 .faq-item {
   margin: 12px 0;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--tsj-gray-200, #e5e7eb);
   border-radius: 10px;
   overflow: hidden;
 }
-
 .faq-question {
   width: 100%;
+  margin: 0;
   padding: 14px 18px;
-  background: #f9f8ff;
+  background: var(--tsj-blue-50, #f0edff);
   border: none;
   border-radius: 10px;
   text-align: left;
@@ -358,118 +290,71 @@ ul ul { margin-top: 0.5rem; }
   justify-content: space-between;
   align-items: center;
 }
-
-.faq-question:hover { background: #f0edff; }
-
+.faq-question:hover { background: var(--tsj-blue-100, #ddd5ff); }
+.faq-question:focus-visible {
+  outline: 2px solid var(--tsj-pink, #ec5a68);
+  outline-offset: -2px;
+}
 .faq-answer {
   padding: 0 18px;
   max-height: 0;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: max-height 0.3s ease, padding 0.3s ease;
   background: #fff;
   border-radius: 0 0 10px 10px;
-  color: #374151;
+  color: var(--tsj-gray-700, #374151);
   font-size: 14px;
   line-height: 1.7;
 }
-
 .faq-answer.active { padding: 14px 18px; max-height: 500px; }
-
 .faq-icon { transition: transform 0.3s ease; color: var(--tsj-pink, #ec5a68); }
 .faq-item.active .faq-icon { transform: rotate(180deg); }
 
-/* ── Buscador ────────────────────────────────────────────── */
-.search-container {
-  position: relative;
-  margin: 18px 0;
-}
-
-.search-input {
-  width: 100%;
-  padding: 14px 44px 14px 18px;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 50px;
-  font-family: var(--tsj-font, 'Poppins', sans-serif);
-  font-size: 14px;
-  background: #fff;
-  transition: border-color 0.25s, box-shadow 0.25s;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--tsj-blue, #32129a);
-  box-shadow: 0 0 0 3px rgba(50, 18, 154, 0.10);
-}
-
-.search-icon {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #9ca3af;
-  font-size: 1.1rem;
-  pointer-events: none;
-}
-
 /* ── Calculadora ─────────────────────────────────────────── */
-.calculator-container {
-  background: #fff;
-  border-radius: 14px;
-  padding: 24px;
-  margin: 18px 0;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-  border: 1px solid #e5e7eb;
-}
-
 .calculator-input {
   width: 100%;
   padding: 11px 14px;
   margin: 8px 0;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1.5px solid var(--tsj-gray-200, #e5e7eb);
+  border-radius: var(--tsj-radius, 8px);
   font-family: var(--tsj-font, 'Poppins', sans-serif);
   font-size: 14px;
   transition: border-color 0.25s, box-shadow 0.25s;
 }
-
 .calculator-input:focus {
   border-color: var(--tsj-blue, #32129a);
   box-shadow: 0 0 0 3px rgba(50, 18, 154, 0.10);
   outline: none;
 }
-
 .calculator-result {
   margin-top: 14px;
   padding: 14px;
-  background: #f0edff;
-  border-radius: 8px;
+  background: var(--tsj-blue-50, #f0edff);
+  border-radius: var(--tsj-radius, 8px);
   font-weight: 700;
   color: var(--tsj-blue, #32129a);
   border: 1px solid rgba(50, 18, 154, 0.15);
   font-size: 14px;
+  min-height: 44px;
 }
 
 /* ── Contenido buscable ──────────────────────────────────── */
-.searchable-content { color: #374151; }
+.searchable-content { color: var(--tsj-gray-700, #374151); }
 .searchable-content h4 {
   font-weight: 700;
+  font-size: 0.92rem;
   color: var(--tsj-blue, #32129a);
   margin-bottom: 6px;
 }
 
 /* ── Animaciones ─────────────────────────────────────────── */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in { animation: fadeIn 0.6s ease-out; }
 }
-
-@keyframes slideIn {
-  from { transform: translateX(-100%); opacity: 0; }
-  to   { transform: translateX(0);     opacity: 1; }
-}
-
-.fade-in  { animation: fadeIn  0.6s ease-out; }
-.slide-in { animation: slideIn 0.5s ease-out; }
 
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 768px) {
@@ -477,11 +362,15 @@ ul ul { margin-top: 0.5rem; }
   .navegacion-secciones { flex-direction: column; align-items: center; }
   .descargas-servicio { grid-template-columns: 1fr; }
   .timeline { padding-left: 36px; }
-  .timeline::before { left: 15px; }   /* centro = 16px */
-  .timeline-dot { left: -26px; }      /* centro = 36 - 26 + 6 = 16px ✓ */
+  .timeline::before { left: 15px; }
+  .timeline-dot { left: -26px; }
   .tarjeta { padding: 20px; }
 }
-
 @media (max-width: 480px) {
   .boton-navegacion { width: 100%; text-align: center; }
+}
+@media (max-width: 360px) {
+  .tarjeta { padding: 16px; }
+  .timeline { padding-left: 28px; }
+  .timeline-dot { left: -20px; }
 }

@@ -1,181 +1,30 @@
+/* ================================================================
+   convenios/src/css/styles.css  —  Estilos del módulo de convenios
+   Usa tokens de shared/assets/css/theme.css (--tsj-*)
+   IMPORTANTE: Este archivo es importado desde output.css (build de Tailwind).
+   Para producción, usa únicamente output.css.
+   ================================================================ */
+
 @import "tailwindcss";
 
 :root {
-  --text-color: #32129a;
-  --box-color-orange: rgb(243, 178, 66);
-  --box-color-green: #5bc792;
+  --conv-text:   #32129a;
+  --conv-orange: rgb(243, 178, 66);
+  --conv-green:  #5bc792;
 }
 
-/* ── Base ───────────────────────────────────────────────────── */
-body {
-  background-color: #f5f5f5;
-}
-
-img {
-  max-width: 100%;
-  vertical-align: top;
-}
-
-.fixed {
-  z-index: 1000 !important;
-}
-
-/* ── Header / Toolbar ───────────────────────────────────────── */
-.up-header {
-  height: 10px;
-  background: #ec5a68;
-}
-
-.toolbar {
-  background: #32129a;
-  box-shadow: 0 3px 9px #00000029;
-  color: #fff;
-  padding: 10px 20px;
-}
-
-.center-section {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.imgJalisco {
-  width: auto;
-  max-width: 200px;
-}
-
-.home-icon {
-  display: block;
-}
-
-/* ── Navigation ─────────────────────────────────────────────── */
-.desktop-nav {
-  display: flex;
-  gap: 40px;
-  align-items: center;
-}
-
-.desktop-nav a,
-.text-container a {
-  position: relative;
-  text-decoration: none;
-  color: white;
-  padding-bottom: 2px;
-  border-bottom: 2px solid transparent;
-  transition: border-color 0.3s ease;
-}
-
-.desktop-nav a:hover,
-.text-container a:hover {
-  border-bottom: 2px solid white;
-}
-
-.text-login.text-white.texto-inter {
-  text-decoration: none;
-  position: relative;
-}
-
-.text-login.text-white.texto-inter::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 1px;
-  background-color: white;
-  left: 0;
-  bottom: -2px;
-  transform: scaleX(0);
-  transform-origin: center;
-  transition: transform 0.3s ease;
-}
-
-.text-login.text-white.texto-inter:hover::after {
-  transform: scaleX(1);
-}
-
-.menu-button {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 10px;
-  transition: transform 0.3s ease;
-}
-
-.menu-button img {
-  transition: opacity 0.3s ease;
-  width: 24px;
-  height: 24px;
-}
-
-.menu-button.active {
-  transform: rotate(180deg);
-}
-
-.imgHome {
-  display: flex;
-  justify-content: center;
-}
-
-.text-container {
-  display: none;
-}
-
-/* ── Mobile slide-out menu ──────────────────────────────────── */
-.menu-panel {
-  position: fixed;
-  top: 103px;
-  left: -300px;
-  width: 300px;
-  height: calc(100vh - 103px);
-  background: white;
-  transition: left 0.3s ease;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-}
-
-.menu-panel.active {
-  left: 0;
-}
-
-.menu-content {
-  padding: 20px;
-}
-
-.menu-item {
-  color: #32129a;
-  font-family: "Inter", sans-serif;
-  padding: 15px 0;
-  border-bottom: 1px solid #eee;
-  cursor: pointer;
-  margin-bottom: 25px;
-  width: 100%;
-  box-sizing: border-box;
-  display: block;
-}
-
-.menu-item:last-child {
-  margin-bottom: 0;
-}
-
-.menu-item:hover {
-  background-color: #f5f5f5;
-}
-
-/* ── Typography helpers ─────────────────────────────────────── */
-.text-base_blue-500 {
-  color: rgb(50, 18, 154);
-}
-
+/* ── Tipografía auxiliar ─────────────────────────────────── */
+.text-base_blue-500 { color: var(--conv-text); }
 .text-convenios {
-  font-family: "Poppins", sans-serif !important;
+  font-family: var(--tsj-font, 'Poppins', sans-serif) !important;
   font-weight: 800;
 }
-
 .texto-inter {
-  font-family: "Inter", sans-serif;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
   font-weight: 300;
 }
 
-/* ── Cards ──────────────────────────────────────────────────── */
+/* ── Cards de carrera ────────────────────────────────────── */
 .cards-container {
   display: flex;
   justify-content: center;
@@ -187,7 +36,7 @@ img {
 
 .card {
   width: 360px;
-  height: 500px;
+  min-height: 400px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -199,543 +48,193 @@ img {
   color: inherit;
   transition: transform 0.3s ease, box-shadow 0.3s;
 }
-
 .card:hover {
-  box-shadow: 0 10px 20px #0003;
-  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  transform: scale(1.04);
 }
-
+.card:focus-visible {
+  outline: 3px solid var(--tsj-pink, #ec5a68);
+  outline-offset: 3px;
+}
 .card::after {
   content: "";
   position: absolute;
-  bottom: -50px;
-  left: 50%;
+  bottom: -50px; left: 50%;
   transform: translateX(-50%);
-  width: 100%;
-  height: 80px;
-  background: rgba(255, 255, 255, 1);
+  width: 100%; height: 80px;
+  background: rgba(255,255,255,1);
   border-radius: 0 0 20px 20px;
 }
-
 .ing-sistemas {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
 }
-
 .card-text {
-  font-family: "Poppins", sans-serif !important;
-  width: 100%;
-  height: 35%;
-  background: white;
-  color: var(--text-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  font-weight: 800;
+  font-family: var(--tsj-font, 'Poppins', sans-serif) !important;
+  width: 100%; background: white;
+  color: var(--conv-text);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 800;
   text-align: center;
-  margin: 0 0 4px;
-  white-space: normal;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-wrap: break-word;
+  padding: 16px 12px;
+  overflow: hidden; word-wrap: break-word;
 }
 
-.corner-box-top {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  height: 55px;
-  width: 55px;
-  background-color: var(--box-color-orange);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* Decoración de esquinas */
+.corner-box-top, .corner-box-top-green {
+  position: absolute; top: 15px; left: 15px;
+  height: 55px; width: 55px;
+  display: flex; justify-content: center; align-items: center;
   border-radius: 5px;
 }
-
-.corner-logo {
-  width: 90%;
-  height: auto;
-  object-fit: contain;
+.corner-box-top       { background-color: var(--conv-orange); }
+.corner-box-top-green { background-color: var(--conv-green); }
+.corner-logo { width: 90%; height: auto; object-fit: contain; }
+.corner-box, .corner-box-green {
+  position: absolute; bottom: 125px; left: 0;
+  height: 16px; width: 100px;
 }
+.corner-box       { background-color: var(--conv-orange); }
+.corner-box-green { background-color: var(--conv-green); }
 
-.corner-box {
-  position: absolute;
-  bottom: 125px;
-  left: 0px;
-  height: 16px;
-  width: 100px;
-  background-color: var(--box-color-orange);
-}
-
-.corner-box-green {
-  position: absolute;
-  bottom: 125px;
-  left: 0px;
-  height: 16px;
-  width: 100px;
-  background-color: var(--box-color-green);
-}
-
-.corner-box-top-green {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  height: 55px;
-  width: 55px;
-  background-color: var(--box-color-green);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 5px;
-}
-
-/* ── Footer ─────────────────────────────────────────────────── */
-.footer {
-  background-color: #39383b;
-  margin-top: 40px;
-  padding: 40px 0;
-}
-
-.footer-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.footer-img {
-  display: flex;
-  align-items: center;
-}
-
-.footer-img img {
-  width: 250px;
-  height: auto;
-}
-
-.footer-link {
-  font-family: "Poppins", sans-serif !important;
-  color: white;
-  text-decoration: none;
-  font-size: 18px;
-}
-
-.footer-links .footer-img img {
-  width: 80px;
-  height: auto;
-  margin: 0 20px;
-}
-
-.extra-info {
-  padding: 20px 0;
-  margin-top: 20px;
-}
-
-.extra-info .additional-images {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 50px;
-  margin-top: -10px;
-  height: 100%;
-}
-
-.extra-info .additional-images img {
-  width: auto;
-  height: 60px;
-  object-fit: cover;
-}
-
-/* ── Login Modal ────────────────────────────────────────────── */
+/* ── Login Modal ────────────────────────────────────────── */
 .login-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  opacity: 0;
-  visibility: hidden;
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 1000; opacity: 0; visibility: hidden;
   transition: opacity 0.3s, visibility 0.3s;
 }
-
-.login-modal-overlay.active {
-  opacity: 1;
-  visibility: visible;
-}
-
+.login-modal-overlay.active { opacity: 1; visibility: visible; }
 .login-modal {
-  background-color: white;
-  border-radius: 10px;
-  padding: 30px;
-  width: 90%;
-  max-width: 400px;
-  position: relative;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  transform: translateY(-20px);
-  transition: transform 0.3s;
+  background-color: white; border-radius: 10px;
+  padding: 30px; width: 90%; max-width: 400px;
+  position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  transform: translateY(-20px); transition: transform 0.3s;
 }
-
-.login-modal-overlay.active .login-modal {
-  transform: translateY(0);
-}
-
+.login-modal-overlay.active .login-modal { transform: translateY(0); }
 .login-close-button {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #666;
+  position: absolute; top: 15px; right: 15px;
+  background: none; border: none; font-size: 24px; cursor: pointer;
+  color: #666; min-width: 44px; min-height: 44px;
+  display: flex; align-items: center; justify-content: center;
 }
-
+.login-close-button:focus-visible { outline: 2px solid var(--tsj-pink, #ec5a68); outline-offset: 2px; }
 .login-modal h2 {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  font-size: 24px;
-  color: #32129A;
-  margin-bottom: 5px;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-weight: 700; font-size: 24px;
+  color: var(--conv-text); margin-bottom: 5px;
 }
-
-.login-subtitle {
-  color: #666;
-  margin-bottom: 25px;
-  font-size: 14px;
-}
-
-.login-form-group {
-  margin-bottom: 20px;
-}
-
-.login-form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #444;
-}
-
+.login-subtitle { color: #666; margin-bottom: 25px; font-size: 14px; }
+.login-form-group { margin-bottom: 20px; }
+.login-form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #444; }
 .login-input-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
+  position: relative; display: flex; align-items: center;
+  border: 1px solid #ddd; border-radius: 8px; overflow: hidden;
+  margin-bottom: 12px;
 }
-
 .login-input-container input {
-  flex: 1;
-  padding: 12px 12px 12px 40px;
-  border: none;
-  outline: none;
-  font-size: 14px;
+  flex: 1; padding: 12px 12px 12px 40px; border: none; font-size: 14px;
+  outline: none; background: transparent;
 }
-
-.login-icon {
-  position: absolute;
-  left: 12px;
-  color: #666;
+.login-input-container:focus-within {
+  border-color: var(--conv-text);
+  box-shadow: 0 0 0 3px rgba(50,18,154,0.12);
 }
-
+.login-icon { position: absolute; left: 12px; color: #666; }
 .toggle-password {
-  position: absolute;
-  right: 10px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #666;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
+  position: absolute; right: 10px;
+  background: none; border: none; cursor: pointer; color: #666;
+  min-width: 44px; min-height: 44px;
+  display: flex; align-items: center; justify-content: center; padding: 0;
 }
-
-.toggle-password svg {
-  width: 20px;
-  height: 20px;
-}
-
-/* Login error message inside modal */
+.toggle-password:focus-visible { outline: 2px solid var(--tsj-pink, #ec5a68); outline-offset: 2px; }
 .login-error {
-  color: #721c24;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  border-radius: 4px;
-  padding: 10px 14px;
-  margin-bottom: 16px;
-  font-size: 14px;
-  text-align: center;
+  color: #721c24; background-color: #f8d7da;
+  border: 1px solid #f5c6cb; border-radius: 4px;
+  padding: 10px 14px; margin-bottom: 16px;
+  font-size: 14px; text-align: center;
 }
-
 .login-button {
-  position: relative;
-  padding: 10px 20px;
-  border-radius: 7px;
-  border: 1px solid #32129a;
-  font-size: 14px;
-  text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: 2px;
-  background: transparent;
-  color: #32129a;
-  overflow: hidden;
-  box-shadow: 0 0 0 0 transparent;
+  position: relative; padding: 10px 20px;
+  border-radius: 7px; border: 1px solid var(--conv-text);
+  font-size: 14px; text-transform: uppercase;
+  font-weight: 600; letter-spacing: 2px;
+  background: transparent; color: var(--conv-text);
+  overflow: hidden; cursor: pointer;
   transition: all 0.2s ease-in;
-  cursor: pointer;
-  display: block;
-  margin: 20px auto;
-  width: 200px;
+  display: block; margin: 20px auto; width: 200px;
+  min-height: 44px;
 }
-
-.login-button:hover {
-  background: #32129a;
-  box-shadow: 0 0 30px 5px #5437b3;
-  transition: all 0.2s ease-out;
-  color: #fff;
+.login-button:hover { background: var(--conv-text); color: #fff; }
+.login-button:focus-visible { outline: 2px solid var(--tsj-pink, #ec5a68); outline-offset: 2px; }
+@media (prefers-reduced-motion: no-preference) {
+  .login-button:hover::before { animation: sh02 0.5s 0s linear; }
+  .login-button::before {
+    content: ''; display: block; width: 0; height: 86%;
+    position: absolute; top: 7%; left: 0;
+    opacity: 0; background: #fff;
+    box-shadow: 0 0 50px 30px #fff; transform: skewX(-20deg);
+  }
+  @keyframes sh02 {
+    from { opacity: 0; left: 0; }
+    50%  { opacity: 1; }
+    to   { opacity: 0; left: 100%; }
+  }
 }
-
-.login-button:hover::before {
-  animation: sh02 0.5s 0s linear;
+.logout-button {
+  background: #dc2626; color: #fff;
+  border: none; border-radius: 6px;
+  padding: 8px 16px; cursor: pointer;
+  font-weight: 600; font-size: 14px;
+  transition: background 0.2s;
 }
+.logout-button:hover { background: #b91c1c; }
 
-.login-button::before {
-  content: '';
-  display: block;
-  width: 0px;
-  height: 86%;
-  position: absolute;
-  top: 7%;
-  left: 0%;
-  opacity: 0;
-  background: #fff;
-  box-shadow: 0 0 50px 30px #fff;
-  transform: skewX(-20deg);
-}
-
-@keyframes sh02 {
-  from { opacity: 0; left: 0%; }
-  50%  { opacity: 1; }
-  to   { opacity: 0; left: 100%; }
-}
-
-.login-button:active {
-  box-shadow: 0 0 0 0 transparent;
-  transition: box-shadow 0.2s ease-in;
-}
-
-/* ── Suggest Company Modal ──────────────────────────────────── */
+/* ── Suggest Company Modal ──────────────────────────────── */
 .suggest-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1100;
-  opacity: 0;
-  visibility: hidden;
+  position: fixed; inset: 0;
+  background-color: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 1100; opacity: 0; visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
 }
-
-.suggest-modal-overlay.active {
-  opacity: 1;
-  visibility: visible;
-}
-
+.suggest-modal-overlay.active { opacity: 1; visibility: visible; }
 .suggest-modal {
-  background-color: white;
-  border-radius: 12px;
+  background-color: white; border-radius: 12px;
   padding: 36px 30px 30px;
-  width: 90%;
-  max-width: 480px;
-  position: relative;
-  box-shadow: 0 8px 32px rgba(50, 18, 154, 0.18);
-  transform: translateY(-20px);
-  transition: transform 0.3s ease;
+  width: 90%; max-width: 480px;
+  position: relative; box-shadow: 0 8px 32px rgba(50,18,154,0.18);
+  transform: translateY(-20px); transition: transform 0.3s ease;
 }
-
-.suggest-modal-overlay.active .suggest-modal {
-  transform: translateY(0);
-}
-
+.suggest-modal-overlay.active .suggest-modal { transform: translateY(0); }
 .suggest-modal-close {
-  position: absolute;
-  top: 14px;
-  right: 16px;
-  background: none;
-  border: none;
-  font-size: 26px;
-  line-height: 1;
-  cursor: pointer;
-  color: #888;
-  transition: color 0.2s;
+  position: absolute; top: 14px; right: 16px;
+  background: none; border: none; font-size: 26px; line-height: 1;
+  cursor: pointer; color: #888; transition: color 0.2s;
+  min-width: 44px; min-height: 44px;
+  display: flex; align-items: center; justify-content: center;
 }
-
-.suggest-modal-close:hover {
-  color: #32129a;
-}
-
+.suggest-modal-close:hover { color: var(--conv-text); }
+.suggest-modal-close:focus-visible { outline: 2px solid var(--tsj-pink, #ec5a68); outline-offset: 2px; }
 .suggest-modal h2 {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  font-size: 20px;
-  color: #32129A;
-  margin-bottom: 20px;
-  text-align: center;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-weight: 700; font-size: 20px;
+  color: var(--conv-text); margin-bottom: 20px; text-align: center;
 }
+.suggest-modal .login-input-container { margin-bottom: 16px; }
 
-.suggest-modal .login-input-container {
-  margin-bottom: 16px;
-}
-
-/* ── Responsive ─────────────────────────────────────────────── */
-@media (min-width: 601px) {
-  .desktop-nav {
-    display: flex;
-    gap: 40px;
-    align-items: center;
-  }
-  .menu-button,
-  .imgHome {
-    display: none;
-  }
-  .toolbar {
-    justify-content: center;
-    gap: 40px;
-  }
-  .menu-panel {
-    display: none;
-  }
-  .text-container {
-    display: flex;
-    gap: 40px;
-  }
-}
-
+/* ── Responsive ─────────────────────────────────────────── */
 @media (max-width: 600px) {
-  .desktop-nav {
-    display: none !important;
-  }
-  .menu-button {
-    display: block;
-  }
-  .imgHome {
-    display: block;
-  }
-  .text-container {
-    display: none;
-  }
-  .toolbar {
-    padding: 10px;
-    gap: 20px;
-    justify-content: space-between;
-  }
-  .home-icon {
-    margin: 0;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  .container {
-    width: 100%;
-    padding: 10px;
-  }
-  .imgJalisco {
-    max-width: 150px;
-    z-index: 1;
-  }
-  .card {
-    width: 100%;
-    height: auto;
-    min-height: 400px;
-    margin: 10px 0;
-  }
-  .card-text {
-    font-size: 18px;
-    height: auto;
-    min-height: 80px;
-    padding: 10px;
-  }
-  .w-full.fixed {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 999;
-  }
-  .footer-container {
-    flex-direction: column;
-    align-items: center;
-  }
-  .footer-img img {
-    max-width: 150px;
-  }
-  .footer-links {
-    flex-direction: column;
-    gap: 10px;
-  }
-  .footer-links .footer-img img {
-    width: 20px;
-  }
-  .footer-text-links {
-    gap: 10px;
-  }
-  .footer-link {
-    font-size: 16px;
-  }
-  .additional-images {
-    flex-direction: column;
-    gap: 20px;
-  }
-  .additional-images img {
-    width: 80%;
-    max-width: 300px;
-    height: auto;
-  }
+  .card { width: 100%; min-height: 350px; margin: 10px 0; }
+  .card-text { font-size: 18px; padding: 12px; }
 }
-
 @media (min-width: 601px) and (max-width: 1024px) {
-  .cards-container {
-    padding: 15px;
-    gap: 15px;
-  }
-  .card {
-    width: calc(50% - 15px);
-    height: 450px;
-    flex: 1 1 calc(50% - 20px);
-  }
-  .toolbar {
-    padding: 10px 15px;
-    gap: 20px;
-  }
-  .text-container {
-    gap: 20px;
-  }
+  .cards-container { padding: 15px; gap: 15px; }
+  .card { width: calc(50% - 15px); flex: 1 1 calc(50% - 20px); }
 }
-
 @media (min-width: 1025px) {
-  .cards-container {
-    padding: 20px;
-    gap: 20px;
-  }
-  .card {
-    width: calc(33.33% - 20px);
-    flex: 1 1 calc(33.33% - 20px);
-  }
+  .card { width: calc(33.33% - 20px); flex: 1 1 calc(33.33% - 20px); }
 }

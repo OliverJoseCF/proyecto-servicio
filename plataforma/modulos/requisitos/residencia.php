@@ -1,262 +1,294 @@
 <?php
 $tsj_module    = 'requisitos';
 $tsj_title     = 'Requisitos — Residencia Profesional';
-$tsj_extra_css  = [
+$tsj_extra_css = [
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css',
     'assets/css/style.css',
 ];
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 
-  <main class="contenedor">
-    <div class="contenido-centrado">
-      <div class="navegacion-secciones">
-        <a href="residencia.php" class="boton-navegacion active">Residencia</a>
-        <a href="servicio-social.php" class="boton-navegacion">Servicio Social</a>
+<main id="main" class="contenedor">
+  <div class="contenido-centrado">
+
+    <h1 class="sr-only">Residencia Profesional — TSJ Chapala</h1>
+
+    <nav class="navegacion-secciones" aria-label="Secciones del módulo">
+      <a href="residencia.php" class="boton-navegacion active" aria-current="page">Residencia</a>
+      <a href="servicio-social.php" class="boton-navegacion">Servicio Social</a>
+    </nav>
+
+    <!-- Calculadora de Créditos -->
+    <section class="tarjeta" aria-label="Calculadora de créditos">
+      <h2><i class="fas fa-calculator" aria-hidden="true"></i> Calculadora de Créditos</h2>
+      <p>Calcula cuántos créditos necesitas para iniciar residencia</p>
+      <label for="totalCredits">Créditos totales de tu carrera</label>
+      <input type="number" class="calculator-input" id="totalCredits"
+             placeholder="Ej. 240" min="1" oninput="calculateCredits()">
+      <label for="currentCredits">Créditos acreditados</label>
+      <input type="number" class="calculator-input" id="currentCredits"
+             placeholder="Ej. 180" min="0" oninput="calculateCredits()">
+      <div class="calculator-result" id="creditResult" aria-live="polite" role="status">
+        Ingresa tus créditos para calcular
       </div>
+    </section>
 
-      <!-- Calculadora de Créditos -->
-      <div class="calculator-container tarjeta">
-        <h3><i class="fas fa-calculator"></i> Calculadora de Créditos</h3>
-        <p>Calcula cuántos créditos necesitas para iniciar residencia</p>
-        <input type="number" class="calculator-input" id="totalCredits" placeholder="Créditos totales de tu carrera" onkeyup="calculateCredits()">
-        <input type="number" class="calculator-input" id="currentCredits" placeholder="Créditos acreditados" onkeyup="calculateCredits()">
-        <div class="calculator-result" id="creditResult">
-          Ingresa tus créditos para calcular
-        </div>
+    <!-- Timeline del Proceso -->
+    <section class="tarjeta" aria-label="Timeline del proceso de residencia">
+      <h2><i class="fas fa-clock" aria-hidden="true"></i> Timeline del Proceso</h2>
+      <ol class="timeline">
+        <li class="timeline-item">
+          <div class="timeline-dot" aria-hidden="true"></div>
+          <h3>Fase 1: Preparación</h3>
+          <p>Reunir documentos y cumplir requisitos académicos (70–80% créditos)</p>
+        </li>
+        <li class="timeline-item">
+          <div class="timeline-dot" aria-hidden="true"></div>
+          <h3>Fase 2: Búsqueda</h3>
+          <p>Encontrar empresa y obtener carta de aceptación</p>
+        </li>
+        <li class="timeline-item">
+          <div class="timeline-dot" aria-hidden="true"></div>
+          <h3>Fase 3: Anteproyecto</h3>
+          <p>Elaborar y presentar anteproyecto</p>
+        </li>
+        <li class="timeline-item">
+          <div class="timeline-dot" aria-hidden="true"></div>
+          <h3>Fase 4: Ejecución</h3>
+          <p>Realizar residencia (480 horas)</p>
+        </li>
+        <li class="timeline-item">
+          <div class="timeline-dot" aria-hidden="true"></div>
+          <h3>Fase 5: Evaluación</h3>
+          <p>Presentar informe final y recibir evaluación</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Barra de Progreso -->
+    <section class="tarjeta" aria-label="Tu progreso de requisitos">
+      <h2>Progreso de Residencia</h2>
+      <div class="progress-container" role="progressbar"
+           aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+           aria-label="Progreso de requisitos completados" id="progressContainer">
+        <div class="progress-bar" id="progressBar" style="width:0%">0%</div>
       </div>
+      <p>Marca los requisitos completados para ver tu progreso</p>
+    </section>
 
-      <!-- Timeline del Proceso -->
-      <div class="tarjeta">
-        <h3><i class="fas fa-clock"></i> Timeline del Proceso</h3>
-        <div class="timeline">
-          <div class="timeline-item fade-in">
-            <div class="timeline-dot"></div>
-            <h4>Fase 1: Preparación</h4>
-            <p>Reunir documentos y cumplir requisitos académicos (70-80% créditos)</p>
-          </div>
-          <div class="timeline-item fade-in">
-            <div class="timeline-dot"></div>
-            <h4>Fase 2: Búsqueda</h4>
-            <p>Encontrar empresa y obtener carta de aceptación</p>
-          </div>
-          <div class="timeline-item fade-in">
-            <div class="timeline-dot"></div>
-            <h4>Fase 3: Anteproyecto</h4>
-            <p>Elaborar y presentar anteproyecto</p>
-          </div>
-          <div class="timeline-item fade-in">
-            <div class="timeline-dot"></div>
-            <h4>Fase 4: Ejecución</h4>
-            <p>Realizar residencia (480 horas)</p>
-          </div>
-          <div class="timeline-item fade-in">
-            <div class="timeline-dot"></div>
-            <h4>Fase 5: Evaluación</h4>
-            <p>Presentar informe final y recibir evaluación</p>
-          </div>
-        </div>
+    <!-- Checklist Interactivo -->
+    <section class="tarjeta" aria-label="Checklist de requisitos">
+      <h2><i class="fas fa-tasks" aria-hidden="true"></i> Checklist de Requisitos</h2>
+      <div class="checklist-item">
+        <input type="checkbox" id="req1">
+        <label for="req1">Haber cursado entre el 70% y el 80% de los créditos</label>
       </div>
-
-      <!-- Barra de Progreso -->
-      <div class="tarjeta">
-        <h3>Progreso de Residencia</h3>
-        <div class="progress-container">
-          <div class="progress-bar" id="progressBar" style="width: 0%">0%</div>
-        </div>
-        <p>Marca los requisitos completados para ver tu progreso</p>
+      <div class="checklist-item">
+        <input type="checkbox" id="req2">
+        <label for="req2">No tener materias reprobadas</label>
       </div>
-
-      <!-- Checklist Interactivo -->
-      <div class="tarjeta">
-        <h3><i class="fas fa-tasks"></i> Checklist de Requisitos</h3>
-        <div class="checklist-item">
-          <input type="checkbox" id="req1" onchange="updateProgress()">
-          <label for="req1">Haber cursado entre el 70% y el 80% de los créditos</label>
-        </div>
-        <div class="checklist-item">
-          <input type="checkbox" id="req2" onchange="updateProgress()">
-          <label for="req2">No tener materias reprobadas</label>
-        </div>
-        <div class="checklist-item">
-          <input type="checkbox" id="req3" onchange="updateProgress()">
-          <label for="req3">Tener el servicio social liberado o en proceso</label>
-        </div>
-        <div class="checklist-item">
-          <input type="checkbox" id="req4" onchange="updateProgress()">
-          <label for="req4">Carta de presentación de la universidad</label>
-        </div>
-        <div class="checklist-item">
-          <input type="checkbox" id="req5" onchange="updateProgress()">
-          <label for="req5">Carta de aceptación de la empresa</label>
-        </div>
-        <div class="checklist-item">
-          <input type="checkbox" id="req6" onchange="updateProgress()">
-          <label for="req6">Anteproyecto aprobado</label>
-        </div>
-        <div class="checklist-item">
-          <input type="checkbox" id="req7" onchange="updateProgress()">
-          <label for="req7">Kárdex o historial académico actualizado</label>
-        </div>
-        <div class="checklist-item">
-          <input type="checkbox" id="req8" onchange="updateProgress()">
-          <label for="req8">CURP, INE y comprobante de domicilio</label>
-        </div>
-        <div class="checklist-item">
-          <input type="checkbox" id="req9" onchange="updateProgress()">
-          <label for="req9">Seguro facultativo o particular vigente</label>
-        </div>
+      <div class="checklist-item">
+        <input type="checkbox" id="req3">
+        <label for="req3">Tener el servicio social liberado o en proceso</label>
       </div>
-
-      <!-- Documentación Detallada -->
-      <div class="tarjeta">
-        <h3><i class="fas fa-file-alt"></i> Documentación Detallada</h3>
-        <div class="searchable-content">
-          <h4>Requisitos Académicos:</h4>
-          <ul>
-            <li>Haber cursado entre el 70% y el 80% del total de créditos de la carrera.</li>
-            <li>No tener materias reprobadas (algunas permiten una o dos).</li>
-            <li>Tener el servicio social liberado o en proceso.</li>
-          </ul>
-
-          <h4>Documentación Solicitada:</h4>
-          <ul>
-            <li>Carta de presentación de la universidad.</li>
-            <li>Carta de aceptación de la empresa u organización.</li>
-            <li>Anteproyecto o plan de trabajo:
-              <ul>
-                <li>Objetivo del proyecto</li>
-                <li>Actividades a realizar</li>
-                <li>Cronograma</li>
-                <li>Resultados esperados</li>
-              </ul>
-            </li>
-            <li>Kárdex o historial académico actualizado</li>
-            <li>CURP, INE y comprobante de domicilio</li>
-            <li>Seguro facultativo o particular vigente</li>
-          </ul>
-        </div>
+      <div class="checklist-item">
+        <input type="checkbox" id="req4">
+        <label for="req4">Carta de presentación de la universidad</label>
       </div>
-
-      <!-- Descargas -->
-      <div class="tarjeta">
-        <h3><i class="fas fa-download"></i> Documentos para Descargar</h3>
-        <div class="descargas-servicio">
-          <a href="https://drive.google.com/file/d/1oJR4zSpAX6o99eMSuqot4T2DOYhlbAFX/view?usp=sharing"
-             target="_blank" rel="noopener noreferrer" class="boton-descarga">
-            <i class="fas fa-file-pdf"></i> Solicitud de Residencia
-          </a>
-          <a href="https://drive.google.com/file/d/1oMtGJNoBKg2Z8n6q1hL04VrRIbzKaWNC/view?usp=sharing"
-             target="_blank" rel="noopener noreferrer" class="boton-descarga">
-            <i class="fas fa-file-pdf"></i> Seguimiento y Evaluación
-          </a>
-        </div>
+      <div class="checklist-item">
+        <input type="checkbox" id="req5">
+        <label for="req5">Carta de aceptación de la empresa</label>
       </div>
+      <div class="checklist-item">
+        <input type="checkbox" id="req6">
+        <label for="req6">Anteproyecto aprobado</label>
+      </div>
+      <div class="checklist-item">
+        <input type="checkbox" id="req7">
+        <label for="req7">Kárdex o historial académico actualizado</label>
+      </div>
+      <div class="checklist-item">
+        <input type="checkbox" id="req8">
+        <label for="req8">CURP, INE y comprobante de domicilio</label>
+      </div>
+      <div class="checklist-item">
+        <input type="checkbox" id="req9">
+        <label for="req9">Seguro facultativo o particular vigente</label>
+      </div>
+    </section>
 
-      <!-- FAQ -->
-      <div class="tarjeta">
-        <h3><i class="fas fa-question-circle"></i> Preguntas Frecuentes</h3>
-        <div class="faq-item">
-          <button class="faq-question" onclick="toggleFAQ(this)">
-            <span>¿Cuánto dura la residencia profesional?</span>
-            <i class="fas fa-chevron-down faq-icon"></i>
-          </button>
-          <div class="faq-answer">
-            <p>La residencia profesional tiene una duración de 480 horas, que equivalen a 6 meses de tiempo completo.</p>
-          </div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-question" onclick="toggleFAQ(this)">
-            <span>¿Puedo hacer residencia en mi propio trabajo?</span>
-            <i class="fas fa-chevron-down faq-icon"></i>
-          </button>
-          <div class="faq-answer">
-            <p>Sí, siempre y cuando las actividades estén relacionadas con tu carrera y cumplan con los requisitos académicos.</p>
-          </div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-question" onclick="toggleFAQ(this)">
-            <span>¿Qué pasa si no encuentro empresa?</span>
-            <i class="fas fa-chevron-down faq-icon"></i>
-          </button>
-          <div class="faq-answer">
-            <p>El departamento de residencias tiene convenios con empresas y puede ayudarte a encontrar una opción adecuada.</p>
-          </div>
+    <!-- Documentación Detallada -->
+    <section class="tarjeta" aria-label="Documentación detallada">
+      <h2><i class="fas fa-file-alt" aria-hidden="true"></i> Documentación Detallada</h2>
+      <div class="searchable-content">
+        <h3>Requisitos Académicos:</h3>
+        <ul>
+          <li>Haber cursado entre el 70% y el 80% del total de créditos de la carrera.</li>
+          <li>No tener materias reprobadas (algunas permiten una o dos).</li>
+          <li>Tener el servicio social liberado o en proceso.</li>
+        </ul>
+        <h3>Documentación Solicitada:</h3>
+        <ul>
+          <li>Carta de presentación de la universidad.</li>
+          <li>Carta de aceptación de la empresa u organización.</li>
+          <li>Anteproyecto o plan de trabajo:
+            <ul>
+              <li>Objetivo del proyecto</li>
+              <li>Actividades a realizar</li>
+              <li>Cronograma</li>
+              <li>Resultados esperados</li>
+            </ul>
+          </li>
+          <li>Kárdex o historial académico actualizado</li>
+          <li>CURP, INE y comprobante de domicilio</li>
+          <li>Seguro facultativo o particular vigente</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Descargas -->
+    <section class="tarjeta" aria-label="Documentos para descargar">
+      <h2><i class="fas fa-download" aria-hidden="true"></i> Documentos para Descargar</h2>
+      <div class="descargas-servicio">
+        <a href="https://drive.google.com/file/d/1oJR4zSpAX6o99eMSuqot4T2DOYhlbAFX/view?usp=sharing"
+           target="_blank" rel="noopener noreferrer" class="boton-descarga"
+           aria-label="Descargar Solicitud de Residencia (PDF, abre en nueva pestaña)">
+          <i class="fas fa-file-pdf" aria-hidden="true"></i> Solicitud de Residencia
+        </a>
+        <a href="https://drive.google.com/file/d/1oMtGJNoBKg2Z8n6q1hL04VrRIbzKaWNC/view?usp=sharing"
+           target="_blank" rel="noopener noreferrer" class="boton-descarga"
+           aria-label="Descargar Formato de Seguimiento y Evaluación (PDF, abre en nueva pestaña)">
+          <i class="fas fa-file-pdf" aria-hidden="true"></i> Seguimiento y Evaluación
+        </a>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="tarjeta" aria-label="Preguntas frecuentes">
+      <h2><i class="fas fa-question-circle" aria-hidden="true"></i> Preguntas Frecuentes</h2>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          <span>¿Cuánto dura la residencia profesional?</span>
+          <i class="fas fa-chevron-down faq-icon" aria-hidden="true"></i>
+        </button>
+        <div class="faq-answer" role="region">
+          <p>La residencia profesional tiene una duración de 480 horas, equivalentes a 6 meses de tiempo completo.</p>
         </div>
       </div>
-    </div>
-  </main>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          <span>¿Puedo hacer residencia en mi propio trabajo?</span>
+          <i class="fas fa-chevron-down faq-icon" aria-hidden="true"></i>
+        </button>
+        <div class="faq-answer" role="region">
+          <p>Sí, siempre y cuando las actividades estén relacionadas con tu carrera y cumplan con los requisitos académicos.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          <span>¿Qué pasa si no encuentro empresa?</span>
+          <i class="fas fa-chevron-down faq-icon" aria-hidden="true"></i>
+        </button>
+        <div class="faq-answer" role="region">
+          <p>El departamento de residencias tiene convenios con empresas y puede ayudarte a encontrar una opción adecuada.</p>
+        </div>
+      </div>
+    </section>
 
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      animateOnScroll();
-      loadProgress();
+  </div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── Progreso ── */
+  function updateProgress() {
+    var checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]');
+    var checked    = document.querySelectorAll('.checklist-item input[type="checkbox"]:checked');
+    var bar        = document.getElementById('progressBar');
+    var container  = document.getElementById('progressContainer');
+    var pct        = Math.round((checked.length / checkboxes.length) * 100);
+
+    bar.style.width = pct + '%';
+    bar.textContent = pct + '%';
+    if (container) container.setAttribute('aria-valuenow', pct);
+
+    var progress = [];
+    checkboxes.forEach(function (cb, i) { progress[i] = cb.checked; });
+    try { localStorage.setItem('residenciaProgress', JSON.stringify(progress)); } catch (e) {}
+
+    checkboxes.forEach(function (cb) {
+      cb.parentElement.classList.toggle('completed', cb.checked);
     });
+  }
 
-    function updateProgress() {
-      const checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]');
-      const checked    = document.querySelectorAll('.checklist-item input[type="checkbox"]:checked');
-      const bar        = document.getElementById('progressBar');
-      const pct        = Math.round((checked.length / checkboxes.length) * 100);
-      bar.style.width  = pct + '%';
-      bar.textContent  = pct + '%';
-      const progress   = [];
-      checkboxes.forEach((cb, i) => { progress[i] = cb.checked; });
-      localStorage.setItem('residenciaProgress', JSON.stringify(progress));
-      checkboxes.forEach(cb => { cb.parentElement.classList.toggle('completed', cb.checked); });
-    }
-
-    function loadProgress() {
-      const saved = localStorage.getItem('residenciaProgress');
+  function loadProgress() {
+    try {
+      var saved = localStorage.getItem('residenciaProgress');
       if (!saved) return;
-      const progress  = JSON.parse(saved);
-      const checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]');
-      progress.forEach((checked, i) => { if (checkboxes[i]) checkboxes[i].checked = checked; });
+      var progress  = JSON.parse(saved);
+      var checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]');
+      progress.forEach(function (checked, i) { if (checkboxes[i]) checkboxes[i].checked = checked; });
       updateProgress();
-    }
+    } catch (e) {}
+  }
 
-    function calculateCredits() {
-      const total   = parseFloat(document.getElementById('totalCredits').value)   || 0;
-      const current = parseFloat(document.getElementById('currentCredits').value) || 0;
-      const result  = document.getElementById('creditResult');
-      if (total > 0 && current >= 0) {
-        const pct      = Math.round((current / total) * 100);
-        const needed70 = Math.round(total * 0.7);
-        const remaining = needed70 - current;
-        if (pct >= 80) {
-          result.innerHTML = `<div style="color:#4CAF50;font-size:1.2rem;margin-bottom:10px;">✅ ¡FELICIDADES!</div><div>Ya puedes iniciar tu residencia</div><div style="color:#666;font-size:.9rem;margin-top:5px;">Tienes ${pct}% de créditos</div>`;
-        } else if (pct >= 70) {
-          result.innerHTML = `<div style="color:#FF9800;font-size:1.2rem;margin-bottom:10px;">⚠️ ¡CASI LISTO!</div><div>Ya puedes comenzar el proceso</div><div style="color:#666;font-size:.9rem;margin-top:5px;">Tienes ${pct}%</div>`;
-        } else {
-          result.innerHTML = `<div style="color:#f44336;font-size:1.2rem;margin-bottom:10px;">❌ AÚN NO</div><div>Necesitas más créditos</div><div style="color:#666;font-size:.9rem;margin-top:5px;">Tienes ${pct}% — te faltan ${remaining} créditos</div>`;
-        }
+  document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(function (cb) {
+    cb.addEventListener('change', updateProgress);
+  });
+
+  /* ── Calculadora ── */
+  function calculateCredits() {
+    var total   = parseFloat(document.getElementById('totalCredits').value)   || 0;
+    var current = parseFloat(document.getElementById('currentCredits').value) || 0;
+    var result  = document.getElementById('creditResult');
+    if (total > 0 && current >= 0) {
+      var pct      = Math.round((current / total) * 100);
+      var needed70 = Math.round(total * 0.7);
+      var remaining = needed70 - current;
+      var msg;
+      if (pct >= 80) {
+        msg = '¡Felicidades! Ya puedes iniciar tu residencia (' + pct + '% de créditos)';
+        result.style.background = '#ecfdf5';
+        result.style.color = '#065f46';
+        result.style.border = '1px solid #16a34a';
+      } else if (pct >= 70) {
+        msg = '¡Casi listo! Ya puedes comenzar el proceso (' + pct + '%)';
+        result.style.background = '#fffbeb';
+        result.style.color = '#92400e';
+        result.style.border = '1px solid #f59e0b';
       } else {
-        result.textContent = 'Ingresa tus créditos para calcular';
+        msg = 'Aún no — tienes ' + pct + '%, te faltan ' + (remaining > 0 ? remaining : 0) + ' créditos para el 70%';
+        result.style.background = '#fef2f2';
+        result.style.color = '#991b1b';
+        result.style.border = '1px solid #dc2626';
       }
+      result.textContent = msg;
+    } else {
+      result.textContent = 'Ingresa tus créditos para calcular';
+      result.style.cssText = '';
     }
+  }
+  window.calculateCredits = calculateCredits;
 
-    function toggleFAQ(button) {
-      const item = button.parentElement;
-      item.classList.toggle('active');
-      button.nextElementSibling.classList.toggle('active');
-    }
+  /* ── FAQ ── */
+  document.querySelectorAll('.faq-question').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var item    = btn.parentElement;
+      var answer  = btn.nextElementSibling;
+      var isOpen  = item.classList.contains('active');
+      item.classList.toggle('active', !isOpen);
+      answer.classList.toggle('active', !isOpen);
+      btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+    });
+  });
 
-    function animateOnScroll() {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.style.opacity   = '1';
-            entry.target.style.transform = 'translateY(0)';
-          }
-        });
-      }, { threshold: 0.1 });
-      document.querySelectorAll('.timeline-item, .tarjeta').forEach(el => {
-        el.style.opacity    = '0';
-        el.style.transform  = 'translateY(30px)';
-        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        observer.observe(el);
-      });
-    }
-  </script>
+  /* ── Init ── */
+  window.addEventListener('DOMContentLoaded', function () {
+    loadProgress();
+  });
+})();
+</script>
 
 <?php require_once __DIR__ . '/../../shared/footer.php'; ?>

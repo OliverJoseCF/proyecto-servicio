@@ -1,69 +1,85 @@
 <?php
-$tsj_module     = 'visitantes';
-$tsj_title      = 'Directorio Institucional - TSJ Chapala';
-$tsj_extra_css  = ['style.css'];
-
+$tsj_module    = 'visitantes';
+$tsj_title     = 'Directorio Institucional — TSJ Chapala';
+$tsj_extra_css = ['style.css'];
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 
-    <a href="index.php" class="top-right">
-        <img src="imagenes/casa.png" alt="Inicio" style="width: 80px; height: auto;">
-    </a>
+<main id="main">
+  <a href="index.php" class="top-right" aria-label="Volver al menú principal">
+    <img src="imagenes/casa.png" alt="">
+  </a>
 
-    <div class="container">
-        <h2>Directorio Institucional</h2>
+  <h1 class="vis-page-title">Directorio Institucional</h1>
 
-        <div class="tabla-scroll">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Foto</th>
-                        <th>Nombre</th>
-                        <th>Puesto</th>
-                        <th>Teléfono</th>
-                        <th>Correo</th>
-                    </tr>
-                </thead>
-                <tbody id="cuerpo-tabla"></tbody>
-            </table>
-        </div>
+  <div class="container">
+    <div class="tabla-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Foto</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Puesto</th>
+            <th scope="col">Teléfono</th>
+            <th scope="col">Correo</th>
+          </tr>
+        </thead>
+        <tbody id="cuerpo-tabla">
+          <tr>
+            <td colspan="5" style="text-align:center;padding:2rem;color:#9ca3af;">
+              Cargando directorio…
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+  </div>
+</main>
 
-    <script>
-        const directorio = [
-            { foto: 'imagenes/miguel.png',    nombre: 'Miguel Angel Delgado Lopez',        puesto: 'Docente Sistemas',    telefono: 'S/N', correo: 'miguel.delgado@chapala.tecnm.mx' },
-            { foto: 'imagenes/julio.png',     nombre: 'Julio Cesar Chavez Novoa',           puesto: 'Docente Sistemas',    telefono: 'S/N', correo: 'julio.chavez@chapala.tecnm.mx' },
-            { foto: 'imagenes/carmen.png',    nombre: 'Carmen Leticia Salcedo Quevedo',     puesto: 'Docente Sistemas',    telefono: 'S/N', correo: 'carmen.salcedo@chapala.tecnm.mx' },
-            { foto: 'imagenes/jorge.png',     nombre: 'Jose Jorge Hernandez Ochoa',         puesto: 'Docente Sistemas',    telefono: 'S/N', correo: 'jorge.hernandez@chapala.tecnm.mx' },
-            { foto: 'imagenes/user.png',      nombre: 'Francisco Javier Gonzalez Siordia',  puesto: 'Docente Sistemas',    telefono: 'S/N', correo: 'francisco.gonzales@chapala.tecnm.mx' },
-            { foto: 'imagenes/gamas.png',     nombre: 'Jose Guadalupe Gamas Gamas',         puesto: 'Docente Sistemas',    telefono: 'S/N', correo: 'jose.gamas@chapala.tecnm.mx' }
-        ];
+<script>
+(function () {
+  'use strict';
+  var directorio = [
+    { foto: 'imagenes/miguel.png', nombre: 'Miguel Ángel Delgado López',       departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'miguel.delgado@chapala.tecnm.mx' },
+    { foto: 'imagenes/julio.png',  nombre: 'Julio César Chávez Novoa',          departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'julio.chavez@chapala.tecnm.mx' },
+    { foto: 'imagenes/carmen.png', nombre: 'Carmen Leticia Salcedo Quevedo',    departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'carmen.salcedo@chapala.tecnm.mx' },
+    { foto: 'imagenes/jorge.png',  nombre: 'José Jorge Hernández Ochoa',        departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'jorge.hernandez@chapala.tecnm.mx' },
+    { foto: 'imagenes/user.png',   nombre: 'Francisco Javier González Siordia', departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'francisco.gonzales@chapala.tecnm.mx' },
+    { foto: 'imagenes/gamas.png',  nombre: 'José Guadalupe Gamas Gamas',        departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'jose.gamas@chapala.tecnm.mx' }
+  ];
 
-        function render() {
-            const tbody = document.getElementById('cuerpo-tabla');
-            tbody.innerHTML = '';
-            directorio.forEach(item => {
-                const tr = document.createElement('tr');
+  var tbody = document.getElementById('cuerpo-tabla');
+  tbody.innerHTML = '';
 
-                const foto = document.createElement('td');
-                const img  = document.createElement('img');
-                img.src     = item.foto;
-                img.alt     = item.nombre;
-                img.className = 'foto-perfil';
-                img.onerror = function() { this.src = 'imagenes/user.png'; };
-                foto.appendChild(img);
+  directorio.forEach(function (item) {
+    var tr = document.createElement('tr');
 
-                const nombre   = document.createElement('td'); const b = document.createElement('b'); b.textContent = item.nombre; nombre.appendChild(b);
-                const puesto   = document.createElement('td'); puesto.textContent   = item.puesto;
-                const telefono = document.createElement('td'); telefono.textContent = item.telefono;
-                const correo   = document.createElement('td'); correo.textContent   = item.correo;
+    var tdFoto = document.createElement('td');
+    var img    = document.createElement('img');
+    img.src       = item.foto;
+    img.alt       = item.nombre;
+    img.className = 'foto-tabla';
+    img.onerror   = function () { this.src = 'imagenes/user.png'; };
+    tdFoto.appendChild(img);
 
-                tr.appendChild(foto); tr.appendChild(nombre); tr.appendChild(puesto); tr.appendChild(telefono); tr.appendChild(correo);
-                tbody.appendChild(tr);
-            });
-        }
+    var tdNombre = document.createElement('td');
+    tdNombre.textContent = item.nombre;
+    tdNombre.style.fontWeight = '600';
 
-        render();
-    </script>
+    var tdDep    = document.createElement('td'); tdDep.textContent    = item.departamento;
+    var tdTel    = document.createElement('td'); tdTel.textContent    = item.telefono;
+    var tdCorreo = document.createElement('td');
+    var link = document.createElement('a');
+    link.href = 'mailto:' + item.correo;
+    link.textContent = item.correo;
+    link.style.color = '#32129a';
+    tdCorreo.appendChild(link);
+
+    tr.appendChild(tdFoto); tr.appendChild(tdNombre); tr.appendChild(tdDep);
+    tr.appendChild(tdTel); tr.appendChild(tdCorreo);
+    tbody.appendChild(tr);
+  });
+})();
+</script>
 
 <?php require_once __DIR__ . '/../../shared/footer.php'; ?>

@@ -1,236 +1,130 @@
-/* =====================================================
-   login.css  —  Pantalla de inicio de sesión · responsive
-   ===================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap');
+/* ================================================================
+   horarios/login.css  —  Pantalla de inicio de sesión
+   Usa tokens de shared/assets/css/theme.css (--tsj-*)
+   ================================================================ */
 
-:root {
-    --morado:      #32129a;
-    --morado-dark: #1e0a6e;
-    --rosa:        #ec5a68;
-    --blanco:      #ffffff;
-    --fondo:       #f5f5f5;
-    --sombra:      0 3px 9px rgba(0,0,0,.16);
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--fondo);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-img { max-width: 100%; height: auto; vertical-align: middle; }
-
-/* =====================================================
-   BARRA ROSA + TOOLBAR
-   ===================================================== */
-.up-header { height: 10px; background: var(--rosa); }
-
-.toolbar {
-    background: var(--morado);
-    box-shadow: var(--sombra);
-    color: var(--blanco);
-    padding: 10px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    flex-shrink: 0;
-}
-
-.toolbar-logo { flex-shrink: 0; }
-.imgJalisco   { width: auto; max-width: 160px; height: 48px; object-fit: contain; }
-
-.toolbar-center {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.logos2 {
-    width: auto;
-    max-width: 520px;
-    height: 54px;
-    object-fit: contain;
-}
-
-.toolbar-right { display: flex; align-items: center; gap: 16px; }
-
-.home-icon a { display: flex; align-items: center; }
-.home-icon img { width: 26px; height: 26px; filter: brightness(0) invert(1); transition: opacity .2s; }
-.home-icon img:hover { opacity: .7; }
-
-/* =====================================================
-   WRAP CENTRAL
-   ===================================================== */
+/* ── Wrap central ────────────────────────────────────────── */
 .login-wrap {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 32px 16px;
+  flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  padding: 32px 16px;
+  background: var(--tsj-bg, #f5f5f5);
 }
 
-/* =====================================================
-   TARJETA DE LOGIN
-   ===================================================== */
+/* ── Tarjeta de login ────────────────────────────────────── */
 .login-container {
-    width: 100%;
-    max-width: 420px;
-    padding: 2.5rem 2rem;
-    background: rgba(255,255,255,.92);
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(50,18,154,.18);
-    backdrop-filter: blur(4px);
+  width: 100%; max-width: 420px;
+  padding: 2.5rem 2rem;
+  background: rgba(255,255,255,.92);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(50,18,154,.18);
 }
-
-.login-container h2 {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-    color: var(--morado);
-    font-size: 1.6rem;
-    text-align: center;
-    margin-bottom: 4px;
+.login-container h1 {
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-weight: 700;
+  color: var(--tsj-blue, #32129a);
+  font-size: 1.6rem;
+  text-align: center;
+  margin-bottom: 4px;
 }
-
 .login-subtitle {
-    font-family: 'Inter', sans-serif;
-    color: #777;
-    font-size: .88rem;
-    text-align: center;
-    margin-bottom: 24px;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  color: var(--tsj-gray-600, #4b5563);
+  font-size: .88rem;
+  text-align: center;
+  margin-bottom: 24px;
 }
 
-/* =====================================================
-   CAMPOS
-   ===================================================== */
+/* ── Campos ──────────────────────────────────────────────── */
 .form-group { margin-bottom: 18px; }
-
 .form-group label {
-    display: block;
-    font-weight: 600;
-    font-size: .85rem;
-    margin-bottom: 6px;
-    color: #444;
+  display: block; font-weight: 600;
+  font-size: .85rem; margin-bottom: 6px;
+  color: var(--tsj-gray-700, #374151);
 }
-
 .input-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-    background: var(--blanco);
-    transition: border-color .2s;
+  position: relative; display: flex; align-items: center;
+  border: 2px solid var(--tsj-gray-200, #e5e7eb);
+  border-radius: var(--tsj-radius, 8px);
+  overflow: hidden; background: #fff;
+  transition: border-color .2s;
 }
-.input-wrap:focus-within { border-color: var(--morado); }
-
+.input-wrap:focus-within {
+  border-color: var(--tsj-blue, #32129a);
+  box-shadow: 0 0 0 3px rgba(50,18,154,0.10);
+}
 .input-icon {
-    position: absolute;
-    left: 12px;
-    color: #888;
-    flex-shrink: 0;
-    pointer-events: none;
+  position: absolute; left: 12px;
+  color: var(--tsj-gray-400, #9ca3af);
+  flex-shrink: 0; pointer-events: none;
 }
-
 .input-wrap input {
-    width: 100%;
-    padding: 11px 12px 11px 38px;
-    border: none;
-    outline: none;
-    font-family: 'Inter', sans-serif;
-    font-size: .9rem;
-    background: transparent;
+  width: 100%; padding: 11px 12px 11px 38px;
+  border: none; outline: none;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-size: .9rem; background: transparent;
 }
 
-/* =====================================================
-   BOTÓN (efecto destello del equipo)
-   ===================================================== */
+/* ── Botón ───────────────────────────────────────────────── */
 .submit-btn {
-    position: relative;
-    width: 100%;
-    padding: 12px;
-    background: transparent;
-    border: 2px solid var(--morado);
-    border-radius: 8px;
-    color: var(--morado);
-    font-family: 'Poppins', sans-serif;
-    font-size: .9rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    cursor: pointer;
-    overflow: hidden;
-    margin-top: 8px;
-    transition: all .2s ease-in;
+  position: relative; width: 100%; padding: 12px;
+  background: transparent;
+  border: 2px solid var(--tsj-blue, #32129a);
+  border-radius: var(--tsj-radius, 8px);
+  color: var(--tsj-blue, #32129a);
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-size: .9rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 2px;
+  cursor: pointer; overflow: hidden; margin-top: 8px;
+  transition: all .2s ease-in;
 }
 .submit-btn::before {
-    content: '';
-    display: block;
-    width: 0;
-    height: 86%;
-    position: absolute;
-    top: 7%; left: 0;
-    opacity: 0;
-    background: var(--blanco);
-    box-shadow: 0 0 50px 30px var(--blanco);
-    transform: skewX(-20deg);
+  content: ''; display: block;
+  width: 0; height: 86%;
+  position: absolute; top: 7%; left: 0;
+  opacity: 0; background: #fff;
+  box-shadow: 0 0 50px 30px #fff;
+  transform: skewX(-20deg);
 }
 .submit-btn:hover {
-    background: var(--morado);
-    box-shadow: 0 0 28px rgba(84,55,179,.45);
-    color: var(--blanco);
+  background: var(--tsj-blue, #32129a);
+  box-shadow: 0 0 28px rgba(50,18,154,.45);
+  color: #fff;
 }
-.submit-btn:hover::before { animation: sh02 .5s linear; }
-.submit-btn:active { box-shadow: none; }
-@keyframes sh02 {
+.submit-btn:focus-visible {
+  outline: 2px solid var(--tsj-pink, #ec5a68);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .submit-btn:hover::before { animation: sh02 .5s linear; }
+  @keyframes sh02 {
     from { opacity: 0; left: 0; }
     50%  { opacity: 1; }
     to   { opacity: 0; left: 100%; }
+  }
 }
+.submit-btn:active { box-shadow: none; }
 
-/* =====================================================
-   LINK VOLVER
-   ===================================================== */
+/* ── Link volver ─────────────────────────────────────────── */
 .volver-link {
-    display: block;
-    text-align: center;
-    margin-top: 20px;
-    font-family: 'Inter', sans-serif;
-    font-size: .85rem;
-    color: var(--morado);
-    text-decoration: none;
-    transition: color .2s;
+  display: block; text-align: center; margin-top: 20px;
+  font-family: var(--tsj-font, 'Poppins', sans-serif);
+  font-size: .85rem;
+  color: var(--tsj-blue, #32129a);
+  text-decoration: none; transition: color .2s;
 }
-.volver-link:hover { color: var(--rosa); }
+.volver-link:hover { color: var(--tsj-pink, #ec5a68); }
+.volver-link:focus-visible { outline: 2px solid var(--tsj-pink, #ec5a68); outline-offset: 2px; }
 
-/* =====================================================
-   ERROR
-   ===================================================== */
+/* ── Error ───────────────────────────────────────────────── */
 .error-message {
-    background: #ffe0e3;
-    color: #c0392b;
-    border: 1px solid #f5c6cb;
-    border-radius: 8px;
-    padding: 10px 14px;
-    margin-bottom: 18px;
-    font-size: .88rem;
-    text-align: center;
+  background: #ffe0e3; color: #c0392b;
+  border: 1px solid #f5c6cb;
+  border-radius: var(--tsj-radius, 8px);
+  padding: 10px 14px; margin-bottom: 18px;
+  font-size: .88rem; text-align: center;
 }
 
-/* =====================================================
-   RESPONSIVE
-   ===================================================== */
 @media (max-width: 600px) {
-    .toolbar { padding: 10px 14px; flex-wrap: wrap; }
-    .toolbar-center { order: 3; width: 100%; }
-    .logos2 { max-width: 260px; height: 40px; }
-    .toolbar-logo { order: 1; }
-    .toolbar-right { order: 2; }
-    .imgJalisco { max-width: 120px; height: 38px; }
-    .login-container { padding: 2rem 1.2rem; }
+  .login-container { padding: 2rem 1.2rem; }
 }
