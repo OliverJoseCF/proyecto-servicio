@@ -1,6 +1,6 @@
 <?php
 $tsj_module    = 'visitantes';
-$tsj_title     = 'Comprobante de Reinscripción — TSJ Chapala';
+$tsj_title     = 'Comprobante de Reinscripción';
 $tsj_extra_css = ['style.css'];
 require_once __DIR__ . '/../../shared/header.php';
 ?>
@@ -46,8 +46,12 @@ require_once __DIR__ . '/../../shared/header.php';
   </a>
 </main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+        integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk"
+        crossorigin="anonymous" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"
+        integrity="sha384-Izc791esqyEy3BEIC42q7jbE0AaOkACziN+dyyXgYeDmpeMCLz0xA+xYN3aCd5zz"
+        crossorigin="anonymous" defer></script>
 <script>
 (function(){
   'use strict';

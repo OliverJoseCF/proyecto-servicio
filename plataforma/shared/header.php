@@ -3,11 +3,12 @@
  * Header unificado de la plataforma TSJ.
  *
  * Variables que el módulo puede definir antes de incluir este archivo:
- *   $tsj_module     — slug activo: 'visitantes'|'biblioteca'|'convenios'|'horarios'|'requisitos'
- *   $tsj_title      — texto del <title>
- *   $tsj_extra_css  — ruta(s) adicional(es) de CSS del módulo (string o array)
- *   $tsj_head_extra — HTML arbitrario de confianza a inyectar en <head>
- *   $tsj_has_hero   — true cuando la página tiene hero propio (header translúcido, sin offset)
+ *   $tsj_module      — slug activo: 'visitantes'|'biblioteca'|'convenios'|'horarios'|'requisitos'
+ *   $tsj_title       — texto del <title> (sin el sufijo "— TSJ Chapala")
+ *   $tsj_description — meta description de la página (opcional)
+ *   $tsj_extra_css   — ruta(s) adicional(es) de CSS del módulo (string o array)
+ *   $tsj_head_extra  — HTML arbitrario de confianza a inyectar en <head>
+ *   $tsj_has_hero    — true cuando la página tiene hero propio (header translúcido, sin offset)
  *   $tsj_no_security_headers — true para omitir security_headers (Convenios los emite propio)
  */
 
@@ -19,11 +20,12 @@ if (empty($tsj_no_security_headers)) {
     require_once __DIR__ . '/security_headers.php';
 }
 
-$tsj_module     = $tsj_module     ?? '';
-$tsj_title      = $tsj_title      ?? 'Tecnológico Superior de Jalisco';
-$tsj_extra_css  = $tsj_extra_css  ?? [];
-$tsj_head_extra = $tsj_head_extra ?? '';
-$tsj_has_hero   = $tsj_has_hero   ?? false;
+$tsj_module      = $tsj_module      ?? '';
+$tsj_title       = $tsj_title       ?? 'Tecnológico Superior de Jalisco';
+$tsj_description = $tsj_description ?? 'Portal de servicios estudiantiles del Tecnológico Superior de Jalisco — Chapala.';
+$tsj_extra_css   = $tsj_extra_css   ?? [];
+$tsj_head_extra  = $tsj_head_extra  ?? '';
+$tsj_has_hero    = $tsj_has_hero    ?? false;
 /* Compatibilidad hacia atrás: $tsj_no_offset era true cuando había hero */
 if (!isset($tsj_has_hero) && isset($tsj_no_offset)) {
     $tsj_has_hero = (bool)$tsj_no_offset;
@@ -47,6 +49,7 @@ $nav_items = [
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="<?= htmlspecialchars($tsj_description, ENT_QUOTES, 'UTF-8') ?>" />
   <title><?= htmlspecialchars($tsj_title, ENT_QUOTES, 'UTF-8') ?> — TSJ Chapala</title>
   <link rel="icon" type="image/png" href="<?= $base ?>/shared/assets/img/favicon.png" />
 
@@ -86,8 +89,6 @@ $nav_items = [
            alt="" aria-hidden="true" />
       <span class="tsj-brand-sub">Campus Chapala</span>
     </a>
-
-    <div class="tsj-header-divider" aria-hidden="true"></div>
 
     <!-- Navegación escritorio -->
     <nav aria-label="Navegación principal">

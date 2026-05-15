@@ -112,12 +112,24 @@ require_once __DIR__ . '/../../../shared/header.php';
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
         crossorigin="anonymous" defer></script>
-<script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js" defer></script>
-<script src="https://cdn.datatables.net/2.2.2/js/dataTables.jquery.min.js" defer></script>
-<script src="https://cdn.datatables.net/buttons/3.2.0/js/dataTables.buttons.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
-<script src="https://cdn.datatables.net/buttons/3.2.0/js/buttons.html5.min.js" defer></script>
-<script src="https://cdn.datatables.net/buttons/3.2.0/js/buttons.print.min.js" defer></script>
+<script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"
+        integrity="sha384-AenwROccLjIcbIsJuEZmrLlBzwrhvO94q+wm9RwETq4Kkqv9npFR2qbpdMhsehX3"
+        crossorigin="anonymous" defer></script>
+<script src="https://cdn.datatables.net/2.2.2/js/dataTables.jquery.min.js"
+        integrity="sha384-ZSs6LKr2GoUPDyHrN+rCQgyHL1yUyok5xMniSrgeRG7rUvA6vTmxronM1eZOfjgz"
+        crossorigin="anonymous" defer></script>
+<script src="https://cdn.datatables.net/buttons/3.2.0/js/dataTables.buttons.min.js"
+        integrity="sha384-1yo9s/77ZWiY2Xvn1BPaWyS3ErmUO+k734D+PxbLD2Iv8WJt4miQdnhv8IiMMY7j"
+        crossorigin="anonymous" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+        integrity="sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG"
+        crossorigin="anonymous" defer></script>
+<script src="https://cdn.datatables.net/buttons/3.2.0/js/buttons.html5.min.js"
+        integrity="sha384-MjweF+FY5MNbjB5ONlHWtlrou29MgBI/+acgSv4n5CBD79xUbMbLyka8NeCoK0D7"
+        crossorigin="anonymous" defer></script>
+<script src="https://cdn.datatables.net/buttons/3.2.0/js/buttons.print.min.js"
+        integrity="sha384-FvTRywo5HrkPlBKFrm2tT8aKxIcI/VU819roC/K/8UrVwrl4XsF3RKRKiCAKWNly"
+        crossorigin="anonymous" defer></script>
 <script src="script_convenios.js" defer></script>
 
 <?php require_once __DIR__ . '/../../../shared/footer.php'; ?>

@@ -12,21 +12,27 @@ try {
     $resultControles = $conexion->query("SELECT * FROM solicitud_controles ORDER BY id DESC");
     $resultSolLibros = $conexion->query("SELECT * FROM solicitud_libros WHERE entregado = 0 ORDER BY id DESC");
     $resultHistorial = $conexion->query("SELECT * FROM solicitud_libros WHERE entregado = 1 OR estado = 'Rechazado' ORDER BY fecha_devolucion DESC LIMIT 30");
-} catch (Exception $e) {
+} catch (\mysqli_sql_exception $e) {
     error_log('admin.php error: ' . $e->getMessage());
     die('Error al cargar los datos. Contacta al administrador.');
 }
 
 $tsj_module    = 'biblioteca';
 $tsj_title     = 'Biblioteca — Gestión Bibliotecaria';
-$tsj_extra_css = [
-    'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
-    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
-    'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css',
-    'https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css',
-    'assets/css/admin.css',
-];
-$tsj_head_extra = '<meta name="_csrf" content="' . htmlspecialchars(csrfToken(), ENT_QUOTES, 'UTF-8') . '">';
+$tsj_extra_css = ['assets/css/admin.css'];
+$tsj_head_extra = '<meta name="_csrf" content="' . htmlspecialchars(csrfToken(), ENT_QUOTES, 'UTF-8') . '">'
+    . '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"'
+    . ' integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"'
+    . ' crossorigin="anonymous" />'
+    . '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"'
+    . ' integrity="sha384-3B6NwesSXE7YJlcLI9RpRqGf2p/EgVH8BgoKTaUrmKNDkHPStTQ3EyoYjCGXaOTS"'
+    . ' crossorigin="anonymous" />'
+    . '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.min.css"'
+    . ' integrity="sha384-9zhnRArCpusIVIudEVdI3QmXKH9nCjEGc2rNvdcQ1utx3a3zbLtW3rBOeJ2PvupL"'
+    . ' crossorigin="anonymous" />'
+    . '<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css"'
+    . ' integrity="sha384-ok3J6xA9oQqai5C9ytYveFsBeKgoGk4T+NExsr6hoIKjZdv9SJcmx2mafwUWRNf9"'
+    . ' crossorigin="anonymous" />';
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 
@@ -327,11 +333,21 @@ require_once __DIR__ . '/../../shared/header.php';
 </div>
 
 <!-- ═══ SCRIPTS ═══ -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js"
+        integrity="sha384-YB/DdIkloKoRpclWB8bNcYXWakt57USgtQPDzvnIDHYU0lasD5eWlXVo1S4ODukY"
+        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"
+        integrity="sha384-Udt767MMeKelGRBxaCfxX88YDLbViYdQ7T/gkRoB197Jf+OviZ+lsaRAOpS/MIjf"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"
+        integrity="sha384-PgPBH0hy6DTJwu7pTf6bkRqPlf/+pjUBExpr/eIfzszlGYFlF9Wi9VTAJODPhgCO"
+        crossorigin="anonymous"></script>
 <script>
 (function () {
   'use strict';

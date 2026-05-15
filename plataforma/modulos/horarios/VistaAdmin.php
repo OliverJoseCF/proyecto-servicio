@@ -10,7 +10,12 @@ try {
     die("Error de conexión. Contacta al administrador.");
 }
 
-$carreras = $pdo->query("SELECT id_carrera, nombre_carrera FROM Carreras")->fetchAll();
+try {
+    $carreras = $pdo->query("SELECT id_carrera, nombre_carrera FROM Carreras")->fetchAll();
+} catch (\PDOException $e) {
+    error_log('horarios/VistaAdmin carreras error: ' . $e->getMessage());
+    $carreras = [];
+}
 
 $busqueda   = isset($_GET['busqueda'])   ? trim($_GET['busqueda'])   : '';
 $id_carrera = isset($_GET['id_carrera']) ? (int)$_GET['id_carrera'] : 0;
@@ -173,7 +178,9 @@ require_once __DIR__ . '/../../shared/header.php';
   <input type="hidden" name="eliminar_id" id="eliminar_id_input">
 </form>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js"
+        integrity="sha384-YB/DdIkloKoRpclWB8bNcYXWakt57USgtQPDzvnIDHYU0lasD5eWlXVo1S4ODukY"
+        crossorigin="anonymous" defer></script>
 <script src="js/modal.js" defer></script>
 <script>
 function confirmarEliminacion(id) {

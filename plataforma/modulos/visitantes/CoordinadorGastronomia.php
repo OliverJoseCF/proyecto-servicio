@@ -1,6 +1,6 @@
 <?php
 $tsj_module    = 'visitantes';
-$tsj_title     = 'Coordinador — Gastronomía — TSJ Chapala';
+$tsj_title     = 'Coordinador — Gastronomía';
 $tsj_extra_css = ['style.css'];
 require_once __DIR__ . '/../../shared/header.php';
 ?>

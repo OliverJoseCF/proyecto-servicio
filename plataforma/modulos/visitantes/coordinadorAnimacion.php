@@ -1,6 +1,6 @@
 <?php
 $tsj_module    = 'visitantes';
-$tsj_title     = 'Coordinador — Animación Digital y Efectos Visuales — TSJ Chapala';
+$tsj_title     = 'Coordinador — Animación Digital y Efectos Visuales';
 $tsj_extra_css = ['style.css'];
 require_once __DIR__ . '/../../shared/header.php';
 ?>

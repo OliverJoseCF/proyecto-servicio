@@ -1,6 +1,6 @@
 <?php
 $tsj_module    = 'visitantes';
-$tsj_title     = 'Docentes — Animación Digital y Efectos Visuales — TSJ Chapala';
+$tsj_title     = 'Docentes — Animación Digital y Efectos Visuales';
 $tsj_extra_css = ['style.css'];
 require_once __DIR__ . '/../../shared/header.php';
 ?>
@@ -27,7 +27,7 @@ require_once __DIR__ . '/../../shared/header.php';
     var tr=document.createElement("tr"), td=document.createElement("td");
     var img=document.createElement("img");
     img.src="imagenes/"+d.foto; img.alt=d.nombre;
-    img.className="foto-mini"; img.width=36; img.height=36;
+    img.className="foto-mini"; img.width=36; img.height=36; img.loading="lazy";
     img.onerror=function(){this.src="imagenes/user.png";};
     var b=document.createElement("b"); b.textContent=d.nombre;
     td.appendChild(img); td.append(" "); td.appendChild(b); tr.appendChild(td); tbody.appendChild(tr);

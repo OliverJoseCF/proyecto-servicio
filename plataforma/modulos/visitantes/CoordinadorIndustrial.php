@@ -1,6 +1,6 @@
 <?php
 $tsj_module    = 'visitantes';
-$tsj_title     = 'Coordinador — Ingeniería Industrial — TSJ Chapala';
+$tsj_title     = 'Coordinador — Ingeniería Industrial';
 $tsj_extra_css = ['style.css'];
 require_once __DIR__ . '/../../shared/header.php';
 ?>

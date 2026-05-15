@@ -8,7 +8,12 @@ try {
     die("Error de conexión. Contacta al administrador.");
 }
 
-$carreras = $pdo->query("SELECT id_carrera, nombre_carrera FROM Carreras")->fetchAll();
+try {
+    $carreras = $pdo->query("SELECT id_carrera, nombre_carrera FROM Carreras")->fetchAll();
+} catch (\PDOException $e) {
+    error_log('horarios/index carreras error: ' . $e->getMessage());
+    $carreras = [];
+}
 
 $busqueda         = isset($_GET['busqueda']) ? trim($_GET['busqueda']) : '';
 $id_carrera       = isset($_GET['id_carrera']) ? (int)$_GET['id_carrera'] : 0;

@@ -22,7 +22,15 @@
       /* Fallback para navegadores sin visor PDF */
       var fallback = document.createElement('p');
       fallback.style.padding = '1rem';
-      fallback.innerHTML = 'No se pudo mostrar el PDF. <a href="' + url + '" target="_blank" rel="noopener noreferrer">Descargarlo aquí</a>.';
+      var fallbackText = document.createTextNode('No se pudo mostrar el PDF. ');
+      var fallbackLink = document.createElement('a');
+      fallbackLink.href = url;
+      fallbackLink.target = '_blank';
+      fallbackLink.rel = 'noopener noreferrer';
+      fallbackLink.textContent = 'Descargarlo aquí';
+      fallback.appendChild(fallbackText);
+      fallback.appendChild(fallbackLink);
+      fallback.appendChild(document.createTextNode('.'));
       obj.appendChild(fallback);
       contentDiv.appendChild(obj);
     } else {

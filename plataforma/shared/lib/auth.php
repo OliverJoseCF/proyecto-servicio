@@ -54,6 +54,7 @@ function csrfField(): string {
 // ── Login / logout helpers ─────────────────────────────────────────────────────
 function authLogin(string $module): void {
     session_regenerate_id(true);
+    $_SESSION['_csrf']          = bin2hex(random_bytes(32));
     $_SESSION['_auth']          = true;
     $_SESSION['_module']        = $module;
     $_SESSION['_last_activity'] = time();
