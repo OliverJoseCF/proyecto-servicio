@@ -40,12 +40,12 @@ require_once __DIR__ . '/../../shared/header.php';
 (function () {
   'use strict';
   var directorio = [
-    { foto: 'imagenes/miguel.png', nombre: 'Miguel Ángel Delgado López',       departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'miguel.delgado@chapala.tecnm.mx' },
-    { foto: 'imagenes/julio.png',  nombre: 'Julio César Chávez Novoa',          departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'julio.chavez@chapala.tecnm.mx' },
-    { foto: 'imagenes/carmen.png', nombre: 'Carmen Leticia Salcedo Quevedo',    departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'carmen.salcedo@chapala.tecnm.mx' },
-    { foto: 'imagenes/jorge.png',  nombre: 'José Jorge Hernández Ochoa',        departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'jorge.hernandez@chapala.tecnm.mx' },
-    { foto: 'imagenes/user.png',   nombre: 'Francisco Javier González Siordia', departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'francisco.gonzales@chapala.tecnm.mx' },
-    { foto: 'imagenes/gamas.png',  nombre: 'José Guadalupe Gamas Gamas',        departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'jose.gamas@chapala.tecnm.mx' }
+    { foto: 'imagenes/miguel.png', nombre: 'Miguel Ángel Delgado López',       departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'miguel.delgado@chapala.tecmm.edu.mx' },
+    { foto: 'imagenes/julio.png',  nombre: 'Julio César Chávez Novoa',          departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'julio.chavez@chapala.tecmm.edu.mx' },
+    { foto: 'imagenes/carmen.png', nombre: 'Carmen Leticia Salcedo Quevedo',    departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'carmen.salcedo@chapala.tecmm.edu.mx' },
+    { foto: 'imagenes/jorge.png',  nombre: 'José Jorge Hernández Ochoa',        departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'jorge.hernandez@chapala.tecmm.edu.mx' },
+    { foto: 'imagenes/user.png',   nombre: 'Francisco Javier González Siordia', departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'francisco.gonzales@chapala.tecmm.edu.mx' },
+    { foto: 'imagenes/gamas.png',  nombre: 'José Guadalupe Gamas Gamas',        departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'jose.gamas@chapala.tecmm.edu.mx' }
   ];
 
   var tbody = document.getElementById('cuerpo-tabla');
