@@ -2,7 +2,7 @@
 require_once __DIR__ . '/src/session.php';
 require_once __DIR__ . '/src/config.php';
 require_once __DIR__ . '/src/security_headers.php';
-require_once __DIR__ . '/src/lib/RateLimit.php';
+require_once __DIR__ . '/../../shared/lib/RateLimit.php';
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -69,24 +69,8 @@ require_once __DIR__ . '/../../shared/header.php';
   <div class="w-full p-4" style="background-color:#f5f5f5">
     <div class="oferta">
       <div class="w-full text-center" style="background-color:#f5f5f5">
-        <div class="flex justify-center items-center gap-4 relative">
+        <div class="flex justify-center items-center">
           <h1 class="text-convenios font-bold text-4xl text-base_blue-500 mb-11 -mt-7">Convenios</h1>
-          <?php if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true): ?>
-            <button class="login-link absolute right-5 top-1/2 transform -translate-y-1/2 text-base_blue-500 texto-inter text-sm"
-                    id="loginPageBtn" aria-haspopup="dialog">
-              Iniciar Sesión
-            </button>
-          <?php else: ?>
-            <a href="vista_lista/lista.php"
-               class="button absolute right-5 top-1/2 transform -translate-y-1/2"
-               id="adminButton" aria-label="Ir al panel de administración">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-                <path fill="none" d="M0 0h24v24H0z"></path>
-                <path fill="currentColor" d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"></path>
-              </svg>
-              <span class="text">Admin</span>
-            </a>
-          <?php endif; ?>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../session.php';
 require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../../src/lib/RateLimit.php';
+require_once __DIR__ . '/../../../../shared/lib/RateLimit.php';
 
 header('Content-Type: application/json; charset=UTF-8');
 

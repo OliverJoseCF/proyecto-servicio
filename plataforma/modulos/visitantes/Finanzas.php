@@ -26,7 +26,7 @@ require_once __DIR__ . '/../../shared/header.php';
         </li>
         <li><strong>Si eliges transferencia bancaria:</strong>
           <ul>
-            <li>Utiliza la siguiente CLABE: <strong>0123456789</strong>.</li>
+            <li>La CLABE interbancaria será proporcionada por el área de Finanzas del plantel. Comunícate directamente con la oficina para obtenerla.</li>
             <li>En el concepto, escribe tu nombre completo y motivo del pago.</li>
             <li>Guarda el comprobante de pago.</li>
           </ul>

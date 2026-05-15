@@ -1,5 +1,5 @@
 # ── Configuración sensible ─────────────────────────────────────
-src/config.php
+src/config.local.php
 .env
 .env.local
 

@@ -108,22 +108,22 @@ require_once __DIR__ . '/../../shared/header.php';
     <section class="tarjeta" aria-label="Documentos para descargar">
       <h2><i class="fas fa-download" aria-hidden="true"></i> Documentos para Descargar</h2>
       <div class="descargas-servicio">
-        <a href="assets/docs/servicio-social/Evaluación_cualitativa.pdf"
+        <a href="assets/docs/servicio-social/evaluacion-cualitativa.pdf"
            target="_blank" rel="noopener noreferrer" class="boton-descarga"
            aria-label="Descargar Evaluación Cualitativa (PDF, abre en nueva pestaña)">
           <i class="fas fa-file-pdf" aria-hidden="true"></i> Evaluación Cualitativa
         </a>
-        <a href="assets/docs/servicio-social/carta compromiso.pdf"
+        <a href="assets/docs/servicio-social/carta-compromiso.pdf"
            target="_blank" rel="noopener noreferrer" class="boton-descarga"
            aria-label="Descargar Carta Compromiso (PDF, abre en nueva pestaña)">
           <i class="fas fa-file-pdf" aria-hidden="true"></i> Carta Compromiso
         </a>
-        <a href="assets/docs/servicio-social/Reporte bimestral 1.pdf"
+        <a href="assets/docs/servicio-social/reporte-bimestral-1.pdf"
            target="_blank" rel="noopener noreferrer" class="boton-descarga"
            aria-label="Descargar Reporte Bimestral (PDF, abre en nueva pestaña)">
           <i class="fas fa-file-pdf" aria-hidden="true"></i> Reporte Bimestral
         </a>
-        <a href="assets/docs/servicio-social/formato evaluacion.pdf"
+        <a href="assets/docs/servicio-social/formato-evaluacion.pdf"
            target="_blank" rel="noopener noreferrer" class="boton-descarga"
            aria-label="Descargar Formato de Evaluación (PDF, abre en nueva pestaña)">
           <i class="fas fa-file-pdf" aria-hidden="true"></i> Formato Evaluación

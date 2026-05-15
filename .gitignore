@@ -1,20 +1,23 @@
 # Configuración sensible — NUNCA commitear
-# (overrides de producción con credenciales reales)
 plataforma/shared/config.local.php
-plataforma/modulos/convenios/src/config.php
-plataforma/modulos/biblioteca/tools/setup_password.php
-plataforma/modulos/horarios/tools/setup_password.php
-plataforma/modulos/convenios/tools/setup_password.php
+plataforma/modulos/convenios/src/config.local.php
+plataforma/modulos/*/config.local.php
 
 # Uploads de usuarios
-plataforma/modulos/convenios/src/pages/upload/
-plataforma/modulos/horarios/horarios/
+plataforma/modulos/convenios/src/pages/upload/*
+!plataforma/modulos/convenios/src/pages/upload/.htaccess
+plataforma/modulos/horarios/horarios/*
+!plataforma/modulos/horarios/horarios/.gitkeep
 
-# Vendor (instalar con composer install)
-plataforma/modulos/biblioteca/vendor/
+# Vendor (no se usa actualmente; si se re-agrega: composer install)
+plataforma/modulos/biblioteca/composer/
 
-# Rate limit (temp files)
+# Rate limit (temp files en /tmp del servidor)
 /tmp/tecsj_rl/
+
+# Logs
+*.log
+logs/
 
 # OS / IDE
 .DS_Store
