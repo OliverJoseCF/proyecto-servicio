@@ -18,17 +18,6 @@ require_once __DIR__ . '/../../shared/header.php';
       <a href="servicio-social.php" class="boton-navegacion active" aria-current="page">Servicio Social</a>
     </nav>
 
-    <!-- Barra de Progreso -->
-    <section class="tarjeta" aria-label="Tu progreso de servicio social">
-      <h2>Progreso de Servicio Social</h2>
-      <div class="progress-container" role="progressbar"
-           aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
-           aria-label="Progreso de requisitos completados" id="progressContainer">
-        <div class="progress-bar" id="progressBar" style="width:0%">0%</div>
-      </div>
-      <p>Marca los requisitos completados para ver tu progreso</p>
-    </section>
-
     <!-- Timeline del Proceso -->
     <section class="tarjeta" aria-label="Timeline del proceso de servicio social">
       <h2><i class="fas fa-clock" aria-hidden="true"></i> Timeline del Proceso</h2>
@@ -86,8 +75,19 @@ require_once __DIR__ . '/../../shared/header.php';
       </div>
     </section>
 
+    <!-- Barra de Progreso -->
+    <section class="tarjeta" aria-label="Tu progreso de servicio social">
+      <h2>Progreso de Servicio Social</h2>
+      <div class="progress-container" role="progressbar"
+           aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+           aria-label="Progreso de requisitos completados" id="progressContainer">
+        <div class="progress-bar" id="progressBar" style="width:0%">0%</div>
+      </div>
+      <p>Marca los requisitos completados para ver tu progreso</p>
+    </section>
+
     <!-- Información del Servicio Social -->
-    <section class="tarjeta servicio-contenido" aria-label="Información del servicio social">
+    <section class="tarjeta" aria-label="Información del servicio social">
       <h2><i class="fas fa-info-circle" aria-hidden="true"></i> Información del Servicio Social</h2>
       <div class="searchable-content">
         <h3>Requisito Principal:</h3>
@@ -166,60 +166,6 @@ require_once __DIR__ . '/../../shared/header.php';
   </div>
 </main>
 
-<script>
-(function () {
-  'use strict';
-
-  function updateProgress() {
-    var checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]');
-    var checked    = document.querySelectorAll('.checklist-item input[type="checkbox"]:checked');
-    var bar        = document.getElementById('progressBar');
-    var container  = document.getElementById('progressContainer');
-    var pct        = Math.round((checked.length / checkboxes.length) * 100);
-
-    bar.style.width = pct + '%';
-    bar.textContent = pct + '%';
-    if (container) container.setAttribute('aria-valuenow', pct);
-
-    var progress = [];
-    checkboxes.forEach(function (cb, i) { progress[i] = cb.checked; });
-    try { localStorage.setItem('servicioProgress', JSON.stringify(progress)); } catch (e) {}
-
-    checkboxes.forEach(function (cb) {
-      cb.parentElement.classList.toggle('completed', cb.checked);
-    });
-  }
-
-  function loadProgress() {
-    try {
-      var saved = localStorage.getItem('servicioProgress');
-      if (!saved) return;
-      var progress  = JSON.parse(saved);
-      var checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]');
-      progress.forEach(function (checked, i) { if (checkboxes[i]) checkboxes[i].checked = checked; });
-      updateProgress();
-    } catch (e) {}
-  }
-
-  document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(function (cb) {
-    cb.addEventListener('change', updateProgress);
-  });
-
-  document.querySelectorAll('.faq-question').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var item   = btn.parentElement;
-      var answer = btn.nextElementSibling;
-      var isOpen = item.classList.contains('active');
-      item.classList.toggle('active', !isOpen);
-      answer.classList.toggle('active', !isOpen);
-      btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
-    });
-  });
-
-  window.addEventListener('DOMContentLoaded', function () {
-    loadProgress();
-  });
-})();
-</script>
+<script src="assets/js/servicio-social.js"></script>
 
 <?php require_once __DIR__ . '/../../shared/footer.php'; ?>

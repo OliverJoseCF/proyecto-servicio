@@ -21,7 +21,7 @@ if (file_exists($_tsj_local)) {
 unset($_tsj_local);
 
 // Defaults de desarrollo (XAMPP). En producción se sobreescriben vía config.local.php
-if (!defined('DB_HOST'))    define('DB_HOST',    '127.0.0.1');
+if (!defined('DB_HOST'))    define('DB_HOST',    'localhost');
 if (!defined('DB_PORT'))    define('DB_PORT',    3306);
 if (!defined('DB_USER'))    define('DB_USER',    'root');
 if (!defined('DB_PASS'))    define('DB_PASS',    '');
@@ -63,11 +63,10 @@ function getPDO(string $dbName): PDO {
  * Usado por: Biblioteca.
  */
 function getMysqli(string $dbName): mysqli {
-    $conn = new mysqli(DB_HOST . ':' . DB_PORT, DB_USER, DB_PASS, $dbName);
-    if ($conn->connect_error) {
-        error_log('getMysqli error: ' . $conn->connect_error);
-        die('Error de conexión. Contacta al administrador.');
-    }
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+    $conn = mysqli_init();
+    $conn->options(MYSQLI_OPT_CONNECT_TIMEOUT, 5);
+    $conn->real_connect(DB_HOST, DB_USER, DB_PASS, $dbName, DB_PORT);
     $conn->set_charset(DB_CHARSET);
     return $conn;
 }

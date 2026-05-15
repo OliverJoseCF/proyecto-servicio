@@ -115,7 +115,8 @@
 .tabla-wrapper tbody tr:last-child td { border-bottom: none; }
 .tabla-wrapper tbody tr:nth-child(even) td { background: var(--tsj-blue-50, #f0edff); }
 .tabla-wrapper tbody tr:hover td { background: #ede9ff; color: var(--tsj-blue, #32129a); }
-/* Indicador lateral en hover — via border en primera celda, compatible con todos los navegadores */
+/* Indicador lateral: reserva siempre 3px de border para evitar desplazamiento en hover */
+.tabla-wrapper tbody tr td:first-child { border-left: 3px solid transparent; }
 .tabla-wrapper tbody tr:hover td:first-child { border-left: 3px solid var(--tsj-blue, #32129a); }
 
 .sin-resultados {

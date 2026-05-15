@@ -65,17 +65,6 @@ require_once __DIR__ . '/../../shared/header.php';
       </ol>
     </section>
 
-    <!-- Barra de Progreso -->
-    <section class="tarjeta" aria-label="Tu progreso de requisitos">
-      <h2>Progreso de Residencia</h2>
-      <div class="progress-container" role="progressbar"
-           aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
-           aria-label="Progreso de requisitos completados" id="progressContainer">
-        <div class="progress-bar" id="progressBar" style="width:0%">0%</div>
-      </div>
-      <p>Marca los requisitos completados para ver tu progreso</p>
-    </section>
-
     <!-- Checklist Interactivo -->
     <section class="tarjeta" aria-label="Checklist de requisitos">
       <h2><i class="fas fa-tasks" aria-hidden="true"></i> Checklist de Requisitos</h2>
@@ -115,6 +104,17 @@ require_once __DIR__ . '/../../shared/header.php';
         <input type="checkbox" id="req9">
         <label for="req9">Seguro facultativo o particular vigente</label>
       </div>
+    </section>
+
+    <!-- Barra de Progreso -->
+    <section class="tarjeta" aria-label="Tu progreso de requisitos">
+      <h2>Progreso de Residencia</h2>
+      <div class="progress-container" role="progressbar"
+           aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+           aria-label="Progreso de requisitos completados" id="progressContainer">
+        <div class="progress-bar" id="progressBar" style="width:0%">0%</div>
+      </div>
+      <p>Marca los requisitos completados para ver tu progreso</p>
     </section>
 
     <!-- Documentación Detallada -->
@@ -198,97 +198,6 @@ require_once __DIR__ . '/../../shared/header.php';
   </div>
 </main>
 
-<script>
-(function () {
-  'use strict';
-
-  /* ── Progreso ── */
-  function updateProgress() {
-    var checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]');
-    var checked    = document.querySelectorAll('.checklist-item input[type="checkbox"]:checked');
-    var bar        = document.getElementById('progressBar');
-    var container  = document.getElementById('progressContainer');
-    var pct        = Math.round((checked.length / checkboxes.length) * 100);
-
-    bar.style.width = pct + '%';
-    bar.textContent = pct + '%';
-    if (container) container.setAttribute('aria-valuenow', pct);
-
-    var progress = [];
-    checkboxes.forEach(function (cb, i) { progress[i] = cb.checked; });
-    try { localStorage.setItem('residenciaProgress', JSON.stringify(progress)); } catch (e) {}
-
-    checkboxes.forEach(function (cb) {
-      cb.parentElement.classList.toggle('completed', cb.checked);
-    });
-  }
-
-  function loadProgress() {
-    try {
-      var saved = localStorage.getItem('residenciaProgress');
-      if (!saved) return;
-      var progress  = JSON.parse(saved);
-      var checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]');
-      progress.forEach(function (checked, i) { if (checkboxes[i]) checkboxes[i].checked = checked; });
-      updateProgress();
-    } catch (e) {}
-  }
-
-  document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(function (cb) {
-    cb.addEventListener('change', updateProgress);
-  });
-
-  /* ── Calculadora ── */
-  function calculateCredits() {
-    var total   = parseFloat(document.getElementById('totalCredits').value)   || 0;
-    var current = parseFloat(document.getElementById('currentCredits').value) || 0;
-    var result  = document.getElementById('creditResult');
-    if (total > 0 && current >= 0) {
-      var pct      = Math.round((current / total) * 100);
-      var needed70 = Math.round(total * 0.7);
-      var remaining = needed70 - current;
-      var msg;
-      if (pct >= 80) {
-        msg = '¡Felicidades! Ya puedes iniciar tu residencia (' + pct + '% de créditos)';
-        result.style.background = '#ecfdf5';
-        result.style.color = '#065f46';
-        result.style.border = '1px solid #16a34a';
-      } else if (pct >= 70) {
-        msg = '¡Casi listo! Ya puedes comenzar el proceso (' + pct + '%)';
-        result.style.background = '#fffbeb';
-        result.style.color = '#92400e';
-        result.style.border = '1px solid #f59e0b';
-      } else {
-        msg = 'Aún no — tienes ' + pct + '%, te faltan ' + (remaining > 0 ? remaining : 0) + ' créditos para el 70%';
-        result.style.background = '#fef2f2';
-        result.style.color = '#991b1b';
-        result.style.border = '1px solid #dc2626';
-      }
-      result.textContent = msg;
-    } else {
-      result.textContent = 'Ingresa tus créditos para calcular';
-      result.style.cssText = '';
-    }
-  }
-  window.calculateCredits = calculateCredits;
-
-  /* ── FAQ ── */
-  document.querySelectorAll('.faq-question').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var item    = btn.parentElement;
-      var answer  = btn.nextElementSibling;
-      var isOpen  = item.classList.contains('active');
-      item.classList.toggle('active', !isOpen);
-      answer.classList.toggle('active', !isOpen);
-      btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
-    });
-  });
-
-  /* ── Init ── */
-  window.addEventListener('DOMContentLoaded', function () {
-    loadProgress();
-  });
-})();
-</script>
+<script src="assets/js/residencia.js"></script>
 
 <?php require_once __DIR__ . '/../../shared/footer.php'; ?>

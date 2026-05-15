@@ -74,7 +74,7 @@ require_once __DIR__ . '/../../../shared/header.php';
         </tr>
       </thead>
       <tbody>
-      <?php if ($resultado && $resultado->num_rows > 0): ?>
+      <?php if ($resultado): ?>
         <?php while ($fila = $resultado->fetch_assoc()): ?>
           <?php
             $logoFile  = !empty($fila['logo']) ? basename($fila['logo']) : '';
@@ -96,12 +96,6 @@ require_once __DIR__ . '/../../../shared/header.php';
             <td><?= htmlspecialchars($fechaVenc, ENT_QUOTES, 'UTF-8') ?></td>
           </tr>
         <?php endwhile; ?>
-      <?php else: ?>
-        <tr>
-          <td colspan="6" style="text-align:center;padding:2rem;color:#666;">
-            No se encontraron convenios<?= $nombreCarrera ? ' para esta carrera.' : '.' ?>
-          </td>
-        </tr>
       <?php endif; ?>
       </tbody>
     </table>

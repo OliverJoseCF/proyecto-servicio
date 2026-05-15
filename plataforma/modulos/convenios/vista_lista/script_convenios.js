@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded', function () {
     dom: 'Bfrtip',
     buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
     language: {
-      url: 'https://cdn.datatables.net/plug-ins/2.2.2/i18n/es-ES.json'
+      url: 'https://cdn.datatables.net/plug-ins/2.2.2/i18n/es-ES.json',
+      emptyTable: 'No se encontraron convenios para esta selección.'
     }
   });
 
