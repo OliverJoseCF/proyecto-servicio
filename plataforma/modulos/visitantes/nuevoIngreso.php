@@ -24,7 +24,7 @@ require_once __DIR__ . '/../../shared/header.php';
       <h2 class="vis-h3">Examen de Admisión</h2>
       <p>
         <label for="ni-nombre" style="display:block;margin-bottom:6px;font-weight:600;">Nombre del aspirante:</label>
-        <input type="text" id="ni-nombre" style="width:100%;padding:8px;border:1.5px solid var(--tsj-gray-200, #e5e7eb);border-radius:6px;" autocomplete="name">
+        <input type="text" id="ni-nombre" style="width:100%;padding:8px;border:1.5px solid var(--tsj-gray-200, #e5e7eb);border-radius:6px;" autocomplete="name" required minlength="3" maxlength="100">
       </p>
       <p>El examen de admisión se llevará a cabo el día:
         <label for="dia-examen" class="sr-only">Día del examen</label>

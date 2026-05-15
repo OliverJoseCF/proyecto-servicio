@@ -54,12 +54,12 @@ $modalOpen   = ($loginError !== null) ? 'active' : '';
 $modalHidden = ($loginError !== null) ? 'false'  : 'true';
 
 $tsj_module    = 'convenios';
-$tsj_title     = 'Convenios — TSJ Chapala';
-$tsj_extra_css = [
-    'src/output.css',
-    'src/css/styles.css',
-    'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css',
-];
+$tsj_title     = 'Convenios';
+$tsj_extra_css = ['src/output.css', 'src/css/styles.css'];
+$tsj_head_extra = '<link rel="stylesheet"'
+    . ' href="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.min.css"'
+    . ' integrity="sha384-9zhnRArCpusIVIudEVdI3QmXKH9nCjEGc2rNvdcQ1utx3a3zbLtW3rBOeJ2PvupL"'
+    . ' crossorigin="anonymous" />';
 $tsj_no_security_headers = true;
 require_once __DIR__ . '/../../shared/header.php';
 ?>
@@ -142,7 +142,9 @@ require_once __DIR__ . '/../../shared/header.php';
 
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js"
+        integrity="sha384-YB/DdIkloKoRpclWB8bNcYXWakt57USgtQPDzvnIDHYU0lasD5eWlXVo1S4ODukY"
+        crossorigin="anonymous" defer></script>
 <script src="src/js/script.js" defer></script>
 
 <!-- Modal Sugerir Empresa -->

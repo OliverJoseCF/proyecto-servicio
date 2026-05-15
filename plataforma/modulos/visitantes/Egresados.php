@@ -16,13 +16,13 @@ require_once __DIR__ . '/../../shared/header.php';
 
     <div class="seccion">
       <label for="rein-nombre">Nombre completo:</label>
-      <input type="text" id="rein-nombre" placeholder="Escribe tu nombre completo" autocomplete="name">
+      <input type="text" id="rein-nombre" placeholder="Escribe tu nombre completo" autocomplete="name" required minlength="3" maxlength="100">
 
       <label for="rein-control">Número de control:</label>
-      <input type="text" id="rein-control" placeholder="Número de control">
+      <input type="text" id="rein-control" placeholder="Número de control" required minlength="8" maxlength="10" pattern="[0-9A-Za-z]{8,10}">
 
       <label for="rein-carrera">Carrera:</label>
-      <select id="rein-carrera">
+      <select id="rein-carrera" required>
         <option value="">Selecciona tu carrera</option>
         <option>Ingeniería Mecatrónica</option>
         <option>Ingeniería en Sistemas Computacionales</option>
