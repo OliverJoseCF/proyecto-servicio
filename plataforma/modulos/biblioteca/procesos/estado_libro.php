@@ -12,7 +12,13 @@ if (!csrfVerify()) {
     exit;
 }
 
-include '../config/conexion.php';
+try {
+    require '../config/conexion.php';
+} catch (\Throwable $e) {
+    error_log('estado_libro DB error: ' . $e->getMessage());
+    header("Location: ../admin.php?error=db");
+    exit;
+}
 
 $id     = isset($_POST['id'])     ? (int)$_POST['id']     : 0;
 $accion = trim($_POST['accion']   ?? '');

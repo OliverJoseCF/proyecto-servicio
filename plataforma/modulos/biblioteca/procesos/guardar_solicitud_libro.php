@@ -1,7 +1,15 @@
 <?php
 require_once __DIR__ . '/../../../shared/lib/auth.php';
 require_once __DIR__ . '/../../../shared/lib/RateLimit.php';
-include '../config/conexion.php';
+
+try {
+    require '../config/conexion.php';
+} catch (\Throwable $e) {
+    error_log('guardar_solicitud_libro DB error: ' . $e->getMessage());
+    $_SESSION['flash_error'] = 'Error de conexión. Inténtalo de nuevo más tarde.';
+    header('Location: ../buscar.php');
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ../buscar.php');

@@ -1,9 +1,9 @@
 <?php
 require_once __DIR__ . '/../../shared/lib/auth.php';
 requireAuth('biblioteca', 'login.php');
-include 'config/conexion.php';
 
 try {
+    require 'config/conexion.php';
     $totalLibros = $conexion->query("SELECT COUNT(*) as total FROM libros")->fetch_assoc()['total'];
     $prestados   = $conexion->query("SELECT COUNT(*) as total FROM solicitud_libros WHERE estado='Aceptado' AND entregado=0")->fetch_assoc()['total'];
     $pendientes  = $conexion->query("SELECT COUNT(*) as total FROM solicitud_libros WHERE estado='Pendiente'")->fetch_assoc()['total'];

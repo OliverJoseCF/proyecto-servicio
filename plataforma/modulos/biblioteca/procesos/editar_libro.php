@@ -1,7 +1,13 @@
 <?php
 require_once __DIR__ . '/../../../shared/lib/auth.php';
 requireAuth('biblioteca', '../login.php');
-include '../config/conexion.php';
+try {
+    require '../config/conexion.php';
+} catch (\Throwable $e) {
+    error_log('editar_libro DB error: ' . $e->getMessage());
+    header("Location: ../admin.php?error=db");
+    exit;
+}
 
 $codigo = trim($_GET['codigo'] ?? '');
 if ($codigo === '') {
@@ -22,8 +28,12 @@ if (!$libro) {
 
 $tsj_module     = 'biblioteca';
 $tsj_title      = 'Biblioteca — Editar Libro';
-$tsj_extra_css  = ['https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css'];
-$tsj_head_extra = '<style>body { background-color: #f8f9fa; }</style>';
+$tsj_extra_css  = [];
+$tsj_head_extra = '<link rel="stylesheet"'
+    . ' href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"'
+    . ' integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"'
+    . ' crossorigin="anonymous" />'
+    . '<style>body { background-color: #f8f9fa; }</style>';
 require_once __DIR__ . '/../../../shared/header.php';
 ?>
 

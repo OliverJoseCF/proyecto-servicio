@@ -12,7 +12,13 @@ if (!csrfVerify()) {
     exit;
 }
 
-include '../config/conexion.php';
+try {
+    require '../config/conexion.php';
+} catch (\Throwable $e) {
+    error_log('actualizar_libro DB error: ' . $e->getMessage());
+    header("Location: ../admin.php?error=db");
+    exit;
+}
 
 $codigo_original = trim($_POST['codigo_original'] ?? '');
 $nombre          = trim($_POST['nombre'] ?? '');

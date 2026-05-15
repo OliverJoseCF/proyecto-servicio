@@ -12,7 +12,13 @@ if (!csrfVerify()) {
     exit;
 }
 
-include '../config/conexion.php';
+try {
+    require '../config/conexion.php';
+} catch (\Throwable $e) {
+    error_log('marcar_devuelto DB error: ' . $e->getMessage());
+    header("Location: ../admin.php?error=db");
+    exit;
+}
 
 $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
 if ($id <= 0) {

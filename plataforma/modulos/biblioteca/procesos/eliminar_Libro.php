@@ -14,23 +14,25 @@ if (!csrfVerify()) {
     exit;
 }
 
-include '../config/conexion.php';
-
-$id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
-if ($id <= 0) {
-    header('Content-Type: application/json');
-    echo json_encode(['success' => false, 'error' => 'ID inválido']);
-    exit;
-}
-
-$stmt = $conexion->prepare("DELETE FROM libros WHERE id = ?");
-$stmt->bind_param("i", $id);
-
 header('Content-Type: application/json');
-if ($stmt->execute()) {
+
+try {
+    require '../config/conexion.php';
+
+    $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+    if ($id <= 0) {
+        echo json_encode(['success' => false, 'error' => 'ID inválido']);
+        exit;
+    }
+
+    $stmt = $conexion->prepare("DELETE FROM libros WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->close();
+    $conexion->close();
     echo json_encode(['success' => true]);
-} else {
-    echo json_encode(['success' => false, 'error' => 'Error al eliminar']);
+} catch (\Throwable $e) {
+    error_log('eliminar_Libro error: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['success' => false, 'error' => 'Error al eliminar. Contacta al administrador.']);
 }
-$stmt->close();
-$conexion->close();
