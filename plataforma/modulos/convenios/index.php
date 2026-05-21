@@ -122,13 +122,19 @@ require_once __DIR__ . '/../../shared/header.php';
     </a>
   </div>
 
-  <!-- Sugerir empresa -->
+  <!-- Sugerir empresa / Acceso administrativo -->
   <div class="w-full flex flex-col items-center gap-2 mb-6">
     <button class="login-button" id="openSuggestModalBtn"
             aria-expanded="false" aria-controls="suggestModalOverlay"
             aria-haspopup="dialog">
       Sugerir una empresa
     </button>
+    <?php if (empty($_SESSION['authenticated'])): ?>
+    <button type="button" class="login-link"
+            aria-haspopup="dialog" aria-controls="loginModalOverlay">
+      Iniciar sesión
+    </button>
+    <?php endif; ?>
   </div>
 
   <?php if (isset($_SESSION['authenticated']) && $_SESSION['authenticated'] === true): ?>

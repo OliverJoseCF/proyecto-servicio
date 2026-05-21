@@ -39,12 +39,22 @@ require_once __DIR__ . '/../../shared/header.php';
 <script>
 (function () {
   'use strict';
+
+  /* Avatar placeholder embebido (SVG data-URI): evita depender de un archivo
+     que puede no existir y previene imágenes rotas. */
+  var PLACEHOLDER = 'data:image/svg+xml,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">' +
+    '<rect width="48" height="48" fill="#e5e7eb"/>' +
+    '<circle cx="24" cy="19" r="8" fill="#9ca3af"/>' +
+    '<path d="M8 44c0-9 7-14 16-14s16 5 16 14z" fill="#9ca3af"/></svg>'
+  );
+
   var directorio = [
     { foto: 'imagenes/miguel.png', nombre: 'Miguel Ángel Delgado López',       departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'miguel.delgado@chapala.tecmm.edu.mx' },
     { foto: 'imagenes/julio.png',  nombre: 'Julio César Chávez Novoa',          departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'julio.chavez@chapala.tecmm.edu.mx' },
     { foto: 'imagenes/carmen.png', nombre: 'Carmen Leticia Salcedo Quevedo',    departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'carmen.salcedo@chapala.tecmm.edu.mx' },
     { foto: 'imagenes/jorge.png',  nombre: 'José Jorge Hernández Ochoa',        departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'jorge.hernandez@chapala.tecmm.edu.mx' },
-    { foto: 'imagenes/user.png',   nombre: 'Francisco Javier González Siordia', departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'francisco.gonzales@chapala.tecmm.edu.mx' },
+    { foto: PLACEHOLDER,           nombre: 'Francisco Javier González Siordia', departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'francisco.gonzales@chapala.tecmm.edu.mx' },
     { foto: 'imagenes/gamas.png',  nombre: 'José Guadalupe Gamas Gamas',        departamento: 'Sistemas Computacionales', telefono: 'S/N', correo: 'jose.gamas@chapala.tecmm.edu.mx' }
   ];
 
@@ -59,7 +69,7 @@ require_once __DIR__ . '/../../shared/header.php';
     img.src       = item.foto;
     img.alt       = item.nombre;
     img.className = 'foto-tabla';
-    img.onerror   = function () { this.src = 'imagenes/user.png'; };
+    img.onerror   = function () { this.onerror = null; this.src = PLACEHOLDER; };
     tdFoto.appendChild(img);
 
     var tdNombre = document.createElement('td');

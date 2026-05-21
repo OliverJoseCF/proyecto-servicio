@@ -184,6 +184,18 @@
     to   { opacity: 0; left: 100%; }
   }
 }
+.login-link {
+  padding: 10px 20px;
+  border-radius: 7px; border: 1px solid var(--conv-text);
+  font-size: 14px; text-transform: uppercase;
+  font-weight: 600; letter-spacing: 2px;
+  background: var(--conv-text); color: #fff;
+  cursor: pointer; transition: all 0.2s ease-in;
+  display: block; width: 200px; min-height: 44px;
+}
+.login-link:hover { background: transparent; color: var(--conv-text); }
+.login-link:focus-visible { outline: 2px solid var(--tsj-pink, #ec5a68); outline-offset: 2px; }
+
 .logout-button {
   background: #dc2626; color: #fff;
   border: none; border-radius: 6px;

@@ -11,7 +11,7 @@ try {
 }
 
 try {
-    $carreras = $pdo->query("SELECT id_carrera, nombre_carrera FROM Carreras")->fetchAll();
+    $carreras = $pdo->query("SELECT id_carrera, nombre_carrera FROM carreras")->fetchAll();
 } catch (\PDOException $e) {
     error_log('horarios/VistaAdmin carreras error: ' . $e->getMessage());
     $carreras = [];
@@ -25,14 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar_id'])) {
     if (!csrfVerify()) { die('Petición inválida.'); }
     $id = (int)$_POST['eliminar_id'];
 
-    $stmtRuta = $pdo->prepare("SELECT imagen_horario FROM Horarios WHERE id_profesor = :id");
+    $stmtRuta = $pdo->prepare("SELECT imagen_horario FROM horarios WHERE id_profesor = :id");
     $stmtRuta->execute(['id' => $id]);
     $rutaArchivo = $stmtRuta->fetchColumn();
 
     try {
         $pdo->beginTransaction();
-        $pdo->prepare("DELETE FROM Horarios   WHERE id_profesor = :id")->execute(['id' => $id]);
-        $pdo->prepare("DELETE FROM Profesores WHERE id_profesor = :id")->execute(['id' => $id]);
+        $pdo->prepare("DELETE FROM horarios   WHERE id_profesor = :id")->execute(['id' => $id]);
+        $pdo->prepare("DELETE FROM profesores WHERE id_profesor = :id")->execute(['id' => $id]);
         $pdo->commit();
         if ($rutaArchivo) {
             $safeFile = HORARIOS_DIR . basename($rutaArchivo);
@@ -59,9 +59,9 @@ if ($id_carrera > 0) {
 }
 
 $sql  = "SELECT p.id_profesor, p.nombre, p.apellido, h.imagen_horario, c.nombre_carrera
-         FROM Horarios h
-         JOIN Profesores p ON h.id_profesor = p.id_profesor
-         JOIN Carreras   c ON h.id_carrera  = c.id_carrera
+         FROM horarios h
+         JOIN profesores p ON h.id_profesor = p.id_profesor
+         JOIN carreras   c ON h.id_carrera  = c.id_carrera
          $where ORDER BY p.apellido, p.nombre";
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
@@ -69,7 +69,7 @@ $datos = $stmt->fetchAll();
 
 $tsj_module    = 'horarios';
 $tsj_title     = 'Horarios — Panel de Administración';
-$tsj_extra_css = ['css/normalize.css', 'css/admin.css'];
+$tsj_extra_css = ['normalize.css', 'css/admin.css'];
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 

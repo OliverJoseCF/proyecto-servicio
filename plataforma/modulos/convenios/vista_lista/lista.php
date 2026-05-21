@@ -147,17 +147,4 @@ require_once __DIR__ . '/../../../shared/header.php';
         crossorigin="anonymous" defer></script>
 <script src="script.js" defer></script>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  var flash = document.getElementById('flashMsg');
-  if (flash) {
-    setTimeout(function () {
-      flash.style.transition = 'opacity 0.5s';
-      flash.style.opacity = '0';
-      setTimeout(function () { flash.remove(); }, 500);
-    }, 6000);
-  }
-});
-</script>
-
 <?php require_once __DIR__ . '/../../../shared/footer.php'; ?>

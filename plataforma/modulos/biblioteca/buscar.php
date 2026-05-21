@@ -41,6 +41,14 @@ require_once __DIR__ . '/../../shared/header.php';
 
   <div class="container pb-5">
 
+    <!-- Acceso al formulario de préstamo de controles -->
+    <div class="d-flex justify-content-end mb-3">
+      <a href="solicitudDeControles.php" class="btn btn-gold btn-sm">
+        <i class="fas fa-gamepad me-1" aria-hidden="true"></i>
+        Solicitar préstamo de controles
+      </a>
+    </div>
+
     <!-- Búsqueda -->
     <div class="search-card" role="search">
       <div class="row g-3 align-items-end">

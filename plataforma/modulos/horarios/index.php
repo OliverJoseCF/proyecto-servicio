@@ -9,7 +9,7 @@ try {
 }
 
 try {
-    $carreras = $pdo->query("SELECT id_carrera, nombre_carrera FROM Carreras")->fetchAll();
+    $carreras = $pdo->query("SELECT id_carrera, nombre_carrera FROM carreras")->fetchAll();
 } catch (\PDOException $e) {
     error_log('horarios/index carreras error: ' . $e->getMessage());
     $carreras = [];
@@ -40,9 +40,9 @@ $sql_base = "
            c.nombre_carrera,
            h.semestre,
            h.imagen_horario
-    FROM   Horarios h
-    JOIN   Profesores p ON h.id_profesor = p.id_profesor
-    JOIN   Carreras   c ON h.id_carrera  = c.id_carrera
+    FROM   horarios h
+    JOIN   profesores p ON h.id_profesor = p.id_profesor
+    JOIN   carreras   c ON h.id_carrera  = c.id_carrera
     $where
 ";
 
@@ -60,7 +60,7 @@ $horarios_paginados = $stmt->fetchAll();
 
 $tsj_module    = 'horarios';
 $tsj_title     = 'Maestros y Horarios';
-$tsj_extra_css = ['css/normalize.css', 'css/Principal.css'];
+$tsj_extra_css = ['normalize.css', 'css/Principal.css'];
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 

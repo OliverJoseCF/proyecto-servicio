@@ -11,8 +11,8 @@ try {
 }
 
 try {
-    $carreras = $pdo->query("SELECT id_carrera, nombre_carrera FROM Carreras ORDER BY nombre_carrera")->fetchAll();
-    $materias = $pdo->query("SELECT id_materia, nombre_materia, id_carrera FROM Materias ORDER BY nombre_materia")->fetchAll();
+    $carreras = $pdo->query("SELECT id_carrera, nombre_carrera FROM carreras ORDER BY nombre_carrera")->fetchAll();
+    $materias = $pdo->query("SELECT id_materia, nombre_materia, id_carrera FROM materias ORDER BY nombre_materia")->fetchAll();
 } catch (\PDOException $e) {
     error_log('horarios/AgregarMaestro catalog error: ' . $e->getMessage());
     $carreras = [];
@@ -25,8 +25,8 @@ if (isset($_GET['editar'])) {
     $stmt = $pdo->prepare("
         SELECT p.id_profesor, p.nombre, p.apellido,
                h.imagen_horario, h.id_carrera, h.id_materia, h.semestre
-        FROM   Profesores p
-        JOIN   Horarios h ON p.id_profesor = h.id_profesor
+        FROM   profesores p
+        JOIN   horarios h ON p.id_profesor = h.id_profesor
         WHERE  p.id_profesor = :id
     ");
     $stmt->execute(['id' => (int)$_GET['editar']]);
@@ -83,24 +83,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo->beginTransaction();
             if ($id_profesor) {
-                $pdo->prepare("UPDATE Profesores SET nombre=:nom,apellido=:ape WHERE id_profesor=:id")
+                $pdo->prepare("UPDATE profesores SET nombre=:nom,apellido=:ape WHERE id_profesor=:id")
                     ->execute(['nom'=>$nombre,'ape'=>$apellido,'id'=>$id_profesor]);
                 if ($filePathDB !== null) {
-                    $stmtOld = $pdo->prepare("SELECT imagen_horario FROM Horarios WHERE id_profesor=:id");
+                    $stmtOld = $pdo->prepare("SELECT imagen_horario FROM horarios WHERE id_profesor=:id");
                     $stmtOld->execute(['id'=>$id_profesor]);
                     $oldPath = $stmtOld->fetchColumn();
                     if ($oldPath && file_exists(HORARIOS_DIR . basename($oldPath))) @unlink(HORARIOS_DIR . basename($oldPath));
-                    $pdo->prepare("UPDATE Horarios SET imagen_horario=:ruta,id_carrera=:car,id_materia=:mat,semestre=:sem WHERE id_profesor=:id")
+                    $pdo->prepare("UPDATE horarios SET imagen_horario=:ruta,id_carrera=:car,id_materia=:mat,semestre=:sem WHERE id_profesor=:id")
                         ->execute(['ruta'=>$filePathDB,'car'=>$carrera,'mat'=>$materia,'sem'=>$semestre,'id'=>$id_profesor]);
                 } else {
-                    $pdo->prepare("UPDATE Horarios SET id_carrera=:car,id_materia=:mat,semestre=:sem WHERE id_profesor=:id")
+                    $pdo->prepare("UPDATE horarios SET id_carrera=:car,id_materia=:mat,semestre=:sem WHERE id_profesor=:id")
                         ->execute(['car'=>$carrera,'mat'=>$materia,'sem'=>$semestre,'id'=>$id_profesor]);
                 }
             } else {
-                $stmt = $pdo->prepare("INSERT INTO Profesores (nombre,apellido) VALUES (:nom,:ape)");
+                $stmt = $pdo->prepare("INSERT INTO profesores (nombre,apellido) VALUES (:nom,:ape)");
                 $stmt->execute(['nom'=>$nombre,'ape'=>$apellido]);
                 $newId = $pdo->lastInsertId();
-                $pdo->prepare("INSERT INTO Horarios (id_profesor,imagen_horario,id_carrera,id_materia,semestre) VALUES (:idp,:rut,:car,:mat,:sem)")
+                $pdo->prepare("INSERT INTO horarios (id_profesor,imagen_horario,id_carrera,id_materia,semestre) VALUES (:idp,:rut,:car,:mat,:sem)")
                     ->execute(['idp'=>$newId,'rut'=>$filePathDB,'car'=>$carrera,'mat'=>$materia,'sem'=>$semestre]);
             }
             $pdo->commit();
@@ -119,7 +119,7 @@ $titulo = $profesor ? 'Editar Maestro' : 'Agregar Maestro';
 
 $tsj_module    = 'horarios';
 $tsj_title     = 'Horarios — ' . $titulo;
-$tsj_extra_css = ['css/normalize.css', 'css/agregarMaestro.css'];
+$tsj_extra_css = ['normalize.css', 'css/agregarMaestro.css'];
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 

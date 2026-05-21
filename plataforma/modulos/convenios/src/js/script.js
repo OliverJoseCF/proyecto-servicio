@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
   /* Toggle visibilidad contraseña */
   if (togglePassword) {
     togglePassword.addEventListener('click', function () {
-      var passwordField = document.getElementById('password');
+      var passwordField = document.getElementById('conv-password');
       var isText = passwordField.getAttribute('type') === 'text';
       passwordField.setAttribute('type', isText ? 'password' : 'text');
       togglePassword.setAttribute('aria-label', isText ? 'Mostrar contraseña' : 'Ocultar contraseña');
@@ -66,8 +66,8 @@ document.addEventListener('DOMContentLoaded', function () {
   /* Validación básica login antes de enviar */
   if (loginForm) {
     loginForm.addEventListener('submit', function (e) {
-      var emailVal    = (document.getElementById('email') || {}).value || '';
-      var passwordVal = (document.getElementById('password') || {}).value || '';
+      var emailVal    = (document.getElementById('conv-email') || {}).value || '';
+      var passwordVal = (document.getElementById('conv-password') || {}).value || '';
       if (!emailVal.trim() || !passwordVal) {
         e.preventDefault();
         var errEl = loginForm.querySelector('.login-error');

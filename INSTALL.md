@@ -22,12 +22,27 @@ cd proyecto-servicio
 
 ### 2.1 Desarrollo local (XAMPP)
 
-El archivo `plataforma/shared/config.local.php` ya existe con las credenciales de XAMPP por defecto
-(BD: `root` sin contraseña). Los hashes de admin para desarrollo ya están incluidos.
+Las credenciales de BD por defecto (XAMPP: `root` sin contraseña) ya vienen en
+`plataforma/shared/config.php`, así que **no necesitas tocar la BD para desarrollo**.
 
-> Este archivo está en `.gitignore` y no se sube al repo.
+Sin embargo, los paneles de administración **sí requieren** los hashes de admin, y por
+defecto están vacíos (el login se bloquea con "El sistema aún no está configurado").
+Crea el archivo local de overrides a partir de la plantilla:
 
-El módulo Convenios también necesita su archivo local:
+```bash
+cp plataforma/shared/config.local.example.php plataforma/shared/config.local.php
+```
+
+> Este archivo está en `.gitignore` y **no existe en un clon nuevo** — debes crearlo.
+
+Genera los hashes de admin de Biblioteca y Horarios y cópialos en ese archivo:
+
+```bash
+php plataforma/modulos/biblioteca/tools/setup_password.php
+php plataforma/modulos/horarios/tools/setup_password.php
+```
+
+El módulo Convenios también necesita su propio archivo local:
 
 ```bash
 cp plataforma/modulos/convenios/src/config.example.php \
@@ -148,6 +163,13 @@ para saber qué valores configurar.
 - [ ] `migrate_horarios_paths.sql` ejecutado después de importar horarios.sql
 - [ ] `setup.sql` ejecutado para crear usuario `tsjplat`
 - [ ] Imágenes/PDFs de horarios copiados a `plataforma/modulos/horarios/horarios/`
+- [ ] MTA configurado (sendmail/SMTP) — requerido por la función "Sugerir empresa" de
+      Convenios, que usa `mail()`. Sin un MTA válido el envío falla con Error 500.
+
+> **Nota sobre MySQL en Linux:** importa los dumps respetando el nombre **en minúsculas** de
+> las tablas. Las aplicaciones consultan `carreras`, `horarios`, `profesores`, `materias`,
+> `libros`, `convenios` en minúsculas; con `lower_case_table_names=0` (default en Linux) los
+> nombres son sensibles a mayúsculas.
 
 ---
 

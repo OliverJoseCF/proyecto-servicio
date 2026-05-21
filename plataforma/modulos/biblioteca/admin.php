@@ -166,6 +166,8 @@ require_once __DIR__ . '/../../shared/header.php';
               <th scope="col">Recibo</th>
               <th scope="col">Salida</th>
               <th scope="col">Entrega</th>
+              <th scope="col">Estado</th>
+              <th scope="col" class="text-center">Acciones</th>
             </tr></thead>
             <tbody>
               <?php
@@ -179,9 +181,33 @@ require_once __DIR__ . '/../../shared/header.php';
                 <td><?= htmlspecialchars($ctrl['recibo'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
                 <td><?= htmlspecialchars($ctrl['hora_prestamo'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
                 <td><?= htmlspecialchars($ctrl['hora_entrega'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
+                <td>
+                  <?php $estadoCtrl = $ctrl['estado'] ?? 'Pendiente'; ?>
+                  <?php if ($estadoCtrl === 'Aceptado'): ?>
+                    <span class="badge-status badge-accepted">Aceptado</span>
+                  <?php elseif ($estadoCtrl === 'Rechazado'): ?>
+                    <span class="badge-status badge-rejected">Rechazado</span>
+                  <?php else: ?>
+                    <span class="badge-status badge-pending">Pendiente</span>
+                  <?php endif; ?>
+                </td>
+                <td class="text-center">
+                  <?php if ($estadoCtrl === 'Pendiente'): ?>
+                    <button class="btn btn-success btn-sm rounded-pill px-3"
+                            onclick="cambiarEstadoControl(<?= (int)$ctrl['id'] ?>, 'Aceptado')">
+                      <i class="fas fa-check me-1" aria-hidden="true"></i>Aceptar
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm rounded-pill px-3 ms-1"
+                            onclick="cambiarEstadoControl(<?= (int)$ctrl['id'] ?>, 'Rechazado')">
+                      <i class="fas fa-times me-1" aria-hidden="true"></i>Rechazar
+                    </button>
+                  <?php else: ?>
+                    <span class="text-muted">—</span>
+                  <?php endif; ?>
+                </td>
               </tr>
               <?php endwhile; else: ?>
-              <tr><td colspan="6" class="text-center text-muted py-4">No hay registros de controles.</td></tr>
+              <tr><td colspan="8" class="text-center text-muted py-4">No hay registros de controles.</td></tr>
               <?php endif; ?>
             </tbody>
           </table>
@@ -387,6 +413,21 @@ require_once __DIR__ . '/../../shared/header.php';
       cancelButtonText: 'Cancelar'
     }).then(function (result) {
       if (result.isConfirmed) postAction('procesos/estado_libro.php', { id: id, accion: n });
+    });
+  };
+
+  window.cambiarEstadoControl = function (id, n) {
+    Swal.fire({
+      title: n === 'Aceptado' ? '¿Aceptar solicitud de control?' : '¿Rechazar solicitud de control?',
+      text:  n === 'Aceptado' ? 'El préstamo del control quedará autorizado.' : 'La solicitud de control será rechazada.',
+      icon:  n === 'Aceptado' ? 'question' : 'warning',
+      showCancelButton: true,
+      confirmButtonColor: n === 'Aceptado' ? '#27ae60' : '#e74c3c',
+      cancelButtonColor: '#95a5a6',
+      confirmButtonText: n === 'Aceptado' ? 'Sí, aceptar' : 'Sí, rechazar',
+      cancelButtonText: 'Cancelar'
+    }).then(function (result) {
+      if (result.isConfirmed) postAction('procesos/estado_control.php', { id: id, accion: n });
     });
   };
 

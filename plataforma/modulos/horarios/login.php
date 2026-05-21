@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $tsj_module    = 'horarios';
 $tsj_title     = 'Horarios — Iniciar Sesión';
-$tsj_extra_css = ['css/normalize.css', 'css/login.css'];
+$tsj_extra_css = ['normalize.css', 'css/login.css'];
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 

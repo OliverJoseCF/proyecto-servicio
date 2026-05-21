@@ -28,4 +28,16 @@ $(document).ready(function () {
     var href = $(this).parent().data('href');
     if (href) window.location.href = href;
   });
+
+  /* Auto-ocultar el mensaje flash de éxito tras 6 s.
+     (Antes era un <script> inline en lista.php; movido aquí porque la CSP
+     del módulo Convenios no permite 'unsafe-inline' en script-src.) */
+  var flash = document.getElementById('flashMsg');
+  if (flash) {
+    setTimeout(function () {
+      flash.style.transition = 'opacity 0.5s';
+      flash.style.opacity = '0';
+      setTimeout(function () { flash.remove(); }, 500);
+    }, 6000);
+  }
 });

@@ -1,8 +1,25 @@
-# Deshabilitar ejecución de PHP en esta carpeta (solo Apache)
-php_flag engine off
+# Deshabilitar el motor PHP en esta carpeta.
+# php_flag SOLO es válido con mod_php; bajo PHP-FPM/FastCGI provoca Error 500,
+# por eso se envuelve en <IfModule>. La protección principal es el <FilesMatch>.
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
 
-# Denegar acceso a scripts ejecutables
+# Denegar acceso a scripts ejecutables (independiente del SAPI de PHP)
 <FilesMatch "(?i)\.(php\d?|phtml|pl|py|cgi|sh|asp|aspx)$">
-    Order allow,deny
-    Deny from all
+    # Apache 2.4
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    # Apache 2.2 (fallback)
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
 </FilesMatch>
