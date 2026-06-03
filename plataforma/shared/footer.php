@@ -2,7 +2,19 @@
 if (!defined('PLATAFORMA_URL')) {
     require_once __DIR__ . '/config.php';
 }
+if (!function_exists('isGlobalAdmin')) {
+    require_once __DIR__ . '/lib/auth.php';
+}
 $base = PLATAFORMA_URL;
+
+// Mapa módulo → página de admin
+$_tsj_admin_links = [
+    'visitantes' => $base . '/admin/visitantes.php',
+    'biblioteca' => $base . '/admin/biblioteca.php',
+    'convenios'  => $base . '/admin/convenios.php',
+    'horarios'   => $base . '/admin/horarios.php',
+    'requisitos' => $base . '/admin/requisitos.php',
+];
 $nav_items = $nav_items ?? [
     'visitantes' => ['label' => 'Visitantes',  'href' => $base . '/modulos/visitantes/index.php'],
     'biblioteca' => ['label' => 'Biblioteca',   'href' => $base . '/modulos/biblioteca/buscar.php'],
@@ -11,6 +23,16 @@ $nav_items = $nav_items ?? [
     'requisitos' => ['label' => 'Requisitos',   'href' => $base . '/modulos/requisitos/residencia.php'],
 ];
 ?>
+<?php if (isGlobalAdmin() && isset($tsj_module, $_tsj_admin_links[$tsj_module])): ?>
+<!-- Botón flotante de admin (solo visible en sesión admin) -->
+<a href="<?= $_tsj_admin_links[$tsj_module] ?>"
+   class="tsj-fab-admin"
+   title="Configurar este módulo (Admin)">
+  <span class="material-symbols-rounded" aria-hidden="true">tune</span>
+  <span class="tsj-fab-admin-label">Configurar</span>
+</a>
+<?php endif; ?>
+
 <footer class="tsj-footer" aria-label="Pie de página institucional">
 
   <!-- ── Sección principal: 3 columnas ────────────────────── -->

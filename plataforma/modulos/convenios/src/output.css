@@ -384,16 +384,14 @@
     border: 0 solid;
   }
   html, :host {
-    line-height: 1.5;
+    /* font-family y line-height removidos: los controla theme.css globalmente
+       para evitar que Tailwind sobreescriba Poppins con ui-sans-serif (Segoe UI). */
     -webkit-text-size-adjust: 100%;
     tab-size: 4;
-    font-family: var( --default-font-family, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" );
-    font-feature-settings: var(--default-font-feature-settings, normal);
-    font-variation-settings: var( --default-font-variation-settings, normal );
     -webkit-tap-highlight-color: transparent;
   }
   body {
-    line-height: inherit;
+    /* line-height: inherit removido para no competir con theme.css */
   }
   hr {
     height: 0;

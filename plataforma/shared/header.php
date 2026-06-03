@@ -16,6 +16,12 @@ if (!defined('PLATAFORMA_URL')) {
     require_once __DIR__ . '/config.php';
 }
 
+// Estado de sesión global para mostrar botón admin en el header
+if (!function_exists('isGlobalAdmin')) {
+    require_once __DIR__ . '/lib/auth.php';
+}
+$_tsj_is_admin = isGlobalAdmin();
+
 if (empty($tsj_no_security_headers)) {
     require_once __DIR__ . '/security_headers.php';
 }
@@ -53,15 +59,11 @@ $nav_items = [
   <title><?= htmlspecialchars($tsj_title, ENT_QUOTES, 'UTF-8') ?> — TSJ Chapala</title>
   <link rel="icon" type="image/png" href="<?= $base ?>/shared/assets/img/favicon.png" />
 
-  <!-- Poppins + Material Icons: no bloquean render -->
+  <!-- Poppins + Material Symbols: carga directa (compatible con CSP sin unsafe-inline) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-        rel="stylesheet" media="print" onload="this.media='all'" />
-  <noscript>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-          rel="stylesheet" />
-  </noscript>
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <style>
     .material-symbols-rounded {
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -70,10 +72,20 @@ $nav_items = [
     }
   </style>
 
-  <link rel="stylesheet" href="<?= $base ?>/shared/assets/css/theme.css" />
+  <?php
+  /* Cache-busting: la URL cambia cada vez que el archivo se modifica.
+     SCRIPT_FILENAME es el .php del módulo que incluyó este header. */
+  $theme_v   = filemtime(__DIR__ . '/assets/css/theme.css');
+  $module_dir = dirname($_SERVER['SCRIPT_FILENAME']);
+  ?>
+  <link rel="stylesheet" href="<?= $base ?>/shared/assets/css/theme.css?v=<?= $theme_v ?>" />
 
   <?php foreach ($tsj_extra_css as $css): ?>
-  <link rel="stylesheet" href="<?= htmlspecialchars($css, ENT_QUOTES, 'UTF-8') ?>" />
+  <?php
+    $abs    = $module_dir . '/' . ltrim($css, '/');
+    $css_v  = file_exists($abs) ? filemtime($abs) : $theme_v;
+  ?>
+  <link rel="stylesheet" href="<?= htmlspecialchars($css, ENT_QUOTES, 'UTF-8') ?>?v=<?= $css_v ?>" />
   <?php endforeach; ?>
 
   <?php if ($tsj_head_extra): /* Solo inyectar HTML de confianza (generado por el propio módulo) */ ?>
@@ -116,6 +128,31 @@ $nav_items = [
         <?php endforeach; ?>
       </ul>
     </nav>
+
+    <!-- Auth: botón de login o badge de admin -->
+    <div class="tsj-header-auth">
+      <?php if ($_tsj_is_admin): ?>
+        <!-- Admin activo: badge enlaza al panel + logout -->
+        <a href="<?= $base ?>/admin/" class="tsj-admin-badge" title="Ir al panel de administración">
+          <span class="material-symbols-rounded" aria-hidden="true">shield_person</span>
+          <span class="tsj-admin-badge-text">Admin</span>
+        </a>
+        <form method="POST" action="<?= $base ?>/logout.php" class="tsj-logout-form">
+          <input type="hidden" name="_csrf" value="<?= htmlspecialchars(csrfToken(), ENT_QUOTES, 'UTF-8') ?>">
+          <button type="submit" class="tsj-logout-btn" aria-label="Cerrar sesión">
+            <span class="material-symbols-rounded" aria-hidden="true">logout</span>
+          </button>
+        </form>
+      <?php else: ?>
+        <!-- Sin sesión: botón de acceso admin -->
+        <a href="<?= $base ?>/login.php"
+           class="tsj-login-btn"
+           aria-label="Acceso administrador">
+          <span class="material-symbols-rounded" aria-hidden="true">admin_panel_settings</span>
+          <span class="tsj-login-btn-text">Admin</span>
+        </a>
+      <?php endif; ?>
+    </div>
 
     <!-- Botón hamburguesa (móvil) -->
     <button class="tsj-menu-btn" id="tsj-menu-btn"

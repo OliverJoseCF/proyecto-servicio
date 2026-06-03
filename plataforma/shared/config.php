@@ -35,8 +35,13 @@ if (!defined('DB_BIBLIOTECA')) define('DB_BIBLIOTECA', 'biblioteca_escolar');
 if (!defined('DB_CONVENIOS'))  define('DB_CONVENIOS',  'convenios_db');
 if (!defined('DB_HORARIOS'))   define('DB_HORARIOS',   'horarios_db');
 
-// Hashes de admin — DEBEN sobreescribirse en config.local.php para producción.
-// Si no se sobreescriben, se usan los defaults inseguros solo para desarrollo local.
+// ── Login global (único para toda la plataforma) ─────────────────────────────
+// Sobreescribir en config.local.php con un hash real generado por:
+//   php -r "echo password_hash('tu_contraseña', PASSWORD_BCRYPT, ['cost'=>12]);"
+if (!defined('GLOBAL_ADMIN_EMAIL')) define('GLOBAL_ADMIN_EMAIL', 'admin@chapala.tecmm.edu.mx');
+if (!defined('GLOBAL_ADMIN_HASH'))  define('GLOBAL_ADMIN_HASH',  '');   // vacío → sin login hasta configurar
+
+// ── Hashes de admin por módulo (legacy — se mantendrán hasta migración BD) ───
 if (!defined('BIBLIOTECA_ADMIN_USER')) define('BIBLIOTECA_ADMIN_USER', 'admin');
 if (!defined('BIBLIOTECA_ADMIN_HASH')) define('BIBLIOTECA_ADMIN_HASH', '');
 if (!defined('HORARIOS_ADMIN_EMAIL'))  define('HORARIOS_ADMIN_EMAIL',  'admin@tecsj.edu.mx');

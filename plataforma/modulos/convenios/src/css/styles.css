@@ -5,7 +5,7 @@
    Para producción, usa únicamente output.css.
    ================================================================ */
 
-@import "tailwindcss";
+/* @import "tailwindcss" — solo para el build, no va al navegador */
 
 :root {
   /* Mapeados a tokens --tsj-* del brand oficial */

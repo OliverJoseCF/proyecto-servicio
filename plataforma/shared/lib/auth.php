@@ -52,6 +52,31 @@ function csrfField(): string {
 }
 
 // ── Login / logout helpers ─────────────────────────────────────────────────────
+
+/**
+ * Login global (toda la plataforma) con rol admin.
+ */
+function globalLogin(string $role = 'admin'): void {
+    session_regenerate_id(true);
+    $_SESSION['_csrf']          = bin2hex(random_bytes(32));
+    $_SESSION['_auth']          = true;
+    $_SESSION['_module']        = 'global';
+    $_SESSION['_role']          = $role;
+    $_SESSION['_last_activity'] = time();
+}
+
+/**
+ * Devuelve true si hay sesión global activa.
+ */
+function isGlobalAdmin(): bool {
+    return !empty($_SESSION['_auth'])
+        && ($_SESSION['_module'] ?? '') === 'global'
+        && ($_SESSION['_role']   ?? '') === 'admin';
+}
+
+/**
+ * Login de módulo individual (legacy — se mantiene hasta migración BD).
+ */
 function authLogin(string $module): void {
     session_regenerate_id(true);
     $_SESSION['_csrf']          = bin2hex(random_bytes(32));
@@ -74,11 +99,21 @@ function authLogout(string $redirectTo = ''): void {
 }
 
 /**
- * Require autenticación; redirige a $loginUrl si no hay sesión.
- * Uso: requireAuth('biblioteca', PLATAFORMA_URL . '/modulos/biblioteca/login.php');
+ * Require autenticación para un módulo O sesión global admin.
+ * Si hay sesión global activa, se considera autorizado para cualquier módulo.
  */
 function requireAuth(string $module, string $loginUrl): void {
-    if (empty($_SESSION['_auth']) || ($_SESSION['_module'] ?? '') !== $module) {
+    if (empty($_SESSION['_auth'])) {
+        header('Location: ' . $loginUrl);
+        exit;
+    }
+    $sessionModule = $_SESSION['_module'] ?? '';
+    // Sesión global admin: acceso a todo
+    if ($sessionModule === 'global' && ($_SESSION['_role'] ?? '') === 'admin') {
+        return;
+    }
+    // Sesión de módulo específico
+    if ($sessionModule !== $module) {
         header('Location: ' . $loginUrl);
         exit;
     }

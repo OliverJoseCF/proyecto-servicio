@@ -1,57 +1,6 @@
 <?php
-require_once __DIR__ . '/src/session.php';
-require_once __DIR__ . '/src/config.php';
+/* Convenios — vista pública. Login centralizado en /plataforma/login.php */
 require_once __DIR__ . '/src/security_headers.php';
-require_once __DIR__ . '/../../shared/lib/RateLimit.php';
-
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
-$loginError = null;
-$rl         = new RateLimit(5, 900);
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['password'])) {
-    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-    if ($rl->isBlocked($ip)) {
-        $loginError = 'Demasiados intentos fallidos. Por favor espera 15 minutos antes de intentarlo de nuevo.';
-    } elseif (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-        $loginError = 'Petición inválida. Recarga la página e intenta de nuevo.';
-        $rl->record($ip);
-    } else {
-        $email    = trim($_POST['email']);
-        $password = $_POST['password'];
-        if ($email === ADMIN_EMAIL && password_verify($password, ADMIN_PASSWORD_HASH)) {
-            $rl->reset($ip);
-            session_regenerate_id(true);
-            $_SESSION['authenticated'] = true;
-            $_SESSION['user']          = 'superuser';
-            $_SESSION['last_activity'] = time();
-            header('Location: vista_lista/lista.php');
-            exit();
-        } else {
-            usleep(300000);
-            $rl->record($ip);
-            $loginError = 'Credenciales incorrectas.';
-        }
-    }
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['logout'])) {
-    if (isset($_POST['csrf_token']) && hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-        $_SESSION = [];
-        if (ini_get('session.use_cookies')) {
-            $p = session_get_cookie_params();
-            setcookie(session_name(), '', time() - 42000, $p['path'], $p['domain'], $p['secure'], $p['httponly']);
-        }
-        session_destroy();
-        header('Location: index.php');
-        exit();
-    }
-}
-
-$modalOpen   = ($loginError !== null) ? 'active' : '';
-$modalHidden = ($loginError !== null) ? 'false'  : 'true';
 
 $tsj_module    = 'convenios';
 $tsj_title     = 'Convenios';
@@ -66,9 +15,9 @@ require_once __DIR__ . '/../../shared/header.php';
 
 <main id="main">
 
-  <div class="w-full p-4" style="background-color:#f5f5f5">
+  <div class="w-full p-4">
     <div class="oferta">
-      <div class="w-full text-center" style="background-color:#f5f5f5">
+      <div class="w-full text-center">
         <div class="flex justify-center items-center">
           <h1 class="text-convenios font-bold text-4xl text-base_blue-500 mb-11 -mt-7">Convenios</h1>
         </div>
