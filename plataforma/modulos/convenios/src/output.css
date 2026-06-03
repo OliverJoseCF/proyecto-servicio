@@ -618,10 +618,10 @@
 }
 .up-header {
   height: 10px;
-  background: #ec5a68;
+  background: #ff4d63;
 }
 .toolbar {
-  background: #32129a;
+  background: #33179c;
   box-shadow: 0 3px 9px #00000029;
   color: #fff;
   display: flex;
@@ -634,7 +634,7 @@
   max-width: 200px;
 }
 .text-base_blue-500 {
-  color: rgb(50,18,154);
+  color: rgb(51,23,156);
 }
 @keyframes spin {
   to {

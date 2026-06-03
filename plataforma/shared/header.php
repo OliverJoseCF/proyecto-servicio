@@ -40,8 +40,8 @@ $nav_items = [
     'visitantes' => ['label' => 'Visitantes',  'href' => $base . '/modulos/visitantes/index.php'],
     'biblioteca' => ['label' => 'Biblioteca',   'href' => $base . '/modulos/biblioteca/buscar.php'],
     'convenios'  => ['label' => 'Convenios',    'href' => $base . '/modulos/convenios/index.php'],
-    'horarios'   => ['label' => 'Horarios',     'href' => $base . '/modulos/horarios/index.php'],
-    'requisitos' => ['label' => 'Requisitos',   'href' => $base . '/modulos/requisitos/residencia.php'],
+    'horarios'   => ['label' => 'Buscar Maestro',              'href' => $base . '/modulos/horarios/index.php'],
+    'requisitos' => ['label' => 'Serv. Social / Residencia', 'href' => $base . '/modulos/requisitos/residencia.php'],
 ];
 ?>
 <!DOCTYPE html>
@@ -53,15 +53,22 @@ $nav_items = [
   <title><?= htmlspecialchars($tsj_title, ENT_QUOTES, 'UTF-8') ?> — TSJ Chapala</title>
   <link rel="icon" type="image/png" href="<?= $base ?>/shared/assets/img/favicon.png" />
 
-  <!-- Poppins: no-bloqueo de render con fallback noscript -->
+  <!-- Poppins + Material Icons: no bloquean render -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         rel="stylesheet" media="print" onload="this.media='all'" />
   <noscript>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
           rel="stylesheet" />
   </noscript>
+  <style>
+    .material-symbols-rounded {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+      line-height: 1;
+    }
+  </style>
 
   <link rel="stylesheet" href="<?= $base ?>/shared/assets/css/theme.css" />
 
@@ -79,6 +86,10 @@ $nav_items = [
 <a class="tsj-skip-link" href="#main">Saltar al contenido principal</a>
 
 <header class="tsj-header <?= $tsj_has_hero ? '' : 'tsj-header--solid' ?>" id="tsj-header">
+
+  <!-- Franja de acento (firma del brand oficial) -->
+  <div class="tsj-topbar" aria-hidden="true"></div>
+
   <div class="tsj-toolbar">
 
     <!-- Marca / logo -->
@@ -90,7 +101,7 @@ $nav_items = [
       <span class="tsj-brand-sub">Campus Chapala</span>
     </a>
 
-    <!-- Navegación escritorio -->
+    <!-- Navegación escritorio (centrada absolutamente) -->
     <nav aria-label="Navegación principal">
       <ul class="tsj-nav">
         <?php foreach ($nav_items as $key => $item): ?>
@@ -106,11 +117,10 @@ $nav_items = [
       </ul>
     </nav>
 
-    <!-- Botón hamburguesa -->
+    <!-- Botón hamburguesa (móvil) -->
     <button class="tsj-menu-btn" id="tsj-menu-btn"
             aria-label="Abrir menú" aria-expanded="false" aria-controls="tsj-menu-panel">
-      <img src="<?= $base ?>/shared/assets/img/menu.svg"
-           alt="" aria-hidden="true" id="tsj-menu-icon" />
+      <span class="material-symbols-rounded" aria-hidden="true">menu</span>
     </button>
 
   </div>
@@ -120,14 +130,39 @@ $nav_items = [
 <nav class="tsj-menu-panel" id="tsj-menu-panel"
      aria-label="Menú de navegación móvil">
   <div class="tsj-menu-content">
-    <a class="tsj-menu-item" href="<?= $base ?>/">← Portal principal</a>
+
+    <!-- Logo dentro del panel -->
+    <div class="tsj-menu-logo">
+      <img src="<?= $base ?>/shared/assets/img/logo.svg"
+           alt="TSJ Chapala" height="36" />
+      <span>TSJ<br>Campus Chapala</span>
+    </div>
+
+    <p class="tsj-menu-section">Portal</p>
+    <a class="tsj-menu-item" href="<?= $base ?>/">
+      <span class="material-symbols-rounded" aria-hidden="true">home</span>
+      Inicio
+    </a>
+
+    <p class="tsj-menu-section">Módulos</p>
     <?php foreach ($nav_items as $key => $item): ?>
       <a class="tsj-menu-item <?= $tsj_module === $key ? 'active' : '' ?>"
          href="<?= htmlspecialchars($item['href'], ENT_QUOTES, 'UTF-8') ?>"
          <?= $tsj_module === $key ? 'aria-current="page"' : '' ?>>
+        <span class="material-symbols-rounded" aria-hidden="true"><?php
+          $icons = [
+            'visitantes' => 'badge',
+            'biblioteca' => 'menu_book',
+            'convenios'  => 'handshake',
+            'horarios'   => 'calendar_month',
+            'requisitos' => 'checklist',
+          ];
+          echo $icons[$key] ?? 'circle';
+        ?></span>
         <?= htmlspecialchars($item['label'], ENT_QUOTES, 'UTF-8') ?>
       </a>
     <?php endforeach; ?>
+
   </div>
 </nav>
 

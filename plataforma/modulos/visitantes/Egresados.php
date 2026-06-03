@@ -1,11 +1,11 @@
 <?php
 $tsj_module    = 'visitantes';
-$tsj_title     = 'Comprobante de Reinscripción';
+$tsj_title     = 'Re-inscripción';
 $tsj_extra_css = ['style.css'];
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 <main id="main">
-  <h1 class="vis-page-title">Comprobante de Reinscripción</h1>
+  <h1 class="vis-page-title">Re-inscripción</h1>
 
   <div class="container">
     <div class="seccion" role="alert" style="background:#fffbeb;border-left:4px solid #f59e0b;border-top:none;">
@@ -93,7 +93,7 @@ require_once __DIR__ . '/../../shared/header.php';
       var datosQR = "Folio: " + folio + "\nNombre: " + nombre + "\nControl: " + control + "\nCarrera: " + carrera + "\nFecha: " + fecha;
       var qrDataURL = await QRCode.toDataURL(datosQR);
 
-      doc.setFillColor(50, 18, 154);
+      doc.setFillColor(51, 23, 156);
       doc.rect(0, 0, 210, 30, "F");
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(16);

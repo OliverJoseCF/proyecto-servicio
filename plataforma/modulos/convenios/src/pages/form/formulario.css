@@ -7,16 +7,16 @@
 #convenioForm input:focus,
 #convenioForm select:focus,
 #convenioForm textarea:focus {
-  outline: 2px solid var(--tsj-blue, #32129a);
+  outline: 2px solid var(--tsj-blue, #33179c);
   outline-offset: 2px;
-  border-color: var(--tsj-blue, #32129a);
-  box-shadow: 0 0 0 3px rgba(50, 18, 154, 0.15);
+  border-color: var(--tsj-blue, #33179c);
+  box-shadow: 0 0 0 3px rgba(51, 23, 156, 0.15);
 }
 
 /* ── Botón primario ──────────────────────────────────────── */
 .btn-primary {
-  background-color: var(--tsj-blue, #32129a);
-  border: 2px solid var(--tsj-blue, #32129a);
+  background-color: var(--tsj-blue, #33179c);
+  border: 2px solid var(--tsj-blue, #33179c);
   color: #fff;
   padding: 0 24px;
   height: 48px;
@@ -37,7 +37,7 @@
   transform: translateY(-1px);
 }
 .btn-primary:focus-visible {
-  outline: 2px solid var(--tsj-pink, #ec5a68);
+  outline: 2px solid var(--tsj-pink, #ff4d63);
   outline-offset: 2px;
 }
 
@@ -50,11 +50,11 @@
 }
 .step-indicator span { color: var(--tsj-gray-400, #9ca3af); transition: color 0.3s ease; }
 .step-indicator.active span,
-.step-indicator.completed span { color: var(--tsj-blue, #32129a); }
+.step-indicator.completed span { color: var(--tsj-blue, #33179c); }
 .step-indicator::after {
   content: ''; position: absolute;
   bottom: 0; left: 0; width: 0; height: 2px;
-  background-color: var(--tsj-blue, #32129a);
+  background-color: var(--tsj-blue, #33179c);
   transition: width 0.3s ease;
 }
 .step-indicator.active::after,
@@ -71,13 +71,13 @@
 
 /* ── Input de archivo ────────────────────────────────────── */
 .file-input-label {
-  color: var(--tsj-blue, #32129a);
-  border-color: var(--tsj-blue, #32129a) !important;
+  color: var(--tsj-blue, #33179c);
+  border-color: var(--tsj-blue, #33179c) !important;
   transition: background 0.2s;
 }
 .file-input-label:hover { background-color: var(--tsj-blue-50, #f0edff); }
 .file-input-label:focus-within {
-  outline: 2px solid var(--tsj-blue, #32129a);
+  outline: 2px solid var(--tsj-blue, #33179c);
   outline-offset: 2px;
 }
 

@@ -59,7 +59,7 @@ $stmt->execute();
 $horarios_paginados = $stmt->fetchAll();
 
 $tsj_module    = 'horarios';
-$tsj_title     = 'Maestros y Horarios';
+$tsj_title     = 'Buscar Maestro';
 $tsj_extra_css = ['normalize.css', 'css/Principal.css'];
 require_once __DIR__ . '/../../shared/header.php';
 ?>

@@ -1,6 +1,6 @@
 <?php
 $tsj_module    = 'requisitos';
-$tsj_title     = 'Requisitos — Residencia Profesional';
+$tsj_title     = 'Convenios — Residencia Profesional';
 $tsj_extra_css = [
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css',
     'assets/css/style.css',

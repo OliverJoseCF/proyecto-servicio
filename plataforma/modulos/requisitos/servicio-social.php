@@ -1,6 +1,6 @@
 <?php
 $tsj_module    = 'requisitos';
-$tsj_title     = 'Requisitos — Servicio Social';
+$tsj_title     = 'Convenios — Servicio Social';
 $tsj_extra_css = [
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css',
     'assets/css/style.css',

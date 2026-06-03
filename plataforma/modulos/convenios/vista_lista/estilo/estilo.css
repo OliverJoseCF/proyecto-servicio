@@ -20,7 +20,7 @@
   margin: auto;
   font-family: var(--tsj-font, 'Poppins', sans-serif);
   font-size: 1.15rem;
-  color: var(--tsj-blue, #32129a);
+  color: var(--tsj-blue, #33179c);
 }
 .botones-container {
   display: flex; align-items: center; gap: 20px; z-index: 1;
@@ -45,7 +45,7 @@
   border: 1px solid #ddd; padding: 8px; text-align: left;
 }
 .datatable-container table.dataTable th {
-  background-color: var(--tsj-blue, #32129a);
+  background-color: var(--tsj-blue, #33179c);
   color: #fff; font-weight: 600;
 }
 .datatable-container table.dataTable tr:nth-child(odd)  { background-color: #f9f9f9; }
@@ -63,7 +63,7 @@
   padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; margin-left: 8px;
 }
 .dataTables_filter input:focus {
-  outline: 2px solid var(--tsj-blue, #32129a); outline-offset: 1px;
+  outline: 2px solid var(--tsj-blue, #33179c); outline-offset: 1px;
 }
 .dataTables_paginate {
   display: flex; flex-direction: row; justify-content: flex-end; margin-top: 15px;
@@ -76,8 +76,8 @@
 }
 .paginate_button:hover  { background-color: var(--tsj-blue-50, #f0edff); }
 .paginate_button.current {
-  background-color: var(--tsj-blue, #32129a);
-  color: white; border-color: var(--tsj-blue, #32129a);
+  background-color: var(--tsj-blue, #33179c);
+  color: white; border-color: var(--tsj-blue, #33179c);
 }
 .paginate_button.disabled { color: #999; cursor: not-allowed; }
 
@@ -85,10 +85,10 @@
 .dt-buttons { margin-bottom: 15px; display: flex; justify-content: center; }
 .dt-buttons button {
   margin-right: 5px; padding: 6px 12px; border-radius: 4px;
-  background-color: var(--tsj-blue, #32129a); color: white; border: none; cursor: pointer;
+  background-color: var(--tsj-blue, #33179c); color: white; border: none; cursor: pointer;
 }
 .dt-buttons button:hover { background-color: var(--tsj-blue-dark, #1e0b6e); }
-.dt-buttons button:focus-visible { outline: 2px solid var(--tsj-pink, #ec5a68); outline-offset: 2px; }
+.dt-buttons button:focus-visible { outline: 2px solid var(--tsj-pink, #ff4d63); outline-offset: 2px; }
 
 .dt-top {
   display: flex; flex-wrap: wrap;
@@ -113,7 +113,7 @@
 }
 .btn-editar:hover, .btn-eliminar-btn:hover { transform: scale(1.2); }
 .btn-editar:focus-visible, .btn-eliminar-btn:focus-visible {
-  outline: 2px solid var(--tsj-pink, #ec5a68); outline-offset: 2px;
+  outline: 2px solid var(--tsj-pink, #ff4d63); outline-offset: 2px;
 }
 
 /* ── Alertas flash ───────────────────────────────────────── */
@@ -122,13 +122,13 @@
 
 /* ── Botones de gestión ──────────────────────────────────── */
 .btn-agregar {
-  background-color: var(--tsj-blue, #32129a); color: white;
+  background-color: var(--tsj-blue, #33179c); color: white;
   padding: 8px 16px; border-radius: 4px; text-decoration: none;
   font-weight: bold; display: inline-block; margin-left: 10px;
   transition: background 0.2s;
 }
 .btn-agregar:hover { background-color: var(--tsj-blue-dark, #1e0b6e); }
-.btn-agregar:focus-visible { outline: 2px solid var(--tsj-pink, #ec5a68); outline-offset: 2px; }
+.btn-agregar:focus-visible { outline: 2px solid var(--tsj-pink, #ff4d63); outline-offset: 2px; }
 
 .btn-cerrar-sesion {
   background-color: var(--tsj-danger, #dc2626); color: white;
