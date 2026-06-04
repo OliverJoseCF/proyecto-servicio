@@ -33,6 +33,7 @@ $nav = [
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><?= htmlspecialchars($adm_title, ENT_QUOTES, 'UTF-8') ?> — Admin TSJ</title>
+  <meta name="plataforma-url" content="<?= htmlspecialchars($base) ?>" />
   <link rel="icon" type="image/png" href="<?= $base ?>/shared/assets/img/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

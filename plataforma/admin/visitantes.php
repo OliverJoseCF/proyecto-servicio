@@ -1,10 +1,37 @@
 <?php
 require_once dirname(__DIR__) . '/shared/lib/auth.php';
+require_once dirname(__DIR__) . '/shared/config.php';
 $loginUrl = (defined('PLATAFORMA_URL') ? PLATAFORMA_URL : '/plataforma') . '/login.php';
 if (!isGlobalAdmin()) { header('Location: ' . $loginUrl); exit; }
 
 $adm_page  = 'visitantes';
 $adm_title = 'Visitantes';
+
+try {
+    $db = getPDO(DB_NAME);
+
+    $directorio   = $db->query('SELECT * FROM directorio ORDER BY orden,nombre')->fetchAll();
+    $carreras     = $db->query('SELECT * FROM carreras ORDER BY orden')->fetchAll();
+    $docentes     = $db->query('SELECT d.*,c.clave carrera_clave,c.nombre carrera_nombre FROM docentes d LEFT JOIN carreras c ON d.carrera_id=c.id ORDER BY d.orden,d.nombre')->fetchAll();
+    $coordinadores= $db->query('SELECT co.*,c.nombre carrera_nombre FROM coordinadores co JOIN carreras c ON co.carrera_id=c.id ORDER BY c.orden')->fetchAll();
+    $secretarias  = $db->query('SELECT * FROM secretarias ORDER BY orden,nombre')->fetchAll();
+    $ni           = $db->query('SELECT * FROM nuevo_ingreso_config LIMIT 1')->fetch();
+
+    $materias_por_carrera = [];
+    $mats = $db->query('SELECT m.*,c.clave carrera_clave FROM materias m JOIN carreras c ON m.carrera_id=c.id ORDER BY m.orden')->fetchAll();
+    foreach ($mats as $m) $materias_por_carrera[$m['carrera_clave']][] = $m;
+
+    $db_ok = true;
+} catch (\Throwable $e) {
+    $directorio = $carreras = $docentes = $coordinadores = $secretarias = $mats = [];
+    $ni = null;
+    $materias_por_carrera = [];
+    $db_ok = false;
+}
+
+$csrf      = getCsrfToken();
+$base_img  = PLATAFORMA_URL . '/modulos/visitantes/imagenes/';
+
 require_once __DIR__ . '/_layout.php';
 ?>
 
@@ -14,27 +41,14 @@ require_once __DIR__ . '/_layout.php';
     <p class="adm-page-desc">Directorio, docentes, coordinadores, planes de estudio y contenido de servicios.</p>
   </div>
 </div>
-<div class="adm-pending">
-  <span class="material-symbols-rounded">construction</span>
-  Los cambios se guardarán al conectar la base de datos. Actualmente los datos son de referencia.
-</div>
 
-<!-- Tabs -->
 <div class="adm-tabs">
   <?php
-  $tabs = [
-    'directorio' => 'Directorio',
-    'docentes'   => 'Docentes',
-    'coord'      => 'Coordinadores',
-    'materias'   => 'Planes de Estudio',
-    'secretarias'=> 'Secretarías',
-    'servicios'  => 'Servicios (Nuevo Ingreso / Reinscripción)',
-    'ubicacion'  => 'Ubicación',
-  ];
+  $tabs = ['directorio'=>'Directorio','docentes'=>'Docentes','coord'=>'Coordinadores',
+           'materias'=>'Planes de Estudio','secretarias'=>'Secretarías','servicios'=>'Nuevo Ingreso'];
   foreach ($tabs as $key => $label): ?>
-    <button class="adm-tab <?= $key === 'directorio' ? 'active' : '' ?>"
-            data-tab-group="vis" data-tab="<?= $key ?>"
-            onclick="showTab('vis','<?= $key ?>')">
+    <button class="adm-tab <?= $key==='directorio'?'active':'' ?>"
+            data-tab-group="vis" data-tab="<?= $key ?>" onclick="showTab('vis','<?= $key ?>')">
       <?= $label ?>
     </button>
   <?php endforeach; ?>
@@ -42,50 +56,30 @@ require_once __DIR__ . '/_layout.php';
 
 <!-- ══ TAB: Directorio ══════════════════════════════════════════ -->
 <div class="adm-tab-panel active" data-tab-group="vis" data-tab="directorio">
-  <div class="adm-toolbar">
-    <div class="adm-search">
-      <span class="material-symbols-rounded">search</span>
-      <input type="text" placeholder="Buscar por nombre o correo…">
-    </div>
-    <div class="adm-toolbar-actions">
-      <button class="adm-btn adm-btn--primary pending-db" data-toast="Agregar persona — pendiente de BD">
-        <span class="material-symbols-rounded">person_add</span> Agregar persona
-      </button>
-    </div>
-  </div>
   <div class="adm-table-wrap">
     <table class="adm-table">
-      <thead><tr>
-        <th>Foto</th><th>Nombre</th><th>Puesto / Área</th><th>Correo</th><th>Teléfono</th><th>Acciones</th>
-      </tr></thead>
+      <thead><tr><th>Foto</th><th>Nombre</th><th>Puesto / Área</th><th>Correo</th><th>Teléfono</th><th>Acciones</th></tr></thead>
       <tbody>
-        <?php
-        $directorio = [
-          ['miguel.png', 'Miguel Ángel Delgado López',       'Sistemas Computacionales',  'miguel.delgado@chapala.tecmm.edu.mx',         'S/N'],
-          ['julio.png',  'Julio César Chávez Novoa',          'Sistemas Computacionales',  'julio.chavez@chapala.tecmm.edu.mx',           'S/N'],
-          ['carmen.png', 'Carmen Leticia Salcedo Quevedo',    'Sistemas Computacionales',  'carmen.salcedo@chapala.tecmm.edu.mx',         'S/N'],
-          ['jorge.png',  'José Jorge Hernández Ochoa',        'Sistemas Computacionales',  'jorge.hernandez@chapala.tecmm.edu.mx',        'S/N'],
-          [null,         'Francisco Javier González Siordia', 'Sistemas Computacionales',  'francisco.gonzales@chapala.tecmm.edu.mx',     'S/N'],
-          ['gamas.png',  'José Guadalupe Gamas Gamas',        'Sistemas Computacionales',  'jose.gamas@chapala.tecmm.edu.mx',             'S/N'],
-        ];
-        $base_img = PLATAFORMA_URL . '/modulos/visitantes/imagenes/';
-        foreach ($directorio as $p):
-        ?>
-        <tr>
+        <?php if (empty($directorio)): ?>
+        <tr><td colspan="6" class="adm-table-empty">Sin personas registradas.</td></tr>
+        <?php endif; ?>
+        <?php foreach ($directorio as $p): ?>
+        <tr id="dir-<?= $p['id'] ?>">
           <td class="col-photo">
-            <img src="<?= $p[0] ? $base_img . htmlspecialchars($p[0]) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='38'%3E%3Crect width='38' height='38' fill='%23e5e7eb'/%3E%3C/svg%3E" ?>"
-                 alt="<?= htmlspecialchars($p[1]) ?>"
-                 style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--tsj-blue-100)">
+            <img src="<?= $p['foto'] ? $base_img.htmlspecialchars($p['foto']) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='38'%3E%3Crect width='38' height='38' fill='%23e5e7eb'/%3E%3C/svg%3E" ?>"
+                 style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--tsj-blue-100)" alt="">
           </td>
-          <td style="font-weight:600;color:var(--tsj-blue)"><?= htmlspecialchars($p[1]) ?></td>
-          <td><?= htmlspecialchars($p[2]) ?></td>
-          <td><a href="mailto:<?= htmlspecialchars($p[3]) ?>" style="color:var(--tsj-blue)"><?= htmlspecialchars($p[3]) ?></a></td>
-          <td><?= htmlspecialchars($p[4]) ?></td>
+          <td style="font-weight:600;color:var(--tsj-blue)"><?= htmlspecialchars($p['nombre']) ?></td>
+          <td><?= htmlspecialchars($p['puesto'] ?? '') ?></td>
+          <td><a href="mailto:<?= htmlspecialchars($p['correo'] ?? '') ?>" style="color:var(--tsj-blue)"><?= htmlspecialchars($p['correo'] ?? '') ?></a></td>
+          <td><?= htmlspecialchars($p['telefono'] ?? 'S/N') ?></td>
           <td class="actions">
-            <button class="adm-btn adm-btn--ghost adm-btn--sm pending-db" data-toast="Editar persona — pendiente de BD">
+            <button class="adm-btn adm-btn--ghost adm-btn--sm"
+                    onclick="abrirEditar('dir',<?= htmlspecialchars(json_encode($p)) ?>)">
               <span class="material-symbols-rounded">edit</span>
             </button>
-            <button class="adm-btn adm-btn--danger adm-btn--sm pending-db" data-toast="Eliminar persona — pendiente de BD">
+            <button class="adm-btn adm-btn--danger adm-btn--sm"
+                    onclick="confirmarEliminar('visitantes','directorio_eliminar',<?= $p['id'] ?>,'dir-<?= $p['id'] ?>')">
               <span class="material-symbols-rounded">delete</span>
             </button>
           </td>
@@ -94,24 +88,24 @@ require_once __DIR__ . '/_layout.php';
       </tbody>
     </table>
   </div>
-  <!-- Formulario agregar (preview) -->
-  <div class="adm-form-card" style="margin-top:20px">
-    <div class="adm-form-title">
-      <span class="material-symbols-rounded">person_add</span> Agregar nueva persona al directorio
-    </div>
-    <form class="pending-db">
+
+  <!-- Formulario agregar/editar directorio -->
+  <div class="adm-form-card" style="margin-top:20px" id="form-dir-wrap">
+    <div class="adm-form-title"><span class="material-symbols-rounded">person_add</span> <span id="form-dir-titulo">Agregar persona al directorio</span></div>
+    <form data-proc="visitantes" data-accion="directorio_agregar" id="form-dir">
+      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="accion" value="directorio_agregar" id="dir-accion">
+      <input type="hidden" name="id" id="dir-id">
       <div class="adm-form-grid cols-3">
-        <div class="adm-field"><label>Nombre completo</label><input type="text" placeholder="Ej. María García López"></div>
-        <div class="adm-field"><label>Puesto / Área</label><input type="text" placeholder="Ej. Sistemas Computacionales"></div>
-        <div class="adm-field"><label>Correo electrónico</label><input type="email" placeholder="nombre@chapala.tecmm.edu.mx"></div>
-        <div class="adm-field"><label>Teléfono</label><input type="tel" placeholder="Ej. 331-234-5678"></div>
-        <div class="adm-field"><label>Foto (URL o subir)</label><input type="text" placeholder="URL de la imagen"></div>
+        <div class="adm-field"><label>Nombre completo <span style="color:var(--tsj-pink)">*</span></label><input type="text" name="nombre" id="dir-nombre" required></div>
+        <div class="adm-field"><label>Puesto / Área</label><input type="text" name="puesto" id="dir-puesto"></div>
+        <div class="adm-field"><label>Correo electrónico</label><input type="email" name="correo" id="dir-correo"></div>
+        <div class="adm-field"><label>Teléfono</label><input type="tel" name="telefono" id="dir-telefono" placeholder="S/N"></div>
+        <div class="adm-field"><label>Foto (nombre de archivo)</label><input type="text" name="foto" id="dir-foto" placeholder="ej. miguel.png"></div>
       </div>
       <div class="adm-form-actions">
-        <button type="submit" class="adm-btn adm-btn--primary">
-          <span class="material-symbols-rounded">save</span> Guardar persona
-        </button>
-        <button type="button" class="adm-btn adm-btn--ghost">Cancelar</button>
+        <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar</button>
+        <button type="button" class="adm-btn adm-btn--ghost" onclick="resetFormDir()">Cancelar</button>
       </div>
     </form>
   </div>
@@ -119,51 +113,39 @@ require_once __DIR__ . '/_layout.php';
 
 <!-- ══ TAB: Docentes ════════════════════════════════════════════ -->
 <div class="adm-tab-panel" data-tab-group="vis" data-tab="docentes">
-  <div class="adm-career-pills">
-    <?php foreach (['ISC' => 'Sistemas', 'II' => 'Industrial', 'IM' => 'Mecatrónica', 'IADEV' => 'Animación', 'IGE' => 'Gestión', 'LG' => 'Gastronomía'] as $k => $v): ?>
-      <button class="adm-career-pill <?= $k === 'ISC' ? 'active' : '' ?>"
-              onclick="document.querySelectorAll('.adm-career-pill').forEach(e=>e.classList.remove('active'));this.classList.add('active')">
-        <?= $v ?>
-      </button>
-    <?php endforeach; ?>
-  </div>
-  <div class="adm-toolbar">
-    <div class="adm-search">
-      <span class="material-symbols-rounded">search</span>
-      <input type="text" placeholder="Buscar docente…">
-    </div>
-    <button class="adm-btn adm-btn--primary pending-db" data-toast="Agregar docente — pendiente de BD">
-      <span class="material-symbols-rounded">person_add</span> Agregar docente
+  <div class="adm-career-pills" id="doc-pills">
+    <?php foreach ($carreras as $c): ?>
+    <button class="adm-career-pill <?= $c['clave']==='ISC'?'active':'' ?>"
+            onclick="filtrarDocentes('<?= $c['clave'] ?>')">
+      <?= htmlspecialchars($c['clave']) ?>
     </button>
+    <?php endforeach; ?>
   </div>
   <div class="adm-table-wrap">
     <table class="adm-table">
       <thead><tr><th>Nombre</th><th>Foto</th><th>Correo</th><th>Carrera</th><th>Acciones</th></tr></thead>
-      <tbody>
-        <?php
-        $docentes = [
-          ['Miguel Ángel Delgado López', 'miguel.png', 'miguel.delgado@chapala.tecmm.edu.mx', 'ISC'],
-          ['Alberto Chavolla',           null,         '—',                                     'ISC'],
-          ['Francisco Javier González',  null,         'francisco.gonzales@chapala.tecmm.edu.mx','ISC'],
-          ['Julio César Chávez Novoa',   'julio.png',  'julio.chavez@chapala.tecmm.edu.mx',    'ISC'],
-          ['Edgar Martínez',             null,         '—',                                     'ISC'],
-          ['José Jorge Hernández Ochoa', 'jorge.png',  'jorge.hernandez@chapala.tecmm.edu.mx', 'ISC'],
-          ['Carmen Leticia Salcedo',     'carmen.png', 'carmen.salcedo@chapala.tecmm.edu.mx',  'ISC'],
-          ['José Guadalupe Gamas',       'gamas.png',  'jose.gamas@chapala.tecmm.edu.mx',      'ISC'],
-        ];
-        foreach ($docentes as $d):
-        ?>
-        <tr>
-          <td style="font-weight:600"><?= htmlspecialchars($d[0]) ?></td>
+      <tbody id="doc-tbody">
+        <?php if (empty($docentes)): ?>
+        <tr><td colspan="5" class="adm-table-empty">Sin docentes registrados.</td></tr>
+        <?php endif; ?>
+        <?php foreach ($docentes as $d): ?>
+        <tr id="doc-<?= $d['id'] ?>" data-carrera="<?= htmlspecialchars($d['carrera_clave'] ?? '') ?>">
+          <td style="font-weight:600"><?= htmlspecialchars($d['nombre']) ?></td>
           <td class="col-photo">
-            <img src="<?= $d[1] ? $base_img . htmlspecialchars($d[1]) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='38'%3E%3Crect width='38' height='38' fill='%23e5e7eb'/%3E%3C/svg%3E" ?>"
-                 alt="" style="width:38px;height:38px;border-radius:50%;object-fit:cover">
+            <img src="<?= $d['foto'] ? $base_img.htmlspecialchars($d['foto']) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='38'%3E%3Crect width='38' height='38' fill='%23e5e7eb'/%3E%3C/svg%3E" ?>"
+                 style="width:38px;height:38px;border-radius:50%;object-fit:cover" alt="">
           </td>
-          <td><?= $d[2] !== '—' ? '<a href="mailto:' . htmlspecialchars($d[2]) . '" style="color:var(--tsj-blue)">' . htmlspecialchars($d[2]) . '</a>' : '<span style="color:var(--tsj-gray-400)">—</span>' ?></td>
-          <td><span class="adm-status adm-status--info"><?= htmlspecialchars($d[3]) ?></span></td>
+          <td><?= $d['correo'] ? '<a href="mailto:'.htmlspecialchars($d['correo']).'" style="color:var(--tsj-blue)">'.htmlspecialchars($d['correo']).'</a>' : '<span style="color:var(--tsj-gray-400)">—</span>' ?></td>
+          <td><span class="adm-status adm-status--info"><?= htmlspecialchars($d['carrera_clave'] ?? '—') ?></span></td>
           <td class="actions">
-            <button class="adm-btn adm-btn--ghost adm-btn--sm pending-db" data-toast="Editar docente — pendiente de BD"><span class="material-symbols-rounded">edit</span></button>
-            <button class="adm-btn adm-btn--danger adm-btn--sm pending-db" data-toast="Eliminar docente — pendiente de BD"><span class="material-symbols-rounded">delete</span></button>
+            <button class="adm-btn adm-btn--ghost adm-btn--sm"
+                    onclick="abrirEditarDoc(<?= htmlspecialchars(json_encode($d)) ?>)">
+              <span class="material-symbols-rounded">edit</span>
+            </button>
+            <button class="adm-btn adm-btn--danger adm-btn--sm"
+                    onclick="confirmarEliminar('visitantes','docente_eliminar',<?= $d['id'] ?>,'doc-<?= $d['id'] ?>')">
+              <span class="material-symbols-rounded">delete</span>
+            </button>
           </td>
         </tr>
         <?php endforeach; ?>
@@ -171,202 +153,294 @@ require_once __DIR__ . '/_layout.php';
     </table>
   </div>
   <div class="adm-form-card" style="margin-top:20px">
-    <div class="adm-form-title"><span class="material-symbols-rounded">school</span> Agregar / Editar docente</div>
-    <form class="pending-db">
+    <div class="adm-form-title"><span class="material-symbols-rounded">school</span> <span id="form-doc-titulo">Agregar docente</span></div>
+    <form data-proc="visitantes" data-accion="docente_agregar" id="form-doc">
+      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="accion" value="docente_agregar" id="doc-accion">
+      <input type="hidden" name="id" id="doc-id">
       <div class="adm-form-grid cols-3">
-        <div class="adm-field"><label>Nombre completo</label><input type="text" placeholder="Nombre del docente"></div>
-        <div class="adm-field"><label>Correo electrónico</label><input type="email" placeholder="correo@chapala.tecmm.edu.mx"></div>
+        <div class="adm-field"><label>Nombre completo <span style="color:var(--tsj-pink)">*</span></label><input type="text" name="nombre" id="doc-nombre" required></div>
+        <div class="adm-field"><label>Correo electrónico</label><input type="email" name="correo" id="doc-correo"></div>
         <div class="adm-field"><label>Carrera</label>
-          <select><option>Sistemas Computacionales</option><option>Industrial</option><option>Mecatrónica</option><option>Animación</option><option>Gestión</option><option>Gastronomía</option></select>
+          <select name="carrera_id" id="doc-carrera">
+            <option value="">Sin asignar</option>
+            <?php foreach ($carreras as $c): ?>
+            <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['nombre']) ?></option>
+            <?php endforeach; ?>
+          </select>
         </div>
-        <div class="adm-field"><label>Foto (URL)</label><input type="text" placeholder="URL de la foto"></div>
+        <div class="adm-field"><label>Foto (nombre de archivo)</label><input type="text" name="foto" id="doc-foto" placeholder="ej. miguel.png"></div>
       </div>
       <div class="adm-form-actions">
         <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar</button>
-        <button type="button" class="adm-btn adm-btn--ghost">Cancelar</button>
+        <button type="button" class="adm-btn adm-btn--ghost" onclick="resetFormDoc()">Cancelar</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- ══ TAB: Coordinadores ════════════════════════════════════════ -->
+<!-- ══ TAB: Coordinadores ══════════════════════════════════════ -->
 <div class="adm-tab-panel" data-tab-group="vis" data-tab="coord">
   <div class="adm-table-wrap">
     <table class="adm-table">
       <thead><tr><th>Carrera</th><th>Nombre del Coordinador</th><th>Correo</th><th>Acciones</th></tr></thead>
       <tbody>
-        <?php
-        $coords = [
-          ['Ing. en Sistemas Computacionales',            'Claudio Castillo',        'claudio.castillo@chapala.tecmm.edu.mx'],
-          ['Ing. en Gestión Empresarial',                  'Pablo Rojas',             'pablo.rojas@chapala.tecmm.edu.mx'],
-          ['Ing. Mecatrónica',                             'Iván (coordinador)',       'ivan@chapala.tecmm.edu.mx'],
-          ['Ing. en Animación Digital',                    'Coordinador Animación',   'coord.animacion@chapala.tecmm.edu.mx'],
-          ['Ing. Industrial',                              'Leonardo',                'leonardo@chapala.tecmm.edu.mx'],
-          ['Gastronomía',                                  'Coordinador Gastronomía', 'coord.gastronomia@chapala.tecmm.edu.mx'],
-        ];
-        foreach ($coords as $c): ?>
-        <tr>
-          <td style="font-weight:600;color:var(--tsj-blue)"><?= htmlspecialchars($c[0]) ?></td>
-          <td><?= htmlspecialchars($c[1]) ?></td>
-          <td><a href="mailto:<?= htmlspecialchars($c[2]) ?>" style="color:var(--tsj-blue)"><?= htmlspecialchars($c[2]) ?></a></td>
+        <?php foreach ($coordinadores as $c): ?>
+        <tr id="coord-<?= $c['id'] ?>">
+          <td style="font-weight:600;color:var(--tsj-blue)"><?= htmlspecialchars($c['carrera_nombre']) ?></td>
+          <td><?= htmlspecialchars($c['nombre']) ?></td>
+          <td><a href="mailto:<?= htmlspecialchars($c['correo'] ?? '') ?>" style="color:var(--tsj-blue)"><?= htmlspecialchars($c['correo'] ?? '') ?></a></td>
           <td class="actions">
-            <button class="adm-btn adm-btn--ghost adm-btn--sm pending-db" data-toast="Editar coordinador — pendiente de BD"><span class="material-symbols-rounded">edit</span></button>
+            <button class="adm-btn adm-btn--ghost adm-btn--sm"
+                    onclick="abrirEditarCoord(<?= htmlspecialchars(json_encode($c)) ?>)">
+              <span class="material-symbols-rounded">edit</span>
+            </button>
           </td>
         </tr>
         <?php endforeach; ?>
       </tbody>
     </table>
+  </div>
+  <div class="adm-form-card" style="margin-top:20px" id="form-coord-wrap" style="display:none">
+    <div class="adm-form-title"><span class="material-symbols-rounded">manage_accounts</span> Editar coordinador</div>
+    <form data-proc="visitantes" data-accion="coord_editar" id="form-coord">
+      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="accion" value="coord_editar">
+      <input type="hidden" name="id" id="coord-id">
+      <div class="adm-form-grid cols-2">
+        <div class="adm-field"><label>Nombre</label><input type="text" name="nombre" id="coord-nombre" required></div>
+        <div class="adm-field"><label>Correo</label><input type="email" name="correo" id="coord-correo"></div>
+      </div>
+      <div class="adm-form-actions">
+        <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar</button>
+        <button type="button" class="adm-btn adm-btn--ghost" onclick="document.getElementById('form-coord-wrap').style.display='none'">Cancelar</button>
+      </div>
+    </form>
   </div>
 </div>
 
 <!-- ══ TAB: Planes de Estudio ══════════════════════════════════ -->
 <div class="adm-tab-panel" data-tab-group="vis" data-tab="materias">
-  <div class="adm-career-pills" style="margin-bottom:20px">
-    <?php foreach (['ISC' => 'Sistemas', 'II' => 'Industrial', 'IM' => 'Mecatrónica', 'IADEV' => 'Animación', 'IGE' => 'Gestión', 'LG' => 'Gastronomía'] as $k => $v): ?>
-      <button class="adm-career-pill <?= $k === 'ISC' ? 'active' : '' ?>"
-              onclick="document.querySelectorAll('[data-career-pills]>.adm-career-pill').forEach(e=>e.classList.remove('active'));this.classList.add('active')"><?= $v ?></button>
-    <?php endforeach; ?>
-  </div>
-  <div class="adm-section">
+  <?php foreach ($carreras as $c): ?>
+  <div class="adm-section" data-carrera-sec="<?= $c['clave'] ?>" style="<?= $c['clave']==='ISC'?'':'display:none' ?>margin-bottom:20px">
     <div class="adm-section-header">
-      <h3 class="adm-section-title"><span class="material-symbols-rounded">list_alt</span> Materias — Ing. en Sistemas Computacionales</h3>
-      <button class="adm-btn adm-btn--primary adm-btn--sm pending-db" data-toast="Agregar materia — pendiente de BD">
-        <span class="material-symbols-rounded">add</span> Agregar materia
-      </button>
+      <h3 class="adm-section-title"><span class="material-symbols-rounded">list_alt</span> Materias — <?= htmlspecialchars($c['nombre']) ?></h3>
     </div>
     <div class="adm-section-body">
-      <div class="adm-list-editor">
-        <?php
-        $materias = ['Fundamentos de Programación','Estructuras de Datos','Bases de Datos',
-                     'Redes de Computadoras','Sistemas Operativos','Ingeniería de Software',
-                     'Análisis de Sistemas','Arquitectura de Computadoras','Desarrollo Web',
-                     'Programación Orientada a Objetos'];
-        foreach ($materias as $m): ?>
-        <div class="adm-list-item">
-          <span class="adm-list-item-drag material-symbols-rounded">drag_indicator</span>
-          <input type="text" value="<?= htmlspecialchars($m) ?>">
-          <button class="adm-btn adm-btn--danger adm-btn--sm pending-db" data-toast="Eliminar materia — pendiente de BD">
-            <span class="material-symbols-rounded">delete</span>
-          </button>
+      <form data-proc="visitantes" data-accion="materias_guardar" class="form-materias">
+        <input type="hidden" name="csrf" value="<?= $csrf ?>">
+        <input type="hidden" name="accion" value="materias_guardar">
+        <input type="hidden" name="carrera_id" value="<?= $c['id'] ?>">
+        <div class="adm-list-editor" id="mat-list-<?= $c['id'] ?>">
+          <?php foreach ($materias_por_carrera[$c['clave']] ?? [] as $m): ?>
+          <div class="adm-list-item">
+            <span class="adm-list-item-drag material-symbols-rounded">drag_indicator</span>
+            <input type="text" name="materias[]" value="<?= htmlspecialchars($m['nombre']) ?>">
+            <button type="button" class="adm-btn adm-btn--danger adm-btn--sm" onclick="this.closest('.adm-list-item').remove()">
+              <span class="material-symbols-rounded">delete</span>
+            </button>
+          </div>
+          <?php endforeach; ?>
         </div>
-        <?php endforeach; ?>
-        <button class="adm-list-add pending-db" data-toast="Agregar materia — pendiente de BD">
+        <button type="button" class="adm-list-add" onclick="addMateria(<?= $c['id'] ?>)">
           <span class="material-symbols-rounded">add</span> Agregar materia
         </button>
-      </div>
-      <div class="adm-form-actions" style="margin-top:16px">
-        <button class="adm-btn adm-btn--primary pending-db"><span class="material-symbols-rounded">save</span> Guardar cambios</button>
-      </div>
+        <div class="adm-form-actions" style="margin-top:14px">
+          <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar materias</button>
+        </div>
+      </form>
     </div>
+  </div>
+  <?php endforeach; ?>
+  <div class="adm-career-pills" style="margin-bottom:16px">
+    <?php foreach ($carreras as $c): ?>
+    <button class="adm-career-pill <?= $c['clave']==='ISC'?'active':'' ?>"
+            onclick="filtrarMaterias('<?= $c['clave'] ?>')">
+      <?= htmlspecialchars($c['clave']) ?>
+    </button>
+    <?php endforeach; ?>
   </div>
 </div>
 
 <!-- ══ TAB: Secretarías ════════════════════════════════════════ -->
 <div class="adm-tab-panel" data-tab-group="vis" data-tab="secretarias">
-  <div class="adm-toolbar">
-    <div></div>
-    <button class="adm-btn adm-btn--primary pending-db" data-toast="Agregar secretaria — pendiente de BD">
-      <span class="material-symbols-rounded">person_add</span> Agregar
-    </button>
-  </div>
   <div class="adm-table-wrap">
     <table class="adm-table">
       <thead><tr><th>Nombre</th><th>Rol</th><th>Correo</th><th>Teléfono</th><th>Acciones</th></tr></thead>
       <tbody>
-        <?php
-        $secs = [
-          ['Laura Martínez',    'Secretaria Administrativa',  'laura.martinez@chapala.tecmm.edu.mx',    '331-234-5678'],
-          ['María López',       'Recepcionista',              'maria.lopez@chapala.tecmm.edu.mx',       '331-456-7890'],
-          ['Patricia Gómez',    'Secretaria de Dirección',    'patricia.gomez@chapala.tecmm.edu.mx',    '332-567-8901'],
-          ['Ana Rivera',        'Asistente Académica',        'ana.rivera@chapala.tecmm.edu.mx',        '333-678-9012'],
-          ['Gabriela Torres',   'Secretaria Control Escolar', 'gabriela.torres@chapala.tecmm.edu.mx',   '334-789-0123'],
-        ];
-        foreach ($secs as $s): ?>
-        <tr>
-          <td style="font-weight:600"><?= htmlspecialchars($s[0]) ?></td>
-          <td><?= htmlspecialchars($s[1]) ?></td>
-          <td><a href="mailto:<?= htmlspecialchars($s[2]) ?>" style="color:var(--tsj-blue)"><?= htmlspecialchars($s[2]) ?></a></td>
-          <td><?= htmlspecialchars($s[3]) ?></td>
+        <?php if (empty($secretarias)): ?>
+        <tr><td colspan="5" class="adm-table-empty">Sin secretarias registradas.</td></tr>
+        <?php endif; ?>
+        <?php foreach ($secretarias as $s): ?>
+        <tr id="sec-<?= $s['id'] ?>">
+          <td style="font-weight:600"><?= htmlspecialchars($s['nombre']) ?></td>
+          <td><?= htmlspecialchars($s['rol'] ?? '') ?></td>
+          <td><a href="mailto:<?= htmlspecialchars($s['correo'] ?? '') ?>" style="color:var(--tsj-blue)"><?= htmlspecialchars($s['correo'] ?? '') ?></a></td>
+          <td><?= htmlspecialchars($s['telefono'] ?? '') ?></td>
           <td class="actions">
-            <button class="adm-btn adm-btn--ghost adm-btn--sm pending-db" data-toast="Editar — pendiente de BD"><span class="material-symbols-rounded">edit</span></button>
-            <button class="adm-btn adm-btn--danger adm-btn--sm pending-db" data-toast="Eliminar — pendiente de BD"><span class="material-symbols-rounded">delete</span></button>
+            <button class="adm-btn adm-btn--ghost adm-btn--sm"
+                    onclick="abrirEditarSec(<?= htmlspecialchars(json_encode($s)) ?>)">
+              <span class="material-symbols-rounded">edit</span>
+            </button>
+            <button class="adm-btn adm-btn--danger adm-btn--sm"
+                    onclick="confirmarEliminar('visitantes','secretaria_eliminar',<?= $s['id'] ?>,'sec-<?= $s['id'] ?>')">
+              <span class="material-symbols-rounded">delete</span>
+            </button>
           </td>
         </tr>
         <?php endforeach; ?>
       </tbody>
     </table>
   </div>
+  <div class="adm-form-card" style="margin-top:20px">
+    <div class="adm-form-title"><span class="material-symbols-rounded">person_add</span> <span id="form-sec-titulo">Agregar secretaria</span></div>
+    <form data-proc="visitantes" data-accion="secretaria_agregar" id="form-sec">
+      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="accion" value="secretaria_agregar" id="sec-accion">
+      <input type="hidden" name="id" id="sec-id">
+      <div class="adm-form-grid cols-2">
+        <div class="adm-field"><label>Nombre completo <span style="color:var(--tsj-pink)">*</span></label><input type="text" name="nombre" id="sec-nombre" required></div>
+        <div class="adm-field"><label>Rol</label><input type="text" name="rol" id="sec-rol"></div>
+        <div class="adm-field"><label>Correo</label><input type="email" name="correo" id="sec-correo"></div>
+        <div class="adm-field"><label>Teléfono</label><input type="tel" name="telefono" id="sec-telefono"></div>
+      </div>
+      <div class="adm-form-actions">
+        <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar</button>
+        <button type="button" class="adm-btn adm-btn--ghost" onclick="resetFormSec()">Cancelar</button>
+      </div>
+    </form>
+  </div>
 </div>
 
-<!-- ══ TAB: Servicios ══════════════════════════════════════════ -->
+<!-- ══ TAB: Nuevo Ingreso ════════════════════════════════════════ -->
 <div class="adm-tab-panel" data-tab-group="vis" data-tab="servicios">
   <div class="adm-form-card">
-    <div class="adm-form-title"><span class="material-symbols-rounded">how_to_reg</span> Nuevo Ingreso — Requisitos</div>
-    <form class="pending-db">
+    <div class="adm-form-title"><span class="material-symbols-rounded">how_to_reg</span> Nuevo Ingreso — Configuración</div>
+    <form data-proc="visitantes" data-accion="nuevo_ingreso_guardar">
+      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="accion" value="nuevo_ingreso_guardar">
       <div class="adm-form-grid cols-2">
-        <div class="adm-field"><label>Fecha del examen de admisión (día del mes)</label><input type="number" value="20" min="1" max="31"></div>
-        <div class="adm-field"><label>Hora del examen</label><input type="time" value="08:00"></div>
+        <div class="adm-field"><label>Día del examen (del mes)</label><input type="number" name="dia_examen" value="<?= (int)($ni['dia_examen'] ?? 20) ?>" min="1" max="31" required></div>
+        <div class="adm-field"><label>Hora del examen</label><input type="time" name="hora_examen" value="<?= htmlspecialchars($ni['hora_examen'] ?? '08:00') ?>"></div>
+        <div class="adm-field" style="grid-column:1/-1"><label>Lugar del examen</label><input type="text" name="lugar_examen" value="<?= htmlspecialchars($ni['lugar_examen'] ?? 'Tecnológico Superior de Jalisco, Campus Chapala') ?>"></div>
       </div>
-      <div class="adm-field" style="margin-bottom:16px"><label>Requisitos de admisión (uno por línea)</label>
-        <textarea>Copia de la identificación oficial.
-Certificado de estudios anteriores (original y copia).
-Comprobante de domicilio.
-Fotografías tamaño infantil (4 piezas).
-Formulario de inscripción llenado.</textarea>
+      <div class="adm-field" style="margin-bottom:16px">
+        <label>Requisitos de admisión (uno por línea)</label>
+        <textarea name="requisitos" style="min-height:140px"><?php
+          $reqs = $ni['requisitos'] ?? '[]';
+          $arr  = json_decode($reqs, true) ?: [];
+          echo htmlspecialchars(implode("\n", $arr));
+        ?></textarea>
       </div>
       <div class="adm-form-actions">
         <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar</button>
       </div>
     </form>
-  </div>
-  <div class="adm-form-card">
-    <div class="adm-form-title"><span class="material-symbols-rounded">school</span> Re-inscripción — Carreras disponibles</div>
-    <p style="font-size:13px;color:var(--tsj-gray-600);margin:0 0 14px">Carreras que aparecen en el selector del comprobante de re-inscripción.</p>
-    <div class="adm-list-editor">
-      <?php
-      $carreras = ['Ingeniería Mecatrónica','Ingeniería en Sistemas Computacionales',
-                   'Ingeniería Industrial','Ingeniería en Animación Digital y Efectos Visuales',
-                   'Gastronomía','Ingeniería en Gestión Empresarial'];
-      foreach ($carreras as $car): ?>
-      <div class="adm-list-item">
-        <span class="adm-list-item-drag material-symbols-rounded">drag_indicator</span>
-        <input type="text" value="<?= htmlspecialchars($car) ?>">
-        <button class="adm-btn adm-btn--danger adm-btn--sm pending-db"><span class="material-symbols-rounded">delete</span></button>
-      </div>
-      <?php endforeach; ?>
-      <button class="adm-list-add pending-db"><span class="material-symbols-rounded">add</span> Agregar carrera</button>
-    </div>
-    <div class="adm-form-actions" style="margin-top:14px">
-      <button class="adm-btn adm-btn--primary pending-db"><span class="material-symbols-rounded">save</span> Guardar cambios</button>
-    </div>
   </div>
 </div>
 
-<!-- ══ TAB: Ubicación ══════════════════════════════════════════ -->
-<div class="adm-tab-panel" data-tab-group="vis" data-tab="ubicacion">
-  <div class="adm-form-card">
-    <div class="adm-form-title"><span class="material-symbols-rounded">location_on</span> Ubicación del Campus</div>
-    <form class="pending-db">
-      <div class="adm-form-grid cols-1">
-        <div class="adm-field">
-          <label>Enlace de Google Maps (URL completa)</label>
-          <input type="url" value="https://maps.app.goo.gl/w3rApmQrocT3j5V88">
-        </div>
-        <div class="adm-field">
-          <label>URL del embed de Google Maps (iframe src)</label>
-          <textarea style="min-height:70px">https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3733.5!2d-103.1901!3d20.2985…</textarea>
-          <span class="adm-field-help">Ve a Google Maps → Compartir → Insertar mapa → copia la URL del src del iframe.</span>
-        </div>
-        <div class="adm-field">
-          <label>Dirección textual</label>
-          <input type="text" value="Carretera Chapala-Jocotepec km 7.5, Ajijic, Chapala, Jalisco">
-        </div>
-      </div>
-      <div class="adm-form-actions">
-        <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar</button>
-      </div>
-    </form>
-  </div>
-</div>
+<script>
+// ── Filtros de carrera ──────────────────────────────────────────
+function filtrarDocentes(clave){
+  document.querySelectorAll('#doc-pills .adm-career-pill').forEach(b=>{
+    b.classList.toggle('active', b.textContent.trim()===clave);
+  });
+  document.querySelectorAll('#doc-tbody tr[data-carrera]').forEach(tr=>{
+    tr.style.display = (tr.dataset.carrera===clave || clave==='') ? '' : 'none';
+  });
+}
+function filtrarMaterias(clave){
+  document.querySelectorAll('[data-carrera-sec]').forEach(s=>{
+    s.style.display = s.dataset.carrerasSec===clave ? '' : 'none';
+  });
+  // Corregir atributo typo
+  document.querySelectorAll('[data-carrera-sec]').forEach(s=>{
+    s.style.display = s.getAttribute('data-carrera-sec')===clave ? '' : 'none';
+  });
+  document.querySelectorAll('.adm-career-pill').forEach(b=>{
+    if(b.closest('[data-tab-group="vis"][data-tab="materias"]')===null) return;
+    b.classList.toggle('active', b.textContent.trim()===clave);
+  });
+}
+document.addEventListener('DOMContentLoaded',()=>filtrarDocentes('ISC'));
+
+// ── Materia agregar fila ────────────────────────────────────────
+function addMateria(carreraId){
+  const list = document.getElementById('mat-list-'+carreraId);
+  const div  = document.createElement('div');
+  div.className = 'adm-list-item';
+  div.innerHTML = `<span class="adm-list-item-drag material-symbols-rounded">drag_indicator</span>
+    <input type="text" name="materias[]" placeholder="Nueva materia">
+    <button type="button" class="adm-btn adm-btn--danger adm-btn--sm" onclick="this.closest('.adm-list-item').remove()">
+      <span class="material-symbols-rounded">delete</span></button>`;
+  list.appendChild(div);
+  div.querySelector('input').focus();
+}
+
+// ── Directorio ─────────────────────────────────────────────────
+function abrirEditar(tipo, p){
+  document.getElementById('dir-accion').value = 'directorio_editar';
+  document.getElementById('dir-id').value     = p.id;
+  document.getElementById('dir-nombre').value  = p.nombre||'';
+  document.getElementById('dir-puesto').value  = p.puesto||'';
+  document.getElementById('dir-correo').value  = p.correo||'';
+  document.getElementById('dir-telefono').value= p.telefono||'';
+  document.getElementById('dir-foto').value    = p.foto||'';
+  document.getElementById('form-dir-titulo').textContent = 'Editar: '+p.nombre;
+  document.getElementById('form-dir-wrap').scrollIntoView({behavior:'smooth'});
+}
+function resetFormDir(){
+  document.getElementById('dir-accion').value='directorio_agregar';
+  document.getElementById('dir-id').value='';
+  document.getElementById('form-dir').reset();
+  document.getElementById('form-dir-titulo').textContent='Agregar persona al directorio';
+}
+
+// ── Docentes ────────────────────────────────────────────────────
+function abrirEditarDoc(d){
+  document.getElementById('doc-accion').value  = 'docente_editar';
+  document.getElementById('doc-id').value      = d.id;
+  document.getElementById('doc-nombre').value  = d.nombre||'';
+  document.getElementById('doc-correo').value  = d.correo||'';
+  document.getElementById('doc-foto').value    = d.foto||'';
+  const sel = document.getElementById('doc-carrera');
+  for(let o of sel.options){ if(o.value==d.carrera_id){ o.selected=true; break; } }
+  document.getElementById('form-doc-titulo').textContent='Editar: '+d.nombre;
+  document.getElementById('form-doc').scrollIntoView({behavior:'smooth'});
+}
+function resetFormDoc(){
+  document.getElementById('doc-accion').value='docente_agregar';
+  document.getElementById('doc-id').value='';
+  document.getElementById('form-doc').reset();
+  document.getElementById('form-doc-titulo').textContent='Agregar docente';
+}
+
+// ── Coordinadores ───────────────────────────────────────────────
+function abrirEditarCoord(c){
+  document.getElementById('coord-id').value    = c.id;
+  document.getElementById('coord-nombre').value= c.nombre||'';
+  document.getElementById('coord-correo').value= c.correo||'';
+  document.getElementById('form-coord-wrap').style.display='';
+  document.getElementById('form-coord-wrap').scrollIntoView({behavior:'smooth'});
+}
+
+// ── Secretarías ─────────────────────────────────────────────────
+function abrirEditarSec(s){
+  document.getElementById('sec-accion').value   = 'secretaria_editar';
+  document.getElementById('sec-id').value       = s.id;
+  document.getElementById('sec-nombre').value   = s.nombre||'';
+  document.getElementById('sec-rol').value      = s.rol||'';
+  document.getElementById('sec-correo').value   = s.correo||'';
+  document.getElementById('sec-telefono').value = s.telefono||'';
+  document.getElementById('form-sec-titulo').textContent='Editar: '+s.nombre;
+  document.getElementById('form-sec').scrollIntoView({behavior:'smooth'});
+}
+function resetFormSec(){
+  document.getElementById('sec-accion').value='secretaria_agregar';
+  document.getElementById('sec-id').value='';
+  document.getElementById('form-sec').reset();
+  document.getElementById('form-sec-titulo').textContent='Agregar secretaria';
+}
+</script>
 
 <?php require_once __DIR__ . '/_layout_end.php'; ?>

@@ -5,7 +5,7 @@
  * USO (ejecutar desde CLI, NO desde navegador):
  *   php plataforma/modulos/biblioteca/tools/setup_password.php
  *
- * Luego copia la constante resultante en biblioteca/login.php:
+ * Luego copia la constante resultante en plataforma/shared/config.local.php:
  *   define('BIBLIOTECA_ADMIN_HASH', '<hash_aqui>');
  */
 
@@ -30,7 +30,7 @@ if (strlen($password) < 12) {
 
 $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
 echo "\n✅ Hash generado:\n$hash\n\n";
-echo "Copia esto en biblioteca/login.php:\n";
+echo "Copia esto en plataforma/shared/config.local.php:\n";
 echo "   define('BIBLIOTECA_ADMIN_HASH', '$hash');\n\n";
 
 if (password_verify($password, $hash)) {

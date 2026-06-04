@@ -30,10 +30,12 @@ if (!defined('DB_CHARSET')) define('DB_CHARSET', 'utf8mb4');
 // URL base de la plataforma (sin barra final) — ajusta si cambias el alias de Apache
 if (!defined('PLATAFORMA_URL')) define('PLATAFORMA_URL', '/plataforma');
 
-// Nombres de BD por módulo
-if (!defined('DB_BIBLIOTECA')) define('DB_BIBLIOTECA', 'biblioteca_escolar');
-if (!defined('DB_CONVENIOS'))  define('DB_CONVENIOS',  'convenios_db');
-if (!defined('DB_HORARIOS'))   define('DB_HORARIOS',   'horarios_db');
+// Base de datos unificada
+if (!defined('DB_NAME'))       define('DB_NAME',       'kiosko_tsj');
+// Aliases por módulo (apuntan a la misma BD unificada)
+if (!defined('DB_BIBLIOTECA')) define('DB_BIBLIOTECA', DB_NAME);
+if (!defined('DB_CONVENIOS'))  define('DB_CONVENIOS',  DB_NAME);
+if (!defined('DB_HORARIOS'))   define('DB_HORARIOS',   DB_NAME);
 
 // ── Login global (único para toda la plataforma) ─────────────────────────────
 // Sobreescribir en config.local.php con un hash real generado por:

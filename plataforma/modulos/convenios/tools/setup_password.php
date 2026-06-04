@@ -2,10 +2,10 @@
 /**
  * Generador de hash de contraseña para el administrador.
  *
- * USO (ejecutar desde la raíz del proyecto):
- *   php tools/setup_password.php
+ * USO (ejecutar desde CLI, desde la raíz del repo):
+ *   php plataforma/modulos/convenios/tools/setup_password.php
  *
- * Luego copia el hash generado en src/config.php:
+ * Luego copia el hash generado en src/config.local.php:
  *   define('ADMIN_PASSWORD_HASH', '<hash_aqui>');
  *
  * ADVERTENCIA: Este script es solo para uso local/CLI.
@@ -40,7 +40,7 @@ $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
 
 echo "\n\n✅ Hash generado (bcrypt, cost=12):\n";
 echo $hash . "\n\n";
-echo "📋 Copia la siguiente línea en src/config.php:\n";
+echo "📋 Copia la siguiente línea en src/config.local.php:\n";
 echo "   define('ADMIN_PASSWORD_HASH', '" . $hash . "');\n\n";
 
 // Verificación inmediata

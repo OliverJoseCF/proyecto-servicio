@@ -9,7 +9,7 @@
 
 ---
 
-## 1. Clonar y configurar
+## 1. Clonar el repositorio
 
 ```bash
 git clone <url-del-repo>
@@ -18,110 +18,79 @@ cd proyecto-servicio
 
 ---
 
-## 2. Configurar credenciales
+## 2. Importar la base de datos
 
-### 2.1 Desarrollo local (XAMPP)
+Solo hay **una** base de datos unificada: `kiosko_tsj`.
 
-Las credenciales de BD por defecto (XAMPP: `root` sin contraseña) ya vienen en
-`plataforma/shared/config.php`, así que **no necesitas tocar la BD para desarrollo**.
+1. Abre phpMyAdmin (`http://localhost/phpmyadmin`)
+2. Haz clic en **Nueva** (panel izquierdo)
+3. Ve a la pestaña **SQL**
+4. Abre el archivo `kiosko_tsj.sql` que está en la raíz del repo, copia todo su contenido y pégalo
+5. Clic en **Continuar**
 
-Sin embargo, los paneles de administración **sí requieren** los hashes de admin, y por
-defecto están vacíos (el login se bloquea con "El sistema aún no está configurado").
-Crea el archivo local de overrides a partir de la plantilla:
+El script crea la BD, todas las tablas y los datos iniciales automáticamente.
 
-```bash
-cp plataforma/shared/config.local.example.php plataforma/shared/config.local.php
-```
-
-> Este archivo está en `.gitignore` y **no existe en un clon nuevo** — debes crearlo.
-
-Genera los hashes de admin de Biblioteca y Horarios y cópialos en ese archivo:
-
-```bash
-php plataforma/modulos/biblioteca/tools/setup_password.php
-php plataforma/modulos/horarios/tools/setup_password.php
-```
-
-El módulo Convenios también necesita su propio archivo local:
-
-```bash
-cp plataforma/modulos/convenios/src/config.example.php \
-   plataforma/modulos/convenios/src/config.local.php
-```
-
-Genera el hash de la contraseña admin de Convenios:
-
-```bash
-php plataforma/modulos/convenios/tools/setup_password.php
-```
-
-Copia el hash resultante en `convenios/src/config.local.php`.
-
-### 2.2 Producción
-
-Copia la plantilla compartida y edita con tus valores reales:
-
-```bash
-cp plataforma/shared/config.local.example.php plataforma/shared/config.local.php
-nano plataforma/shared/config.local.php
-```
-
-Genera nuevos hashes de admin para Biblioteca y Horarios:
-
-```bash
-php plataforma/modulos/biblioteca/tools/setup_password.php
-php plataforma/modulos/horarios/tools/setup_password.php
-```
-
-Haz lo mismo para Convenios:
-
-```bash
-cp plataforma/modulos/convenios/src/config.example.php \
-   plataforma/modulos/convenios/src/config.local.php
-php plataforma/modulos/convenios/tools/setup_password.php
-```
-
-Copia los hashes en sus respectivos `config.local.php`.
+> **Alternativa desde terminal:**
+> ```bash
+> mysql -u root < kiosko_tsj.sql
+> ```
 
 ---
 
-## 3. Importar base de datos
+## 3. Crear el archivo de configuración local
 
-```sql
--- En MySQL (como root), en este orden:
-SOURCE plataforma/sql/biblioteca.sql;
-SOURCE plataforma/sql/convenios.sql;
-SOURCE plataforma/sql/horarios.sql;
-```
-
-**OBLIGATORIO:** Ejecuta la migración de rutas de horarios:
+Este archivo **no existe en un clon nuevo** (está en `.gitignore`). Debes crearlo:
 
 ```bash
-mysql -u root < plataforma/sql/migrate_horarios_paths.sql
+# Windows (PowerShell)
+copy plataforma\shared\config.local.example.php plataforma\shared\config.local.php
+
+# Mac/Linux
+cp plataforma/shared/config.local.example.php plataforma/shared/config.local.php
 ```
 
-Luego ejecuta el script de setup (crea usuario `tsjplat` con permisos mínimos):
+Abre `plataforma/shared/config.local.php` y ajusta:
 
-```bash
-mysql -u root < plataforma/sql/setup.sql
+```php
+// Para desarrollo local con XAMPP (root sin contraseña) no necesitas cambiar
+// DB_HOST, DB_USER, DB_PASS — los defaults en config.php ya funcionan.
+
+// Solo DEBES configurar esto para poder entrar al admin:
+define('GLOBAL_ADMIN_EMAIL', 'admin@chapala.tecmm.edu.mx');  // el correo que quieras
+define('GLOBAL_ADMIN_HASH',  '<<GENERA EL HASH — ver paso 4>>');
 ```
+
+> Para desarrollo con XAMPP (root sin contraseña), **las credenciales de BD ya vienen
+> configuradas por defecto** en `config.php`. Solo necesitas el hash del admin.
 
 ---
 
-## 4. Directorios de uploads
+## 4. Generar el hash de contraseña del administrador
+
+Ejecuta desde la terminal (PowerShell o CMD en Windows):
 
 ```bash
-mkdir -p plataforma/modulos/convenios/src/pages/upload
-mkdir -p plataforma/modulos/horarios/horarios
-chmod 755 plataforma/modulos/convenios/src/pages/upload
-chmod 755 plataforma/modulos/horarios/horarios
+# Windows XAMPP
+C:\xampp\php\php.exe -r "echo password_hash('TU_CLAVE', PASSWORD_BCRYPT, ['cost'=>12]);"
+
+# Mac/Linux
+php -r "echo password_hash('TU_CLAVE', PASSWORD_BCRYPT, ['cost'=>12]);"
 ```
+
+Copia el hash resultante (`$2y$12$…`) y pégalo como valor de `GLOBAL_ADMIN_HASH` en
+`plataforma/shared/config.local.php`.
+
+> También puedes usar el script interactivo:
+> ```bash
+> php plataforma/modulos/biblioteca/tools/setup_password.php
+> ```
+> (muestra las instrucciones exactas con el hash listo para copiar)
 
 ---
 
 ## 5. Configurar Apache
 
-Añade un alias en `httpd-vhosts.conf` o en `httpd.conf`:
+Agrega un alias en `httpd-vhosts.conf` (XAMPP: `C:\xampp\apache\conf\extra\httpd-vhosts.conf`):
 
 ```apache
 Alias /plataforma "C:/xampp/htdocs/proyecto-servicio/plataforma"
@@ -132,70 +101,134 @@ Alias /plataforma "C:/xampp/htdocs/proyecto-servicio/plataforma"
 </Directory>
 ```
 
-Reinicia Apache. Accede en: `http://localhost/plataforma`
+> Ajusta la ruta si tu repo está en una ubicación diferente.
+
+Reinicia Apache desde el panel de XAMPP. Accede en: `http://localhost/plataforma`
 
 ---
 
-## 6. Credenciales de acceso
+## 6. Crear directorios de uploads
 
-Los módulos con panel de administración requieren las credenciales definidas en los respectivos
-`config.local.php`. Consulta los archivos de plantilla `config.example.php` o `config.local.example.php`
-para saber qué valores configurar.
+```bash
+# Windows (PowerShell)
+mkdir plataforma\modulos\horarios\horarios
+mkdir plataforma\modulos\convenios\src\pages\upload
 
-| Módulo | URL |
+# Mac/Linux
+mkdir -p plataforma/modulos/horarios/horarios
+mkdir -p plataforma/modulos/convenios/src/pages/upload
+chmod 755 plataforma/modulos/horarios/horarios
+chmod 755 plataforma/modulos/convenios/src/pages/upload
+```
+
+---
+
+## 7. Módulo Convenios — config local (solo si usas login propio de Convenios)
+
+```bash
+# Windows
+copy plataforma\modulos\convenios\src\config.example.php plataforma\modulos\convenios\src\config.local.php
+
+# Mac/Linux
+cp plataforma/modulos/convenios/src/config.example.php plataforma/modulos/convenios/src/config.local.php
+```
+
+Genera el hash del admin de Convenios:
+
+```bash
+php plataforma/modulos/convenios/tools/setup_password.php
+```
+
+Pega el hash en `convenios/src/config.local.php` → `ADMIN_PASSWORD_HASH`.
+
+> El panel de administración principal (`/plataforma/admin/`) ya **no requiere** este paso —
+> solo lo necesitas si usas el admin propio del módulo Convenios directamente.
+
+---
+
+## 8. Verificar que funciona
+
+| Qué probar | URL |
 |---|---|
-| Biblioteca Admin | `/plataforma/modulos/biblioteca/login.php` |
-| Horarios Admin | `/plataforma/modulos/horarios/login.php` |
-| Convenios Admin | `/plataforma/modulos/convenios/index.php` |
+| Portal principal | `http://localhost/plataforma` |
+| Login admin global | `http://localhost/plataforma/login.php` |
+| Panel de administración | `http://localhost/plataforma/admin/` |
+| Biblioteca (módulo) | `http://localhost/plataforma/modulos/biblioteca/` |
+| Convenios (módulo) | `http://localhost/plataforma/modulos/convenios/` |
+| Horarios / Buscar maestro | `http://localhost/plataforma/modulos/horarios/` |
 
 ---
 
-## 7. Checklist producción
+## Checklist rápida para un clon nuevo
 
-- [ ] `shared/config.local.php` con credenciales reales (usuario `tsjplat`, contraseña ≥16 chars)
-- [ ] `convenios/src/config.local.php` creado a partir de `config.example.php`
-- [ ] Hashes de admin generados con `tools/setup_password.php` en los 3 módulos
+- [ ] BD `kiosko_tsj` importada desde `kiosko_tsj.sql`
+- [ ] `plataforma/shared/config.local.php` creado (a partir de `config.local.example.php`)
+- [ ] `GLOBAL_ADMIN_HASH` configurado en `config.local.php`
+- [ ] Alias Apache configurado y reiniciado
+- [ ] Carpeta `plataforma/modulos/horarios/horarios/` existe
+- [ ] Carpeta `plataforma/modulos/convenios/src/pages/upload/` existe
+- [ ] (Opcional) `convenios/src/config.local.php` con `ADMIN_PASSWORD_HASH`
+
+---
+
+## Estructura del proyecto
+
+```
+proyecto-servicio/
+├── kiosko_tsj.sql              ← BD unificada (importar primero)
+├── INSTALL.md                  ← Esta guía
+└── plataforma/
+    ├── index.php               ← Portal principal
+    ├── login.php               ← Login admin global
+    ├── admin/                  ← Panel de administración
+    │   ├── index.php           ← Dashboard
+    │   ├── biblioteca.php
+    │   ├── convenios.php
+    │   ├── horarios.php
+    │   ├── visitantes.php
+    │   ├── requisitos.php
+    │   ├── configuracion.php
+    │   └── procesos/           ← Handlers de guardado (PHP/JSON)
+    ├── shared/
+    │   ├── config.php              ← Defaults de desarrollo (versionado)
+    │   ├── config.local.php        ← Credenciales reales (gitignored, CREAR)
+    │   └── config.local.example.php ← Plantilla
+    ├── modulos/
+    │   ├── biblioteca/
+    │   ├── convenios/
+    │   │   └── src/
+    │   │       ├── config.example.php
+    │   │       └── config.local.php  ← (gitignored, CREAR si se usa)
+    │   ├── horarios/
+    │   │   └── horarios/         ← Archivos de horario subidos (gitignored)
+    │   ├── visitantes/
+    │   └── requisitos/
+    └── sql/
+        └── setup.sql             ← Crea usuario tsjplat (producción)
+```
+
+---
+
+## Solo para producción
+
+Ejecuta `plataforma/sql/setup.sql` para crear el usuario con mínimos privilegios:
+
+```bash
+# Edita primero TU_CLAVE_SEGURA en setup.sql, luego:
+mysql -u root < plataforma/sql/setup.sql
+```
+
+Y en `config.local.php` usa ese usuario en lugar de root:
+
+```php
+define('DB_USER', 'tsjplat');
+define('DB_PASS', 'TU_CLAVE_SEGURA');
+```
+
+Checklist adicional de producción:
+
 - [ ] `display_errors = Off` y `log_errors = On` en `php.ini`
 - [ ] HTTPS habilitado + redirect HTTP→HTTPS
-- [ ] Directorios de upload con permisos correctos (no 777)
-- [ ] `tools/.htaccess` presente en biblioteca/tools, horarios/tools, convenios/tools
-- [ ] Dumps SQL importados en orden: biblioteca → convenios → horarios
-- [ ] `migrate_horarios_paths.sql` ejecutado después de importar horarios.sql
-- [ ] `setup.sql` ejecutado para crear usuario `tsjplat`
-- [ ] Imágenes/PDFs de horarios copiados a `plataforma/modulos/horarios/horarios/`
-- [ ] MTA configurado (sendmail/SMTP) — requerido por la función "Sugerir empresa" de
-      Convenios, que usa `mail()`. Sin un MTA válido el envío falla con Error 500.
-
-> **Nota sobre MySQL en Linux:** importa los dumps respetando el nombre **en minúsculas** de
-> las tablas. Las aplicaciones consultan `carreras`, `horarios`, `profesores`, `materias`,
-> `libros`, `convenios` en minúsculas; con `lower_case_table_names=0` (default en Linux) los
-> nombres son sensibles a mayúsculas.
-
----
-
-## Estructura de módulos
-
-```
-plataforma/
-├── index.php               ← Portal principal
-├── shared/                 ← Auth, config, header, footer, theme
-│   ├── config.php          ← Config con defaults dev (versioned)
-│   ├── config.local.php    ← Overrides producción (gitignored)
-│   └── config.local.example.php  ← Plantilla para producción
-├── modulos/
-│   ├── biblioteca/         ← Catálogo + préstamos
-│   ├── convenios/          ← CRUD convenios empresas
-│   │   └── src/
-│   │       ├── config.php          ← Template versionado
-│   │       ├── config.local.php    ← Hash admin real (gitignored)
-│   │       └── config.example.php  ← Plantilla para producción
-│   ├── horarios/           ← Búsqueda maestros/horarios
-│   ├── visitantes/         ← Directorio institucional (estático)
-│   └── requisitos/         ← Residencia y servicio social
-└── sql/
-    ├── biblioteca.sql
-    ├── convenios.sql
-    ├── horarios.sql
-    ├── migrate_horarios_paths.sql  ← Ejecutar SIEMPRE tras horarios.sql
-    └── setup.sql                   ← Usuario DB tsjplat + permisos
-```
+- [ ] Directorios de upload sin permisos 777
+- [ ] `tools/.htaccess` bloqueando acceso web a los scripts de setup
+- [ ] MTA configurado si usas la función "Sugerir empresa" de Convenios (usa `mail()`)

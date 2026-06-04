@@ -1,180 +1,197 @@
 <?php
 require_once dirname(__DIR__) . '/shared/lib/auth.php';
+require_once dirname(__DIR__) . '/shared/config.php';
 $loginUrl = (defined('PLATAFORMA_URL') ? PLATAFORMA_URL : '/plataforma') . '/login.php';
 if (!isGlobalAdmin()) { header('Location: ' . $loginUrl); exit; }
 
 $adm_page  = 'horarios';
 $adm_title = 'Buscar Maestro';
+
+try {
+    $db        = getPDO(DB_NAME);
+    $carreras  = $db->query('SELECT * FROM carreras ORDER BY orden')->fetchAll();
+    $profesores= $db->query('SELECT * FROM profesores ORDER BY apellido,nombre')->fetchAll();
+    $horarios  = $db->query('SELECT h.*,p.nombre,p.apellido,p.foto,c.clave carrera_clave,c.nombre carrera_nombre
+                              FROM horarios h
+                              JOIN profesores p ON h.id_profesor=p.id_profesor
+                              LEFT JOIN carreras c ON h.id_carrera=c.id
+                              ORDER BY p.apellido,p.nombre')->fetchAll();
+    $db_ok = true;
+} catch (\Throwable $e) {
+    $carreras = $profesores = $horarios = [];
+    $db_ok    = false;
+}
+
+$csrf      = getCsrfToken();
+$base_img  = PLATAFORMA_URL . '/modulos/visitantes/imagenes/';
 require_once __DIR__ . '/_layout.php';
 ?>
 
 <div class="adm-page-header">
   <div>
     <h1 class="adm-page-title">Gestión de Maestros y Horarios</h1>
-    <p class="adm-page-desc">Agrega, edita o elimina maestros, sus correos y archivos de horario.</p>
+    <p class="adm-page-desc">Agrega, edita o elimina maestros y sus archivos de horario.</p>
   </div>
-</div>
-<div class="adm-pending">
-  <span class="material-symbols-rounded">construction</span>
-  Los maestros reales se cargarán desde la base de datos. La interfaz está lista.
 </div>
 
 <div class="adm-tabs">
-  <?php foreach (['maestros'=>'Maestros','horarios_archivos'=>'Archivos de horario','carreras'=>'Carreras'] as $k=>$l): ?>
-    <button class="adm-tab <?= $k==='maestros'?'active':'' ?>"
-            data-tab-group="hor" data-tab="<?= $k ?>" onclick="showTab('hor','<?= $k ?>')">
-      <?= $l ?>
-    </button>
+  <?php foreach (['maestros'=>'Maestros','horarios_tab'=>'Horarios / Archivos'] as $k=>$l): ?>
+  <button class="adm-tab <?= $k==='maestros'?'active':'' ?>"
+          data-tab-group="hor" data-tab="<?= $k ?>" onclick="showTab('hor','<?= $k ?>')">
+    <?= $l ?>
+  </button>
   <?php endforeach; ?>
 </div>
 
-<!-- ══ Maestros ══════════════════════════════════════════════ -->
+<!-- ══ Maestros ══════════════════════════════════════════════════ -->
 <div class="adm-tab-panel active" data-tab-group="hor" data-tab="maestros">
-  <div class="adm-toolbar">
-    <div class="adm-search">
-      <span class="material-symbols-rounded">search</span>
-      <input type="text" placeholder="Buscar por nombre o carrera…">
-    </div>
-    <div class="adm-toolbar-actions">
-      <select style="padding:9px 12px;border:1.5px solid var(--tsj-gray-200);border-radius:var(--tsj-radius);font-family:var(--tsj-font);font-size:13px">
-        <option>Todas las carreras</option>
-        <option>Sistemas</option><option>Industrial</option><option>Mecatrónica</option>
-        <option>Animación</option><option>Gestión</option><option>Gastronomía</option>
-      </select>
-      <button class="adm-btn adm-btn--primary pending-db" data-toast="Agregar maestro — pendiente de BD">
-        <span class="material-symbols-rounded">person_add</span> Agregar maestro
-      </button>
-    </div>
-  </div>
   <div class="adm-table-wrap">
     <table class="adm-table">
-      <thead><tr><th>Foto</th><th>Nombre</th><th>Apellido</th><th>Carrera</th><th>Semestre</th><th>Correo</th><th>Horario</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Foto</th><th>Nombre</th><th>Apellido</th><th>Correo</th><th>Acciones</th></tr></thead>
       <tbody>
-        <?php
-        $maestros = [
-          ['miguel.png','Miguel Ángel','Delgado López',   'Sistemas','3er','miguel.delgado@chapala.tecmm.edu.mx',    'horario_delgado.pdf'],
-          [null,        'Alberto',     'Chavolla',         'Industrial','4to','alberto.chavolla@chapala.tecmm.edu.mx', 'horario_chavolla.pdf'],
-          ['julio.png', 'Julio César', 'Chávez Novoa',    'Sistemas','5to','julio.chavez@chapala.tecmm.edu.mx',       'horario_chavez.pdf'],
-          [null,        'Francisco',   'González Siordia','Mecatrónica','2do','fgonzalez@chapala.tecmm.edu.mx',       null],
-          ['jorge.png', 'José Jorge',  'Hernández Ochoa', 'Sistemas','6to','jorge.hernandez@chapala.tecmm.edu.mx',    'horario_hernandez.pdf'],
-        ];
-        $base_img = PLATAFORMA_URL . '/modulos/visitantes/imagenes/';
-        foreach ($maestros as $m): ?>
-        <tr>
+        <?php if (empty($profesores)): ?>
+        <tr><td colspan="5" class="adm-table-empty">Sin maestros registrados.</td></tr>
+        <?php endif; ?>
+        <?php foreach ($profesores as $p): ?>
+        <tr id="prof-<?= $p['id_profesor'] ?>">
           <td class="col-photo">
-            <img src="<?= $m[0] ? $base_img . htmlspecialchars($m[0]) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='38'%3E%3Crect width='38' height='38' fill='%23e5e7eb'/%3E%3C/svg%3E" ?>"
-                 alt="" style="width:38px;height:38px;border-radius:50%;object-fit:cover">
+            <img src="<?= $p['foto'] ? $base_img.htmlspecialchars($p['foto']) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='38'%3E%3Crect width='38' height='38' fill='%23e5e7eb'/%3E%3C/svg%3E" ?>"
+                 style="width:38px;height:38px;border-radius:50%;object-fit:cover" alt="">
           </td>
-          <td style="font-weight:600"><?= htmlspecialchars($m[1]) ?></td>
-          <td><?= htmlspecialchars($m[2]) ?></td>
-          <td><span class="adm-status adm-status--info"><?= htmlspecialchars($m[3]) ?></span></td>
-          <td><?= htmlspecialchars($m[4]) ?></td>
-          <td><a href="mailto:<?= htmlspecialchars($m[5]) ?>" style="color:var(--tsj-blue);font-size:12.5px"><?= htmlspecialchars($m[5]) ?></a></td>
-          <td>
-            <?php if ($m[6]): ?>
-              <span class="adm-status adm-status--ok"><span class="material-symbols-rounded" style="font-size:14px">attach_file</span> <?= htmlspecialchars($m[6]) ?></span>
-            <?php else: ?>
-              <span class="adm-status adm-status--warn">Sin archivo</span>
-            <?php endif; ?>
-          </td>
+          <td style="font-weight:600"><?= htmlspecialchars($p['nombre']) ?></td>
+          <td><?= htmlspecialchars($p['apellido']) ?></td>
+          <td><?= $p['correo'] ? '<a href="mailto:'.htmlspecialchars($p['correo']).'" style="color:var(--tsj-blue);font-size:12.5px">'.htmlspecialchars($p['correo']).'</a>' : '—' ?></td>
           <td class="actions">
-            <button class="adm-btn adm-btn--ghost adm-btn--sm pending-db" data-toast="Editar maestro — pendiente de BD"><span class="material-symbols-rounded">edit</span></button>
-            <button class="adm-btn adm-btn--danger adm-btn--sm pending-db" data-toast="Eliminar maestro — pendiente de BD"><span class="material-symbols-rounded">delete</span></button>
+            <button class="adm-btn adm-btn--ghost adm-btn--sm"
+                    onclick="abrirEditarProf(<?= htmlspecialchars(json_encode($p)) ?>)">
+              <span class="material-symbols-rounded">edit</span>
+            </button>
+            <button class="adm-btn adm-btn--danger adm-btn--sm"
+                    onclick="confirmarEliminar('horarios','profesor_eliminar',<?= $p['id_profesor'] ?>,'prof-<?= $p['id_profesor'] ?>')">
+              <span class="material-symbols-rounded">delete</span>
+            </button>
           </td>
         </tr>
         <?php endforeach; ?>
-        <tr><td colspan="8" class="adm-table-empty">Los maestros reales se cargarán desde la base de datos.</td></tr>
       </tbody>
     </table>
   </div>
 
   <div class="adm-form-card" style="margin-top:20px">
-    <div class="adm-form-title"><span class="material-symbols-rounded">school</span> Agregar / Editar maestro</div>
-    <form class="pending-db">
+    <div class="adm-form-title"><span class="material-symbols-rounded">school</span> <span id="form-prof-titulo">Agregar maestro</span></div>
+    <form data-proc="horarios" data-accion="profesor_agregar" id="form-prof">
+      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="accion" value="profesor_agregar" id="prof-accion">
+      <input type="hidden" name="id" id="prof-id">
       <div class="adm-form-grid cols-3">
-        <div class="adm-field"><label>Nombre(s)</label><input type="text" placeholder="Nombre del maestro"></div>
-        <div class="adm-field"><label>Apellido(s)</label><input type="text" placeholder="Apellidos"></div>
-        <div class="adm-field"><label>Correo electrónico</label><input type="email" placeholder="correo@chapala.tecmm.edu.mx"></div>
-        <div class="adm-field"><label>Carrera</label>
-          <select><option>Sistemas Computacionales</option><option>Industrial</option><option>Mecatrónica</option><option>Animación</option><option>Gestión</option><option>Gastronomía</option></select>
-        </div>
-        <div class="adm-field"><label>Semestre</label>
-          <select><option>1er</option><option>2do</option><option>3er</option><option>4to</option><option>5to</option><option>6to</option><option>7mo</option><option>8vo</option></select>
-        </div>
-        <div class="adm-field"><label>Foto (URL)</label><input type="text" placeholder="URL de la foto del maestro"></div>
-        <div class="adm-field"><label>Archivo de horario (PDF/imagen)</label><input type="file" accept=".pdf,.jpg,.png"></div>
+        <div class="adm-field"><label>Nombre(s) <span style="color:var(--tsj-pink)">*</span></label><input type="text" name="nombre" id="prof-nombre" required></div>
+        <div class="adm-field"><label>Apellido(s) <span style="color:var(--tsj-pink)">*</span></label><input type="text" name="apellido" id="prof-apellido" required></div>
+        <div class="adm-field"><label>Correo electrónico</label><input type="email" name="correo" id="prof-correo"></div>
+        <div class="adm-field"><label>Foto (nombre de archivo)</label><input type="text" name="foto" id="prof-foto" placeholder="ej. miguel.png"></div>
       </div>
       <div class="adm-form-actions">
         <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar maestro</button>
-        <button type="button" class="adm-btn adm-btn--ghost">Cancelar</button>
+        <button type="button" class="adm-btn adm-btn--ghost" onclick="resetFormProf()">Cancelar</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- ══ Archivos de horario ════════════════════════════════════ -->
-<div class="adm-tab-panel" data-tab-group="hor" data-tab="horarios_archivos">
-  <div class="adm-section">
-    <div class="adm-section-header">
-      <h3 class="adm-section-title"><span class="material-symbols-rounded">folder_open</span> Archivos de horario subidos</h3>
-      <button class="adm-btn adm-btn--primary adm-btn--sm pending-db" data-toast="Subir archivo — pendiente de BD">
-        <span class="material-symbols-rounded">upload</span> Subir archivo
-      </button>
-    </div>
-    <div class="adm-section-body">
-      <div class="adm-table-wrap">
-        <table class="adm-table">
-          <thead><tr><th>Archivo</th><th>Maestro asociado</th><th>Tipo</th><th>Fecha subida</th><th>Acciones</th></tr></thead>
-          <tbody>
-            <?php
-            $archivos = [
-              ['horario_delgado.pdf',   'Miguel Ángel Delgado',  'PDF','15/01/2025'],
-              ['horario_chavez.pdf',    'Julio César Chávez',     'PDF','12/01/2025'],
-              ['horario_hernandez.pdf', 'José Jorge Hernández',   'PDF','10/01/2025'],
-            ];
-            foreach ($archivos as $a): ?>
-            <tr>
-              <td><span class="material-symbols-rounded" style="color:var(--tsj-pink);vertical-align:middle">picture_as_pdf</span> <?= htmlspecialchars($a[0]) ?></td>
-              <td><?= htmlspecialchars($a[1]) ?></td>
-              <td><span class="adm-status adm-status--info"><?= $a[2] ?></span></td>
-              <td><?= $a[3] ?></td>
-              <td class="actions">
-                <button class="adm-btn adm-btn--ghost adm-btn--sm pending-db" data-toast="Reemplazar archivo — pendiente de BD"><span class="material-symbols-rounded">upload</span></button>
-                <button class="adm-btn adm-btn--danger adm-btn--sm pending-db" data-toast="Eliminar archivo — pendiente de BD"><span class="material-symbols-rounded">delete</span></button>
-              </td>
-            </tr>
+<!-- ══ Horarios / Archivos ════════════════════════════════════════ -->
+<div class="adm-tab-panel" data-tab-group="hor" data-tab="horarios_tab">
+  <div class="adm-table-wrap">
+    <table class="adm-table">
+      <thead><tr><th>Maestro</th><th>Carrera</th><th>Semestre</th><th>Archivo</th><th>Acciones</th></tr></thead>
+      <tbody>
+        <?php if (empty($horarios)): ?>
+        <tr><td colspan="5" class="adm-table-empty">Sin horarios registrados.</td></tr>
+        <?php endif; ?>
+        <?php foreach ($horarios as $h): ?>
+        <tr id="hor-<?= $h['id_horario'] ?>">
+          <td style="font-weight:600"><?= htmlspecialchars($h['nombre'].' '.$h['apellido']) ?></td>
+          <td><?= htmlspecialchars($h['carrera_clave'] ?? '—') ?></td>
+          <td><?= htmlspecialchars($h['semestre'] ?? '—') ?></td>
+          <td>
+            <?php if ($h['imagen_horario']): ?>
+              <span class="adm-status adm-status--ok">
+                <span class="material-symbols-rounded" style="font-size:14px">attach_file</span>
+                <?= htmlspecialchars(basename($h['imagen_horario'])) ?>
+              </span>
+            <?php else: ?>
+              <span class="adm-status adm-status--warn">Sin archivo</span>
+            <?php endif; ?>
+          </td>
+          <td class="actions">
+            <button class="adm-btn adm-btn--danger adm-btn--sm"
+                    onclick="confirmarEliminar('horarios','horario_eliminar',<?= $h['id_horario'] ?>,'hor-<?= $h['id_horario'] ?>')">
+              <span class="material-symbols-rounded">delete</span>
+            </button>
+          </td>
+        </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="adm-form-card" style="margin-top:20px">
+    <div class="adm-form-title"><span class="material-symbols-rounded">upload_file</span> Agregar / actualizar horario</div>
+    <form data-proc="horarios" data-accion="horario_guardar" id="form-hor" enctype="multipart/form-data">
+      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="accion" value="horario_guardar">
+      <div class="adm-form-grid cols-3">
+        <div class="adm-field"><label>Maestro <span style="color:var(--tsj-pink)">*</span></label>
+          <select name="profesor_id" required>
+            <option value="">— Seleccionar —</option>
+            <?php foreach ($profesores as $p): ?>
+            <option value="<?= $p['id_profesor'] ?>"><?= htmlspecialchars($p['apellido'].', '.$p['nombre']) ?></option>
             <?php endforeach; ?>
-          </tbody>
-        </table>
+          </select>
+        </div>
+        <div class="adm-field"><label>Carrera</label>
+          <select name="carrera_id">
+            <option value="">Sin asignar</option>
+            <?php foreach ($carreras as $c): ?>
+            <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['clave'].' — '.$c['nombre']) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="adm-field"><label>Semestre</label>
+          <select name="semestre">
+            <option value="">—</option>
+            <?php foreach (['1er','2do','3er','4to','5to','6to','7mo','8vo'] as $sem): ?>
+            <option><?= $sem ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="adm-field" style="grid-column:1/-1"><label>Archivo de horario (PDF/imagen)</label>
+          <input type="file" name="archivo_horario" accept=".pdf,.jpg,.jpeg,.png">
+          <span class="adm-field-help">Si ya existe un horario para este maestro+carrera, se reemplazará.</span>
+        </div>
       </div>
-    </div>
+      <div class="adm-form-actions">
+        <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar horario</button>
+      </div>
+    </form>
   </div>
 </div>
 
-<!-- ══ Carreras ════════════════════════════════════════════════ -->
-<div class="adm-tab-panel" data-tab-group="hor" data-tab="carreras">
-  <div class="adm-section">
-    <div class="adm-section-header">
-      <h3 class="adm-section-title"><span class="material-symbols-rounded">school</span> Carreras registradas</h3>
-      <button class="adm-btn adm-btn--primary adm-btn--sm pending-db" data-toast="Agregar carrera — pendiente de BD">
-        <span class="material-symbols-rounded">add</span> Agregar carrera
-      </button>
-    </div>
-    <div class="adm-section-body">
-      <div class="adm-list-editor">
-        <?php foreach (['Ingeniería en Sistemas Computacionales','Ingeniería Industrial','Ingeniería Mecatrónica','Ingeniería en Animación Digital y Efectos Visuales','Ingeniería en Gestión Empresarial','Gastronomía'] as $car): ?>
-        <div class="adm-list-item">
-          <span class="adm-list-item-drag material-symbols-rounded">drag_indicator</span>
-          <input type="text" value="<?= htmlspecialchars($car) ?>">
-          <button class="adm-btn adm-btn--danger adm-btn--sm pending-db"><span class="material-symbols-rounded">delete</span></button>
-        </div>
-        <?php endforeach; ?>
-      </div>
-      <div class="adm-form-actions" style="margin-top:14px">
-        <button class="adm-btn adm-btn--primary pending-db"><span class="material-symbols-rounded">save</span> Guardar cambios</button>
-      </div>
-    </div>
-  </div>
-</div>
+<script>
+function abrirEditarProf(p){
+  document.getElementById('prof-accion').value   = 'profesor_editar';
+  document.getElementById('prof-id').value       = p.id_profesor;
+  document.getElementById('prof-nombre').value   = p.nombre||'';
+  document.getElementById('prof-apellido').value = p.apellido||'';
+  document.getElementById('prof-correo').value   = p.correo||'';
+  document.getElementById('prof-foto').value     = p.foto||'';
+  document.getElementById('form-prof-titulo').textContent='Editar: '+p.nombre+' '+p.apellido;
+  document.getElementById('form-prof').scrollIntoView({behavior:'smooth'});
+}
+function resetFormProf(){
+  document.getElementById('prof-accion').value='profesor_agregar';
+  document.getElementById('prof-id').value='';
+  document.getElementById('form-prof').reset();
+  document.getElementById('form-prof-titulo').textContent='Agregar maestro';
+}
+</script>
 
 <?php require_once __DIR__ . '/_layout_end.php'; ?>

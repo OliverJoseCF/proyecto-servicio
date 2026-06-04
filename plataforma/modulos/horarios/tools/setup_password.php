@@ -5,7 +5,7 @@
  * USO (ejecutar desde CLI, NO desde navegador):
  *   php plataforma/modulos/horarios/tools/setup_password.php
  *
- * Luego copia la constante resultante en horarios/login.php:
+ * Luego copia la constante resultante en plataforma/shared/config.local.php:
  *   define('HORARIOS_ADMIN_HASH', '<hash_aqui>');
  */
 
@@ -30,7 +30,7 @@ if (strlen($password) < 12) {
 
 $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
 echo "\n✅ Hash generado:\n$hash\n\n";
-echo "Copia esto en horarios/login.php:\n";
+echo "Copia esto en plataforma/shared/config.local.php:\n";
 echo "   define('HORARIOS_ADMIN_HASH', '$hash');\n\n";
 
 if (password_verify($password, $hash)) {
