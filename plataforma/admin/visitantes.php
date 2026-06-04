@@ -224,7 +224,7 @@ require_once __DIR__ . '/_layout.php';
 <!-- ══ TAB: Planes de Estudio ══════════════════════════════════ -->
 <div class="adm-tab-panel" data-tab-group="vis" data-tab="materias">
   <?php foreach ($carreras as $c): ?>
-  <div class="adm-section" data-carrera-sec="<?= $c['clave'] ?>" style="<?= $c['clave']==='ISC'?'':'display:none' ?>margin-bottom:20px">
+  <div class="adm-section" data-carrera-sec="<?= $c['clave'] ?>" style="<?= $c['clave']==='ISC'?'':'display:none;' ?>margin-bottom:20px">
     <div class="adm-section-header">
       <h3 class="adm-section-title"><span class="material-symbols-rounded">list_alt</span> Materias — <?= htmlspecialchars($c['nombre']) ?></h3>
     </div>
@@ -353,14 +353,9 @@ function filtrarDocentes(clave){
 }
 function filtrarMaterias(clave){
   document.querySelectorAll('[data-carrera-sec]').forEach(s=>{
-    s.style.display = s.dataset.carrerasSec===clave ? '' : 'none';
-  });
-  // Corregir atributo typo
-  document.querySelectorAll('[data-carrera-sec]').forEach(s=>{
     s.style.display = s.getAttribute('data-carrera-sec')===clave ? '' : 'none';
   });
-  document.querySelectorAll('.adm-career-pill').forEach(b=>{
-    if(b.closest('[data-tab-group="vis"][data-tab="materias"]')===null) return;
+  document.querySelectorAll('[data-tab="materias"] .adm-career-pill').forEach(b=>{
     b.classList.toggle('active', b.textContent.trim()===clave);
   });
 }

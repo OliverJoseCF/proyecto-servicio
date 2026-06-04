@@ -21,7 +21,7 @@ $items_por_pagina = 30;
 $pagina_actual    = max(1, (int)($_GET['pagina'] ?? 1));
 $offset           = ($pagina_actual - 1) * $items_por_pagina;
 
-$where  = 'WHERE 1=1';
+$where  = '';
 $params = [];
 if ($busqueda !== '') {
     $where .= ' AND (p.nombre LIKE :busqueda1 OR p.apellido LIKE :busqueda2)';
@@ -37,12 +37,13 @@ $sql_base = "
     SELECT h.id_horario,
            p.nombre    AS nombre_profesor,
            p.apellido  AS apellido_profesor,
-           c.nombre AS nombre_carrera,
+           c.nombre    AS nombre_carrera,
            h.semestre,
            h.imagen_horario
-    FROM   horarios h
-    JOIN   profesores p ON h.id_profesor = p.id_profesor
-    JOIN   carreras   c ON h.id_carrera  = c.id
+    FROM   profesores p
+    LEFT JOIN horarios h  ON h.id_profesor = p.id_profesor AND h.activo = 1
+    LEFT JOIN carreras  c ON h.id_carrera  = c.id
+    WHERE p.activo = 1
     $where
 ";
 
@@ -132,14 +133,18 @@ require_once __DIR__ . '/../../shared/header.php';
               <tr>
                 <td><?= htmlspecialchars($h['nombre_profesor'] . ' ' . $h['apellido_profesor'], ENT_QUOTES, 'UTF-8') ?></td>
                 <td>
-                  <a href="<?= htmlspecialchars($h['imagen_horario'], ENT_QUOTES, 'UTF-8') ?>"
-                     class="open-modal btn-horario"
-                     rel="noopener noreferrer"
-                     aria-label="Ver horario de <?= htmlspecialchars($h['nombre_profesor'] . ' ' . $h['apellido_profesor'], ENT_QUOTES, 'UTF-8') ?>">
-                    Ver Horario
-                  </a>
+                  <?php if ($h['imagen_horario']): ?>
+                    <a href="<?= htmlspecialchars($h['imagen_horario'], ENT_QUOTES, 'UTF-8') ?>"
+                       class="open-modal btn-horario"
+                       rel="noopener noreferrer"
+                       aria-label="Ver horario de <?= htmlspecialchars($h['nombre_profesor'] . ' ' . $h['apellido_profesor'], ENT_QUOTES, 'UTF-8') ?>">
+                      Ver Horario
+                    </a>
+                  <?php else: ?>
+                    <span style="color:#9ca3af;font-size:13px">Sin horario</span>
+                  <?php endif; ?>
                 </td>
-                <td><?= htmlspecialchars($h['nombre_carrera'], ENT_QUOTES, 'UTF-8') ?></td>
+                <td><?= htmlspecialchars($h['nombre_carrera'] ?? '—', ENT_QUOTES, 'UTF-8') ?></td>
               </tr>
             <?php endforeach; ?>
           <?php endif; ?>

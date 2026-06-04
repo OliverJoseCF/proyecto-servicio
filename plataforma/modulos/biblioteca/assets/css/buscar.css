@@ -66,11 +66,17 @@
   margin: 0 auto 40px;
   background: #fff;
   border-radius: 12px;
-  overflow: hidden;
-  overflow-x: auto;
-  overscroll-behavior: none;
+  overflow: auto;
+  max-height: 520px;
+  overscroll-behavior: contain;
   border: 1px solid var(--tsj-gray-200, #e5e7eb);
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+/* Cabecera fija al hacer scroll */
+.table-wrapper .table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 .table-wrapper .table { margin-bottom: 0; }
 .table-wrapper .table thead th {

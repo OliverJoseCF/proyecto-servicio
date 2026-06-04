@@ -45,12 +45,19 @@ if ($accion === 'horario_guardar') {
 
     // Upload de archivo si viene
     if (isset($_FILES['archivo_horario']) && $_FILES['archivo_horario']['error'] === UPLOAD_ERR_OK) {
-        $ext   = strtolower(pathinfo($_FILES['archivo_horario']['name'], PATHINFO_EXTENSION));
-        $allow = ['pdf','jpg','jpeg','png'];
-        if (!in_array($ext, $allow)) jsonErr('Tipo de archivo no permitido. Usa PDF, JPG o PNG');
-        $dir   = dirname(__DIR__, 2) . '/modulos/horarios/horarios/';
+        $ext     = strtolower(pathinfo($_FILES['archivo_horario']['name'], PATHINFO_EXTENSION));
+        $allow   = ['pdf','jpg','jpeg','png'];
+        $maxSize = 5 * 1024 * 1024; // 5 MB
+
+        if (!in_array($ext, $allow))
+            jsonErr('Tipo de archivo no permitido. Usa PDF, JPG o PNG');
+        if ($_FILES['archivo_horario']['size'] > $maxSize)
+            jsonErr('El archivo supera el límite de 5 MB');
+
+        $dir = dirname(__DIR__, 2) . '/modulos/horarios/horarios/';
         if (!is_dir($dir)) mkdir($dir, 0755, true);
-        $fname = 'horario_' . $profesor_id . '_' . time() . '.' . $ext;
+
+        $fname = 'horario_' . $profesor_id . '_' . bin2hex(random_bytes(6)) . '.' . $ext;
         move_uploaded_file($_FILES['archivo_horario']['tmp_name'], $dir . $fname);
         $imagen = $fname;
     }
