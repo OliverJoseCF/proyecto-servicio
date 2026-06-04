@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/_helper.php';
 
 $accion = str('accion', 30);
@@ -11,7 +11,7 @@ if ($accion === 'libro_agregar') {
     $autor     = str('autor', 200);
     $editorial = str('editorial', 150);
     $categoria = str('categoria', 100);
-    $ejemplares= intVal('ejemplares', 1);
+    $ejemplares= postInt('ejemplares', 1);
     if (!$codigo || !$nombre) jsonErr('Código y título son requeridos');
     try {
         $db->prepare('INSERT INTO libros (codigo,nombre,autor,editorial,categoria,ejemplares) VALUES (?,?,?,?,?,?)')
@@ -24,13 +24,13 @@ if ($accion === 'libro_agregar') {
 }
 
 if ($accion === 'libro_editar') {
-    $id        = intVal('id');
+    $id        = postInt('id');
     $codigo    = str('codigo', 30);
     $nombre    = str('nombre', 300);
     $autor     = str('autor', 200);
     $editorial = str('editorial', 150);
     $categoria = str('categoria', 100);
-    $ejemplares= intVal('ejemplares', 1);
+    $ejemplares= postInt('ejemplares', 1);
     if (!$id || !$codigo || !$nombre) jsonErr('Datos incompletos');
     $db->prepare('UPDATE libros SET codigo=?,nombre=?,autor=?,editorial=?,categoria=?,ejemplares=? WHERE id=?')
        ->execute([$codigo,$nombre,$autor,$editorial,$categoria,$ejemplares,$id]);
@@ -38,7 +38,7 @@ if ($accion === 'libro_editar') {
 }
 
 if ($accion === 'libro_eliminar') {
-    $id = intVal('id');
+    $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('DELETE FROM libros WHERE id=?')->execute([$id]);
     jsonOk('Libro eliminado');
@@ -46,7 +46,7 @@ if ($accion === 'libro_eliminar') {
 
 // ══ PRÉSTAMOS ════════════════════════════════════════════════════
 if ($accion === 'prestamo_devuelto') {
-    $id = intVal('id');
+    $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('UPDATE prestamos SET devuelto=1, fecha_devuelto=NOW() WHERE id=?')->execute([$id]);
     jsonOk('Préstamo marcado como devuelto');
@@ -54,7 +54,7 @@ if ($accion === 'prestamo_devuelto') {
 
 // ══ SOLICITUDES ════════════════════════════════════════════════
 if ($accion === 'solicitud_aprobar') {
-    $id = intVal('id');
+    $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
 
     $db->beginTransaction();
@@ -81,7 +81,7 @@ if ($accion === 'solicitud_aprobar') {
 }
 
 if ($accion === 'solicitud_rechazar') {
-    $id = intVal('id');
+    $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('UPDATE solicitudes_biblioteca SET estado="rechazada", updated_at=NOW() WHERE id=?')
        ->execute([$id]);

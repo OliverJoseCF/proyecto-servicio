@@ -11,7 +11,9 @@ if ($accion === 'guardar_config') {
     $stmt = $db->prepare('INSERT INTO configuracion (clave, valor) VALUES (:k,:v)
                           ON DUPLICATE KEY UPDATE valor = VALUES(valor)');
     foreach ($campos as $c) {
-        $v = str($c, 2000);
+        // maps_embed_url puede ser muy larga
+        $max = in_array($c, ['maps_embed_url','maps_link_url','descripcion_portal']) ? 5000 : 500;
+        $v   = str($c, $max);
         $stmt->execute([':k' => $c, ':v' => $v]);
     }
     jsonOk('Configuración guardada');

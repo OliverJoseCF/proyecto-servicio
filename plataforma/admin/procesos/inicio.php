@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/_helper.php';
 
 $accion = str('accion', 30);
@@ -17,7 +17,7 @@ if ($accion === 'aviso_agregar') {
 }
 
 if ($accion === 'aviso_editar') {
-    $id     = intVal('id');
+    $id     = postInt('id');
     $titulo = str('titulo', 200);
     $desc   = str('descripcion', 2000);
     $fecha  = str('fecha', 10);
@@ -28,7 +28,7 @@ if ($accion === 'aviso_editar') {
 }
 
 if ($accion === 'aviso_eliminar') {
-    $id = intVal('id');
+    $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('DELETE FROM avisos WHERE id=?')->execute([$id]);
     jsonOk('Aviso eliminado');
@@ -61,7 +61,7 @@ if ($accion === 'carrusel_agregar') {
 }
 
 if ($accion === 'carrusel_editar') {
-    $id        = intVal('id');
+    $id        = postInt('id');
     $url       = str('url', 1000);
     $titulo    = str('titulo', 200);
     $subtitulo = str('subtitulo', 300);
@@ -72,7 +72,7 @@ if ($accion === 'carrusel_editar') {
 }
 
 if ($accion === 'carrusel_eliminar') {
-    $id = intVal('id');
+    $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('DELETE FROM carrusel_fotos WHERE id=?')->execute([$id]);
     jsonOk('Imagen eliminada del carrusel');

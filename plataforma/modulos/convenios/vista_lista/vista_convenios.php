@@ -79,7 +79,7 @@ require_once __DIR__ . '/../../../shared/header.php';
 ?>
 
 <style>
-.conv-page { max-width: 1100px; margin: 0 auto; padding: 24px 20px 56px; }
+.conv-page { max-width: 960px; margin: 0 auto; padding: 24px 20px 56px; }
 .conv-header { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
 .conv-header h1 { font-size:1.4rem; font-weight:700; color:#1a0960; margin:0; }
 .conv-volver { margin-left:auto; color:#32129a; font-size:13px; font-weight:600; text-decoration:none; white-space:nowrap; }

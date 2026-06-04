@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/_helper.php';
 
 $accion = str('accion', 30);
@@ -17,7 +17,7 @@ if ($accion === 'profesor_agregar') {
 }
 
 if ($accion === 'profesor_editar') {
-    $id       = intVal('id');
+    $id       = postInt('id');
     $nombre   = str('nombre', 100);
     $apellido = str('apellido', 100);
     $correo   = str('correo', 254);
@@ -29,7 +29,7 @@ if ($accion === 'profesor_editar') {
 }
 
 if ($accion === 'profesor_eliminar') {
-    $id = intVal('id');
+    $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('DELETE FROM profesores WHERE id_profesor=?')->execute([$id]);
     jsonOk('Profesor eliminado');
@@ -37,8 +37,8 @@ if ($accion === 'profesor_eliminar') {
 
 // ══ HORARIOS ════════════════════════════════════════════════════
 if ($accion === 'horario_guardar') {
-    $profesor_id = intVal('profesor_id');
-    $carrera_id  = intVal('carrera_id');
+    $profesor_id = postInt('profesor_id');
+    $carrera_id  = postInt('carrera_id');
     $semestre    = str('semestre', 10);
     $imagen      = null; // se asigna solo si hay upload
     if (!$profesor_id) jsonErr('Selecciona un profesor');
@@ -83,7 +83,7 @@ if ($accion === 'horario_guardar') {
 }
 
 if ($accion === 'horario_eliminar') {
-    $id = intVal('id');
+    $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('DELETE FROM horarios WHERE id_horario=?')->execute([$id]);
     jsonOk('Horario eliminado');

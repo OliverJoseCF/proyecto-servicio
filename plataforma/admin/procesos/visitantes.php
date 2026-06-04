@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/_helper.php';
 
 $accion = str('accion', 30);
@@ -21,7 +21,7 @@ if ($accion === 'directorio_agregar') {
 }
 
 if ($accion === 'directorio_editar') {
-    $id       = intVal('id');
+    $id       = postInt('id');
     $nombre   = str('nombre', 150);
     $puesto   = str('puesto', 150);
     $correo   = str('correo', 254);
@@ -36,7 +36,7 @@ if ($accion === 'directorio_editar') {
 }
 
 if ($accion === 'directorio_eliminar') {
-    $id = intVal('id');
+    $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('DELETE FROM directorio WHERE id=?')->execute([$id]);
     jsonOk('Persona eliminada');
@@ -46,7 +46,7 @@ if ($accion === 'directorio_eliminar') {
 if ($accion === 'docente_agregar') {
     $nombre     = str('nombre', 150);
     $correo     = str('correo', 254);
-    $carrera_id = intVal('carrera_id');
+    $carrera_id = postInt('carrera_id');
     $foto       = str('foto', 500);
     if (!$nombre) jsonErr('El nombre es requerido');
     $db->prepare('INSERT INTO docentes (nombre,correo,carrera_id,foto) VALUES (?,?,?,?)')
@@ -55,10 +55,10 @@ if ($accion === 'docente_agregar') {
 }
 
 if ($accion === 'docente_editar') {
-    $id         = intVal('id');
+    $id         = postInt('id');
     $nombre     = str('nombre', 150);
     $correo     = str('correo', 254);
-    $carrera_id = intVal('carrera_id');
+    $carrera_id = postInt('carrera_id');
     $foto       = str('foto', 500);
     if (!$id || !$nombre) jsonErr('Datos incompletos');
     $db->prepare('UPDATE docentes SET nombre=?,correo=?,carrera_id=?,foto=? WHERE id=?')
@@ -67,7 +67,7 @@ if ($accion === 'docente_editar') {
 }
 
 if ($accion === 'docente_eliminar') {
-    $id = intVal('id');
+    $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('DELETE FROM docentes WHERE id=?')->execute([$id]);
     jsonOk('Docente eliminado');
@@ -75,7 +75,7 @@ if ($accion === 'docente_eliminar') {
 
 // ══ COORDINADORES ════════════════════════════════════════════════
 if ($accion === 'coord_editar') {
-    $id         = intVal('id');
+    $id         = postInt('id');
     $nombre     = str('nombre', 150);
     $correo     = str('correo', 254);
     if (!$id || !$nombre) jsonErr('Datos incompletos');
@@ -86,7 +86,7 @@ if ($accion === 'coord_editar') {
 
 // ══ MATERIAS ════════════════════════════════════════════════════
 if ($accion === 'materias_guardar') {
-    $carrera_id = intVal('carrera_id');
+    $carrera_id = postInt('carrera_id');
     $nombres    = $_POST['materias'] ?? [];
     if (!$carrera_id) jsonErr('Carrera inválida');
     if (!is_array($nombres)) jsonErr('Datos inválidos');
@@ -113,7 +113,7 @@ if ($accion === 'secretaria_agregar') {
 }
 
 if ($accion === 'secretaria_editar') {
-    $id       = intVal('id');
+    $id       = postInt('id');
     $nombre   = str('nombre', 150);
     $rol      = str('rol', 150);
     $correo   = str('correo', 254);
@@ -125,7 +125,7 @@ if ($accion === 'secretaria_editar') {
 }
 
 if ($accion === 'secretaria_eliminar') {
-    $id = intVal('id');
+    $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('DELETE FROM secretarias WHERE id=?')->execute([$id]);
     jsonOk('Secretaria eliminada');
@@ -133,7 +133,7 @@ if ($accion === 'secretaria_eliminar') {
 
 // ══ NUEVO INGRESO ══════════════════════════════════════════════
 if ($accion === 'nuevo_ingreso_guardar') {
-    $dia    = intVal('dia_examen');
+    $dia    = postInt('dia_examen');
     $hora   = str('hora_examen', 10);
     $lugar  = str('lugar_examen', 200);
     $rawReq = str('requisitos', 5000);

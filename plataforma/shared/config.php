@@ -21,6 +21,11 @@ if (file_exists($_tsj_local)) {
 unset($_tsj_local);
 
 // Defaults de desarrollo (XAMPP). En producción se sobreescriben vía config.local.php
+// URL correcta del mapa del campus (actualizar en BD via admin → Configuración)
+if (!defined('MAPS_EMBED_DEFAULT')) define('MAPS_EMBED_DEFAULT',
+    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1322.9681638304503!2d-103.22284273653298!3d20.303617966560704!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x842f46d5a7843b5f%3A0x12046fea1ab84e7d!2sTecnol%C3%B3gico%20Superior%20de%20Jalisco%20Chapala!5e0!3m2!1ses-419!2smx!4v1780543430963!5m2!1ses-419!2smx'
+);
+
 if (!defined('DB_HOST'))    define('DB_HOST',    'localhost');
 if (!defined('DB_PORT'))    define('DB_PORT',    3306);
 if (!defined('DB_USER'))    define('DB_USER',    'root');

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/_helper.php';
 
 $accion = str('accion', 30);
@@ -55,7 +55,7 @@ if ($accion === 'doc_agregar') {
 }
 
 if ($accion === 'doc_editar') {
-    $id        = intVal('id');
+    $id        = postInt('id');
     $nombre    = str('nombre', 200);
     $url       = str('url', 1000);
     $tipo_arch = str('tipo_archivo', 30) ?: 'PDF';
@@ -66,7 +66,7 @@ if ($accion === 'doc_editar') {
 }
 
 if ($accion === 'doc_eliminar') {
-    $id = intVal('id');
+    $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('DELETE FROM documentos_descargables WHERE id=?')->execute([$id]);
     jsonOk('Documento eliminado');

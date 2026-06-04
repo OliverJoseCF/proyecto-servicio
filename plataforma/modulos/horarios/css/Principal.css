@@ -7,9 +7,9 @@
 .main-content {
   flex: 1;
   width: 100%;
-  max-width: 1400px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 0 20px 0;
+  padding: 0 20px 48px;
 }
 
 /* ── Títulos ─────────────────────────────────────────────── */
@@ -90,9 +90,17 @@
 /* ── Tabla (scoped) ──────────────────────────────────────── */
 .tabla-section { margin-bottom: 24px; }
 .tabla-wrapper {
-  overflow-x: auto;
+  overflow: auto;
+  max-height: 520px;
   border-radius: var(--tsj-radius, 8px);
   box-shadow: 0 2px 12px rgba(0,0,0,.08);
+  border: 1px solid var(--tsj-gray-200, #e5e7eb);
+  overscroll-behavior: contain;
+}
+.tabla-wrapper thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 .tabla-wrapper table {
   width: 100%; border-collapse: collapse;

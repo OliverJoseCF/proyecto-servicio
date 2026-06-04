@@ -117,7 +117,7 @@ function confirmarEliminar(modulo, accion, id, rowId) {
   // Obtener el CSRF del primer formulario de la página
   var csrfEl = document.querySelector('input[name="_csrf"]');
   var csrf   = csrfEl ? csrfEl.value : '';
-  adminFetch(modulo, { csrf: csrf, accion: accion, id: id })
+  adminFetch(modulo, { _csrf: csrf, accion: accion, id: id })
     .then(function(json) {
       if (json.ok && rowId) {
         var row = document.getElementById(rowId);

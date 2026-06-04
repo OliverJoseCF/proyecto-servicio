@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/_helper.php';
 
 $accion = str('accion', 30);
@@ -9,7 +9,7 @@ if ($accion === 'convenio_agregar') {
     $nombre     = str('nombre', 300);
     $tipo       = str('tipo_convenio', 100);
     $sector     = str('sector', 20) ?: 'privado';
-    $carrera_id = intVal('carrera_id');
+    $carrera_id = postInt('carrera_id');
     $contacto   = str('nombre_contacto', 200);
     $correo     = str('correo_contacto', 254);
     $telefono   = str('telefono_contacto', 30);
@@ -23,11 +23,11 @@ if ($accion === 'convenio_agregar') {
 }
 
 if ($accion === 'convenio_editar') {
-    $id         = intVal('id');
+    $id         = postInt('id');
     $nombre     = str('nombre', 300);
     $tipo       = str('tipo_convenio', 100);
     $sector     = str('sector', 20) ?: 'privado';
-    $carrera_id = intVal('carrera_id');
+    $carrera_id = postInt('carrera_id');
     $contacto   = str('nombre_contacto', 200);
     $correo     = str('correo_contacto', 254);
     $telefono   = str('telefono_contacto', 30);
@@ -40,7 +40,7 @@ if ($accion === 'convenio_editar') {
 }
 
 if ($accion === 'convenio_eliminar') {
-    $id = intVal('id');
+    $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('DELETE FROM convenios WHERE id=?')->execute([$id]);
     jsonOk('Convenio eliminado');
@@ -48,7 +48,7 @@ if ($accion === 'convenio_eliminar') {
 
 // ══ SUGERENCIAS ══════════════════════════════════════════════════
 if ($accion === 'sugerencia_aceptar') {
-    $id = intVal('id');
+    $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('UPDATE sugerencias_empresa SET estado="aceptada", updated_at=NOW() WHERE id=?')
        ->execute([$id]);
@@ -56,7 +56,7 @@ if ($accion === 'sugerencia_aceptar') {
 }
 
 if ($accion === 'sugerencia_rechazar') {
-    $id = intVal('id');
+    $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('UPDATE sugerencias_empresa SET estado="rechazada", updated_at=NOW() WHERE id=?')
        ->execute([$id]);
