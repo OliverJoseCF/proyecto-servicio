@@ -11,7 +11,7 @@ try {
 }
 
 try {
-    $carreras = $pdo->query("SELECT id_carrera, nombre_carrera FROM carreras")->fetchAll();
+    $carreras = $pdo->query("SELECT id AS id_carrera, nombre AS nombre_carrera FROM carreras ORDER BY orden")->fetchAll();
 } catch (\PDOException $e) {
     error_log('horarios/VistaAdmin carreras error: ' . $e->getMessage());
     $carreras = [];
@@ -58,10 +58,10 @@ if ($id_carrera > 0) {
     $params[':id_carrera'] = $id_carrera;
 }
 
-$sql  = "SELECT p.id_profesor, p.nombre, p.apellido, h.imagen_horario, c.nombre_carrera
+$sql  = "SELECT p.id_profesor, p.nombre, p.apellido, h.imagen_horario, c.nombre AS nombre_carrera
          FROM horarios h
          JOIN profesores p ON h.id_profesor = p.id_profesor
-         JOIN carreras   c ON h.id_carrera  = c.id_carrera
+         JOIN carreras   c ON h.id_carrera  = c.id
          $where ORDER BY p.apellido, p.nombre";
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);

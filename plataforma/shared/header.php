@@ -43,11 +43,12 @@ if (is_string($tsj_extra_css)) {
 $base = PLATAFORMA_URL;
 
 $nav_items = [
-    'visitantes' => ['label' => 'Visitantes',  'href' => $base . '/modulos/visitantes/index.php'],
-    'biblioteca' => ['label' => 'Biblioteca',   'href' => $base . '/modulos/biblioteca/buscar.php'],
-    'convenios'  => ['label' => 'Convenios',    'href' => $base . '/modulos/convenios/index.php'],
-    'horarios'   => ['label' => 'Buscar Maestro',              'href' => $base . '/modulos/horarios/index.php'],
-    'requisitos' => ['label' => 'Serv. Social / Residencia', 'href' => $base . '/modulos/requisitos/residencia.php'],
+    'visitantes' => ['label' => 'Directorio',               'href' => $base . '/modulos/visitantes/Directorio.php', 'icon' => 'contacts'],
+    'biblioteca' => ['label' => 'Biblioteca',               'href' => $base . '/modulos/biblioteca/buscar.php',     'icon' => 'menu_book'],
+    'convenios'  => ['label' => 'Convenios',                'href' => $base . '/modulos/convenios/index.php',       'icon' => 'handshake'],
+    'horarios'   => ['label' => 'Buscar Maestro',           'href' => $base . '/modulos/horarios/index.php',        'icon' => 'manage_search'],
+    'requisitos' => ['label' => 'Serv. Social / Residencia','href' => $base . '/modulos/requisitos/residencia.php', 'icon' => 'checklist'],
+    'inscripcion'=> ['label' => 'Inscripción',              'href' => $base . '/modulos/visitantes/nuevoIngreso.php','icon' => 'school'],
 ];
 ?>
 <!DOCTYPE html>
@@ -186,16 +187,7 @@ $nav_items = [
       <a class="tsj-menu-item <?= $tsj_module === $key ? 'active' : '' ?>"
          href="<?= htmlspecialchars($item['href'], ENT_QUOTES, 'UTF-8') ?>"
          <?= $tsj_module === $key ? 'aria-current="page"' : '' ?>>
-        <span class="material-symbols-rounded" aria-hidden="true"><?php
-          $icons = [
-            'visitantes' => 'badge',
-            'biblioteca' => 'menu_book',
-            'convenios'  => 'handshake',
-            'horarios'   => 'calendar_month',
-            'requisitos' => 'checklist',
-          ];
-          echo $icons[$key] ?? 'circle';
-        ?></span>
+        <span class="material-symbols-rounded" aria-hidden="true"><?= htmlspecialchars($item['icon'] ?? 'circle') ?></span>
         <?= htmlspecialchars($item['label'], ENT_QUOTES, 'UTF-8') ?>
       </a>
     <?php endforeach; ?>

@@ -1,5 +1,4 @@
 <?php
-/* Convenios — vista pública. Login centralizado en /plataforma/login.php */
 require_once __DIR__ . '/src/security_headers.php';
 
 $tsj_module    = 'convenios';
@@ -10,7 +9,12 @@ $tsj_head_extra = '<link rel="stylesheet"'
     . ' integrity="sha384-9zhnRArCpusIVIudEVdI3QmXKH9nCjEGc2rNvdcQ1utx3a3zbLtW3rBOeJ2PvupL"'
     . ' crossorigin="anonymous" />';
 $tsj_no_security_headers = true;
+require_once __DIR__ . '/../../shared/lib/auth.php';
+require_once __DIR__ . '/../../shared/config.php';
 require_once __DIR__ . '/../../shared/header.php';
+
+// CSRF para el modal de sugerir empresa
+$_csrf_token = csrfToken();
 ?>
 
 <main id="main">
@@ -71,29 +75,14 @@ require_once __DIR__ . '/../../shared/header.php';
     </a>
   </div>
 
-  <!-- Sugerir empresa / Acceso administrativo -->
+  <!-- Sugerir empresa -->
   <div class="w-full flex flex-col items-center gap-2 mb-6">
     <button class="login-button" id="openSuggestModalBtn"
             aria-expanded="false" aria-controls="suggestModalOverlay"
             aria-haspopup="dialog">
       Sugerir una empresa
     </button>
-    <?php if (empty($_SESSION['authenticated'])): ?>
-    <button type="button" class="login-link"
-            aria-haspopup="dialog" aria-controls="loginModalOverlay">
-      Iniciar sesión
-    </button>
-    <?php endif; ?>
   </div>
-
-  <?php if (isset($_SESSION['authenticated']) && $_SESSION['authenticated'] === true): ?>
-  <div class="w-full p-6 flex justify-center gap-6 flex-wrap bg-base_blue-500 text-white text-center rounded-lg mb-10">
-    <a href="src/pages/form/formulario.php"
-       class="px-6 py-2 bg-white text-base_blue-500 font-bold rounded hover:bg-gray-200 transition">
-      Solicitar convenio
-    </a>
-  </div>
-  <?php endif; ?>
 
 </main>
 
@@ -110,98 +99,25 @@ require_once __DIR__ . '/../../shared/header.php';
             aria-label="Cerrar formulario de sugerencia">&times;</button>
     <h2 id="suggestModalTitle">Sugerir una empresa</h2>
     <form id="suggestForm">
-      <input type="hidden" name="csrf_token"
-             value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
+      <input type="hidden" name="_csrf" value="<?= htmlspecialchars($_csrf_token, ENT_QUOTES, 'UTF-8') ?>">
       <div class="login-input-container">
         <label for="sug-empresa" class="sr-only">Nombre de la empresa</label>
         <input type="text" id="sug-empresa" name="nombre_empresa"
-               placeholder="Nombre de la empresa" required maxlength="200"
-               aria-label="Nombre de la empresa" />
+               placeholder="Nombre de la empresa" required maxlength="200" />
       </div>
       <div class="login-input-container">
-        <label for="sug-correo" class="sr-only">Correo de contacto con la empresa</label>
+        <label for="sug-correo" class="sr-only">Correo de contacto</label>
         <input type="email" id="sug-correo" name="correo_empresa"
-               placeholder="Correo de contacto con la empresa" required maxlength="254"
-               aria-label="Correo de contacto con la empresa" />
+               placeholder="Correo de contacto con la empresa" required maxlength="254" />
       </div>
       <div class="login-input-container">
-        <label for="sug-contacto" class="sr-only">Nombre de la persona de contacto</label>
+        <label for="sug-contacto" class="sr-only">Nombre del contacto</label>
         <input type="text" id="sug-contacto" name="nombre_contacto"
-               placeholder="Nombre de la persona con la que se contactará" required maxlength="200"
-               aria-label="Nombre de la persona de contacto" />
+               placeholder="Nombre de la persona con la que se contactará" required maxlength="200" />
       </div>
       <div id="suggestFormError" class="login-error" role="alert" style="display:none;"></div>
       <button type="submit" class="login-button">Enviar</button>
     </form>
-  </div>
-</div>
-
-<!-- Modal de Login -->
-<div class="login-modal-overlay <?= $modalOpen ?>" id="loginModalOverlay"
-     role="dialog" aria-modal="true" aria-labelledby="loginModalTitle"
-     aria-hidden="<?= $modalHidden ?>">
-  <div class="login-modal">
-    <button class="login-close-button" id="closeLoginModal"
-            aria-label="Cerrar modal de inicio de sesión">&times;</button>
-    <h2 id="loginModalTitle">Iniciar Sesión</h2>
-    <p class="login-subtitle">Introduce tus datos para iniciar sesión</p>
-
-    <?php if ($loginError !== null): ?>
-      <p class="login-error" role="alert"><?= htmlspecialchars($loginError, ENT_QUOTES, 'UTF-8') ?></p>
-    <?php endif; ?>
-
-    <form id="loginForm" method="POST" action="">
-      <input type="hidden" name="csrf_token"
-             value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
-
-      <div class="login-form-group">
-        <label for="conv-email">Correo</label>
-        <div class="login-input-container">
-          <span class="login-icon email-icon" aria-hidden="true">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <rect width="20" height="16" x="2" y="4" rx="2" />
-              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-            </svg>
-          </span>
-          <input type="email" id="conv-email" name="email"
-                 placeholder="admin@mail.com" required autocomplete="email" maxlength="254">
-        </div>
-      </div>
-
-      <div class="login-form-group">
-        <label for="conv-password">Contraseña</label>
-        <div class="login-input-container">
-          <span class="login-icon lock-icon" aria-hidden="true">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
-          </span>
-          <input type="password" id="conv-password" name="password"
-                 placeholder="••••••••" required autocomplete="current-password">
-          <button type="button" class="toggle-password" id="togglePassword"
-                  aria-label="Mostrar contraseña">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
-          </button>
-        </div>
-      </div>
-      <button type="submit" class="login-button">Acceder</button>
-    </form>
-
-    <?php if (isset($_SESSION['authenticated']) && $_SESSION['authenticated']): ?>
-      <form method="POST" action="" style="display:inline; margin-top:12px;">
-        <input type="hidden" name="csrf_token"
-               value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
-        <input type="hidden" name="logout" value="1">
-        <button type="submit" class="logout-button">Cerrar Sesión</button>
-      </form>
-    <?php endif; ?>
   </div>
 </div>
 

@@ -9,7 +9,7 @@ try {
 }
 
 try {
-    $carreras = $pdo->query("SELECT id_carrera, nombre_carrera FROM carreras")->fetchAll();
+    $carreras = $pdo->query("SELECT id AS id_carrera, nombre AS nombre_carrera FROM carreras ORDER BY orden")->fetchAll();
 } catch (\PDOException $e) {
     error_log('horarios/index carreras error: ' . $e->getMessage());
     $carreras = [];
@@ -37,12 +37,12 @@ $sql_base = "
     SELECT h.id_horario,
            p.nombre    AS nombre_profesor,
            p.apellido  AS apellido_profesor,
-           c.nombre_carrera,
+           c.nombre AS nombre_carrera,
            h.semestre,
            h.imagen_horario
     FROM   horarios h
     JOIN   profesores p ON h.id_profesor = p.id_profesor
-    JOIN   carreras   c ON h.id_carrera  = c.id_carrera
+    JOIN   carreras   c ON h.id_carrera  = c.id
     $where
 ";
 

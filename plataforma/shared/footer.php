@@ -9,18 +9,20 @@ $base = PLATAFORMA_URL;
 
 // Mapa módulo → página de admin
 $_tsj_admin_links = [
-    'visitantes' => $base . '/admin/visitantes.php',
-    'biblioteca' => $base . '/admin/biblioteca.php',
-    'convenios'  => $base . '/admin/convenios.php',
-    'horarios'   => $base . '/admin/horarios.php',
-    'requisitos' => $base . '/admin/requisitos.php',
+    'visitantes'  => $base . '/admin/visitantes.php',
+    'biblioteca'  => $base . '/admin/biblioteca.php',
+    'convenios'   => $base . '/admin/convenios.php',
+    'horarios'    => $base . '/admin/horarios.php',
+    'requisitos'  => $base . '/admin/requisitos.php',
+    'inscripcion' => $base . '/admin/visitantes.php',
 ];
 $nav_items = $nav_items ?? [
-    'visitantes' => ['label' => 'Visitantes',  'href' => $base . '/modulos/visitantes/index.php'],
-    'biblioteca' => ['label' => 'Biblioteca',   'href' => $base . '/modulos/biblioteca/buscar.php'],
-    'convenios'  => ['label' => 'Convenios',    'href' => $base . '/modulos/convenios/index.php'],
-    'horarios'   => ['label' => 'Horarios',     'href' => $base . '/modulos/horarios/index.php'],
-    'requisitos' => ['label' => 'Requisitos',   'href' => $base . '/modulos/requisitos/residencia.php'],
+    'visitantes' => ['label' => 'Directorio',               'href' => $base . '/modulos/visitantes/Directorio.php',  'icon' => 'contacts'],
+    'biblioteca' => ['label' => 'Biblioteca',               'href' => $base . '/modulos/biblioteca/buscar.php',      'icon' => 'menu_book'],
+    'convenios'  => ['label' => 'Convenios',                'href' => $base . '/modulos/convenios/index.php',        'icon' => 'handshake'],
+    'horarios'   => ['label' => 'Buscar Maestro',           'href' => $base . '/modulos/horarios/index.php',         'icon' => 'manage_search'],
+    'requisitos' => ['label' => 'Serv. Social / Residencia','href' => $base . '/modulos/requisitos/residencia.php',  'icon' => 'checklist'],
+    'inscripcion'=> ['label' => 'Inscripción',              'href' => $base . '/modulos/visitantes/nuevoIngreso.php','icon' => 'school'],
 ];
 ?>
 <?php if (isGlobalAdmin() && isset($tsj_module, $_tsj_admin_links[$tsj_module])): ?>

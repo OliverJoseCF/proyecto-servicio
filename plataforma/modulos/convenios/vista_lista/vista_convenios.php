@@ -79,48 +79,65 @@ require_once __DIR__ . '/../../../shared/header.php';
 ?>
 
 <style>
+.conv-page { max-width: 1100px; margin: 0 auto; padding: 24px 20px 56px; }
+.conv-header { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
+.conv-header h1 { font-size:1.4rem; font-weight:700; color:#1a0960; margin:0; }
+.conv-volver { margin-left:auto; color:#32129a; font-size:13px; font-weight:600; text-decoration:none; white-space:nowrap; }
+.conv-volver:hover { text-decoration:underline; }
+
 .filtros-bar {
-    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
-    padding: 16px 24px; background: #f8f9ff;
-    border-bottom: 1px solid #e8eaf2; margin-bottom: 20px;
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    padding: 14px 18px; background: #f8f9ff;
+    border: 1px solid #e8eaf2; border-radius: 10px; margin-bottom: 20px;
 }
-.filtro-label { font-size: 12px; font-weight: 700; color: #8892a8; text-transform: uppercase; letter-spacing: 1px; }
+.filtro-label { font-size: 11px; font-weight: 700; color: #8892a8; text-transform: uppercase; letter-spacing: 1px; white-space:nowrap; }
 .filtro-pills { display: flex; gap: 6px; flex-wrap: wrap; }
 .filtro-pill {
-    padding: 5px 14px; border-radius: 99px; font-size: 12px; font-weight: 600;
+    padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: 600;
     border: 1.5px solid #d0d5e8; background: #fff; color: #4a5170;
     text-decoration: none; transition: all .18s;
 }
 .filtro-pill:hover { border-color: #32129a; color: #32129a; }
 .filtro-pill.active { background: #32129a; color: #fff; border-color: #32129a; }
-.conv-table-wrap { padding: 0 24px 40px; overflow-x: auto; }
-.conv-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+.conv-table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid #e8eaf2; }
+.conv-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .conv-table th {
     background: #f0f2f7; color: #4a5170; font-weight: 700;
-    padding: 10px 14px; text-align: left; font-size: 12px;
-    text-transform: uppercase; letter-spacing: .5px; border-bottom: 2px solid #e8eaf2;
+    padding: 10px 14px; text-align: left; font-size: 11px;
+    text-transform: uppercase; letter-spacing: .5px;
+    border-bottom: 2px solid #e8eaf2; white-space: nowrap;
 }
-.conv-table td { padding: 12px 14px; border-bottom: 1px solid #f0f2f7; vertical-align: middle; }
+.conv-table td { padding: 11px 14px; border-bottom: 1px solid #f0f2f7; vertical-align: middle; }
+.conv-table tbody tr:last-child td { border-bottom: none; }
 .conv-table tr:hover td { background: #f8f9ff; }
 .badge {
-    display: inline-block; padding: 3px 10px; border-radius: 99px;
-    font-size: 11px; font-weight: 700;
+    display: inline-block; padding: 3px 9px; border-radius: 99px;
+    font-size: 11px; font-weight: 700; white-space: nowrap;
 }
 .badge-tipo    { background: #ede9ff; color: #32129a; }
 .badge-sector  { background: #e0f2fe; color: #0369a1; }
 .badge-vence   { background: #fef3c7; color: #92400e; }
 .badge-vencido { background: #fee2e2; color: #991b1b; }
-.conv-empty { text-align: center; padding: 3rem; color: #9ca3af; }
-.fila-busqueda { display:flex;align-items:center;gap:12px;padding:20px 24px 0; }
-.fila-busqueda h1 { font-size:1.4rem;font-weight:700;color:#1a0960;margin:0; }
+.conv-empty { text-align: center; padding: 3rem; color: #9ca3af; font-size: 14px; }
+.conv-count { font-size: 12px; color: #8892a8; margin-bottom: 10px; }
+
+/* Ocultar columnas menos importantes en pantallas pequeñas */
+@media (max-width: 768px) {
+  .conv-table .col-correo,
+  .conv-table .col-vence { display: none; }
+}
+@media (max-width: 540px) {
+  .conv-table .col-sector,
+  .conv-table .col-carrera { display: none; }
+}
 </style>
 
 <main id="main">
-  <div class="fila-busqueda">
+<div class="conv-page">
+  <div class="conv-header">
     <h1>Convenios<?= $nombreCarrera ? ' — ' . htmlspecialchars($nombreCarrera) : '' ?></h1>
-    <a href="../index.php" style="margin-left:auto;color:#32129a;font-size:13px;font-weight:600;text-decoration:none">
-      ← Volver
-    </a>
+    <a href="../index.php" class="conv-volver">← Volver</a>
   </div>
 
   <!-- ── Filtros ────────────────────────────────────────────── -->
@@ -158,17 +175,20 @@ require_once __DIR__ . '/../../../shared/header.php';
   </div>
 
   <!-- ── Tabla ─────────────────────────────────────────────── -->
+  <?php if (!empty($convenios)): ?>
+  <p class="conv-count"><?= count($convenios) ?> convenio<?= count($convenios) !== 1 ? 's' : '' ?> encontrado<?= count($convenios) !== 1 ? 's' : '' ?></p>
+  <?php endif; ?>
   <div class="conv-table-wrap">
     <table class="conv-table">
       <thead>
         <tr>
           <th>Empresa</th>
           <th>Tipo</th>
-          <th>Sector</th>
-          <th>Carrera</th>
+          <th class="col-sector">Sector</th>
+          <th class="col-carrera">Carrera</th>
           <th>Contacto</th>
-          <th>Correo</th>
-          <th>Vencimiento</th>
+          <th class="col-correo">Correo</th>
+          <th class="col-vence">Vencimiento</th>
         </tr>
       </thead>
       <tbody>
@@ -184,17 +204,17 @@ require_once __DIR__ . '/../../../shared/header.php';
         <tr>
           <td style="font-weight:600;color:#1a0960"><?= htmlspecialchars($cv['nombre']) ?></td>
           <td><span class="badge badge-tipo"><?= htmlspecialchars($tipoLabels[$cv['tipo_convenio']] ?? $cv['tipo_convenio']) ?></span></td>
-          <td><span class="badge badge-sector"><?= htmlspecialchars($sectorLabels[$cv['sector']] ?? $cv['sector']) ?></span></td>
-          <td><?= htmlspecialchars($cv['carrera_clave'] ?? '—') ?></td>
+          <td class="col-sector"><span class="badge badge-sector"><?= htmlspecialchars($sectorLabels[$cv['sector']] ?? $cv['sector']) ?></span></td>
+          <td class="col-carrera"><?= htmlspecialchars($cv['carrera_clave'] ?? '—') ?></td>
           <td><?= htmlspecialchars($cv['nombre_contacto'] ?? '—') ?></td>
-          <td>
+          <td class="col-correo">
             <?php if ($cv['correo_contacto']): ?>
-              <a href="mailto:<?= htmlspecialchars($cv['correo_contacto']) ?>" style="color:#32129a">
+              <a href="mailto:<?= htmlspecialchars($cv['correo_contacto']) ?>" style="color:#32129a;font-size:12.5px">
                 <?= htmlspecialchars($cv['correo_contacto']) ?>
               </a>
             <?php else: ?>—<?php endif; ?>
           </td>
-          <td>
+          <td class="col-vence">
             <span class="badge <?= $vencida ? 'badge-vencido' : 'badge-vence' ?>">
               <?= htmlspecialchars($fechaStr) ?>
             </span>
@@ -204,6 +224,7 @@ require_once __DIR__ . '/../../../shared/header.php';
       </tbody>
     </table>
   </div>
+</div><!-- /conv-page -->
 </main>
 
 <?php require_once __DIR__ . '/../../../shared/footer.php'; ?>

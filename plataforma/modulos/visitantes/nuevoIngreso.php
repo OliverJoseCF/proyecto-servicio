@@ -44,9 +44,6 @@ require_once __DIR__ . '/../../shared/header.php';
     </div>
   </div>
 
-  <a href="index.php" class="top-right" aria-label="Volver al menú principal">
-    <img src="imagenes/casa.png" alt="">
-  </a>
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"

@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../shared/config.php';
 
-define('DB_NAME', DB_HORARIOS);
+// DB_NAME ya está definido en shared/config.php apuntando a kiosko_tsj
 
 // Rutas de archivos de horarios (PDFs/imágenes subidas)
 define('HORARIOS_DIR', __DIR__ . '/horarios/');

@@ -312,57 +312,68 @@ require_once __DIR__ . '/shared/header.php';
 
     <div class="portal-grid">
 
-      <a href="<?= $base ?>/modulos/visitantes/index.php" class="portal-card">
-        <div class="portal-card-icon" aria-hidden="true">
+      <a href="<?= $base ?>/modulos/visitantes/Directorio.php" class="portal-card">
+        <div class="portal-card-icon" style="background:#ede9ff" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
         <div class="portal-card-body">
-          <h2>Visitantes</h2>
-          <p>Directorio institucional, docentes, carreras y servicios del tecnológico.</p>
+          <h2>Directorio</h2>
+          <p>Conoce al personal institucional: departamento, correo, extensión y ubicación.</p>
           <div class="portal-card-arrow" aria-hidden="true">Acceder <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
         </div>
       </a>
 
       <a href="<?= $base ?>/modulos/biblioteca/buscar.php" class="portal-card">
-        <div class="portal-card-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <div class="portal-card-icon" style="background:#dcfce7" aria-hidden="true">
+          <svg viewBox="0 0 24 24" style="stroke:#16a34a"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         </div>
         <div class="portal-card-body">
           <h2>Biblioteca</h2>
-          <p>Catálogo de libros, búsqueda y solicitud de préstamos bibliográficos.</p>
+          <p>Consulta el catálogo de libros y solicita préstamos del acervo bibliográfico.</p>
           <div class="portal-card-arrow" aria-hidden="true">Acceder <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
         </div>
       </a>
 
       <a href="<?= $base ?>/modulos/convenios/index.php" class="portal-card">
-        <div class="portal-card-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M9 14l-4-4 4-4"/><path d="M5 10h11a4 4 0 0 1 0 8h-1"/></svg>
+        <div class="portal-card-icon" style="background:#fef3c7" aria-hidden="true">
+          <svg viewBox="0 0 24 24" style="stroke:#b45309"><path d="M9 14l-4-4 4-4"/><path d="M5 10h11a4 4 0 0 1 0 8h-1"/></svg>
         </div>
         <div class="portal-card-body">
           <h2>Convenios</h2>
-          <p>Directorio de convenios por carrera, residencia y servicio social.</p>
+          <p>Empresas vinculadas para residencia profesional, servicio social y prácticas.</p>
           <div class="portal-card-arrow" aria-hidden="true">Acceder <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
         </div>
       </a>
 
       <a href="<?= $base ?>/modulos/horarios/index.php" class="portal-card">
-        <div class="portal-card-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <div class="portal-card-icon" style="background:#e0e7ff" aria-hidden="true">
+          <svg viewBox="0 0 24 24" style="stroke:#4338ca"><circle cx="11" cy="11" r="7"/><path d="M11 8v3l2 2"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </div>
         <div class="portal-card-body">
-          <h2>Horarios</h2>
-          <p>Búsqueda de maestros y consulta de horarios por carrera.</p>
+          <h2>Buscar Maestro</h2>
+          <p>Encuentra a tus maestros, consulta sus horarios y datos de contacto.</p>
           <div class="portal-card-arrow" aria-hidden="true">Acceder <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
         </div>
       </a>
 
       <a href="<?= $base ?>/modulos/requisitos/residencia.php" class="portal-card">
-        <div class="portal-card-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <div class="portal-card-icon" style="background:#ffe4e8" aria-hidden="true">
+          <svg viewBox="0 0 24 24" style="stroke:#ec5a68"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         </div>
         <div class="portal-card-body">
-          <h2>Requisitos</h2>
-          <p>Residencia profesional y servicio social: checklist, documentos y descargas.</p>
+          <h2>Serv. Social / Residencia</h2>
+          <p>Requisitos, documentos descargables, fases del proceso y preguntas frecuentes.</p>
+          <div class="portal-card-arrow" aria-hidden="true">Acceder <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+      </a>
+
+      <a href="<?= $base ?>/modulos/visitantes/nuevoIngreso.php" class="portal-card">
+        <div class="portal-card-icon" style="background:#f0fdf4" aria-hidden="true">
+          <svg viewBox="0 0 24 24" style="stroke:#16a34a"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/></svg>
+        </div>
+        <div class="portal-card-body">
+          <h2>Inscripción y Reinscripción</h2>
+          <p>Información sobre el proceso de nuevo ingreso, requisitos y fechas de reinscripción.</p>
           <div class="portal-card-arrow" aria-hidden="true">Acceder <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
         </div>
       </a>
