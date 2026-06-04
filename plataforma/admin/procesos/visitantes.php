@@ -10,11 +10,13 @@ if ($accion === 'directorio_agregar') {
     $puesto   = str('puesto', 150);
     $correo   = str('correo', 254);
     $telefono = str('telefono', 30) ?: 'S/N';
+    $extension= str('extension', 20);
+    $ubicacion= str('ubicacion_fisica', 200);
     $foto     = str('foto', 500);
     if (!$nombre) jsonErr('El nombre es requerido');
-    $db->prepare('INSERT INTO directorio (nombre,puesto,correo,telefono,foto)
-                  VALUES (?,?,?,?,?)')
-       ->execute([$nombre,$puesto,$correo,$telefono,$foto ?: null]);
+    $db->prepare('INSERT INTO directorio (nombre,puesto,correo,telefono,extension,ubicacion_fisica,foto)
+                  VALUES (?,?,?,?,?,?,?)')
+       ->execute([$nombre,$puesto,$correo,$telefono,$extension ?: null,$ubicacion ?: null,$foto ?: null]);
     jsonOk('Persona agregada', ['id' => $db->lastInsertId()]);
 }
 
@@ -24,10 +26,12 @@ if ($accion === 'directorio_editar') {
     $puesto   = str('puesto', 150);
     $correo   = str('correo', 254);
     $telefono = str('telefono', 30) ?: 'S/N';
+    $extension= str('extension', 20);
+    $ubicacion= str('ubicacion_fisica', 200);
     $foto     = str('foto', 500);
     if (!$id || !$nombre) jsonErr('Datos incompletos');
-    $db->prepare('UPDATE directorio SET nombre=?,puesto=?,correo=?,telefono=?,foto=? WHERE id=?')
-       ->execute([$nombre,$puesto,$correo,$telefono,$foto ?: null,$id]);
+    $db->prepare('UPDATE directorio SET nombre=?,puesto=?,correo=?,telefono=?,extension=?,ubicacion_fisica=?,foto=? WHERE id=?')
+       ->execute([$nombre,$puesto,$correo,$telefono,$extension ?: null,$ubicacion ?: null,$foto ?: null,$id]);
     jsonOk('Persona actualizada');
 }
 
@@ -129,19 +133,23 @@ if ($accion === 'secretaria_eliminar') {
 
 // ══ NUEVO INGRESO ══════════════════════════════════════════════
 if ($accion === 'nuevo_ingreso_guardar') {
-    $dia       = intVal('dia_examen');
-    $hora      = str('hora_examen', 10);
-    $lugar     = str('lugar_examen', 200);
-    $requisitos= str('requisitos', 5000);
+    $dia    = intVal('dia_examen');
+    $hora   = str('hora_examen', 10);
+    $lugar  = str('lugar_examen', 200);
+    $rawReq = str('requisitos', 5000);
     if ($dia < 1 || $dia > 31) jsonErr('Día inválido');
+
+    // Convertir texto (uno por línea) a JSON array
+    $arr        = array_values(array_filter(array_map('trim', explode("\n", $rawReq))));
+    $requisitos = json_encode($arr, JSON_UNESCAPED_UNICODE);
 
     $existe = $db->query('SELECT COUNT(*) FROM nuevo_ingreso_config')->fetchColumn();
     if ($existe) {
         $db->prepare('UPDATE nuevo_ingreso_config SET dia_examen=?,hora_examen=?,lugar_examen=?,requisitos=? WHERE id=1')
-           ->execute([$dia,$hora,$lugar,$requisitos]);
+           ->execute([$dia, $hora, $lugar, $requisitos]);
     } else {
         $db->prepare('INSERT INTO nuevo_ingreso_config (dia_examen,hora_examen,lugar_examen,requisitos) VALUES (?,?,?,?)')
-           ->execute([$dia,$hora,$lugar,$requisitos]);
+           ->execute([$dia, $hora, $lugar, $requisitos]);
     }
     jsonOk('Configuración de nuevo ingreso guardada');
 }

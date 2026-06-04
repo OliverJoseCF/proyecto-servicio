@@ -19,7 +19,7 @@ if (!isGlobalAdmin()) {
     exit(json_encode(['ok' => false, 'msg' => 'No autorizado']));
 }
 
-if (!verifyCsrf($_POST['csrf'] ?? '')) {
+if (!csrfVerify()) {
     http_response_code(403);
     exit(json_encode(['ok' => false, 'msg' => 'Token CSRF inválido']));
 }

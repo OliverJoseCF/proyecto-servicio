@@ -46,7 +46,9 @@ if ($accion === 'doc_agregar') {
     $tipo_arch = str('tipo_archivo', 30) ?: 'PDF';
     if (!in_array($tipo, ['residencia','servicio_social'])) jsonErr('Tipo inválido');
     if (!$nombre || !$url) jsonErr('Nombre y URL son requeridos');
-    $orden = (int)$db->query("SELECT COALESCE(MAX(orden),0)+1 FROM documentos_descargables WHERE tipo='$tipo'")->fetchColumn();
+    $stmtOrden = $db->prepare('SELECT COALESCE(MAX(orden),0)+1 FROM documentos_descargables WHERE tipo=?');
+    $stmtOrden->execute([$tipo]);
+    $orden = (int)$stmtOrden->fetchColumn();
     $db->prepare('INSERT INTO documentos_descargables (tipo,nombre,url,tipo_archivo,orden) VALUES (?,?,?,?,?)')
        ->execute([$tipo,$nombre,$url,$tipo_arch,$orden]);
     jsonOk('Documento agregado', ['id' => $db->lastInsertId()]);

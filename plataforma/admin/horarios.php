@@ -22,7 +22,7 @@ try {
     $db_ok    = false;
 }
 
-$csrf      = getCsrfToken();
+$csrf      = csrfToken();
 $base_img  = PLATAFORMA_URL . '/modulos/visitantes/imagenes/';
 require_once __DIR__ . '/_layout.php';
 ?>
@@ -80,7 +80,7 @@ require_once __DIR__ . '/_layout.php';
   <div class="adm-form-card" style="margin-top:20px">
     <div class="adm-form-title"><span class="material-symbols-rounded">school</span> <span id="form-prof-titulo">Agregar maestro</span></div>
     <form data-proc="horarios" data-accion="profesor_agregar" id="form-prof">
-      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="profesor_agregar" id="prof-accion">
       <input type="hidden" name="id" id="prof-id">
       <div class="adm-form-grid cols-3">
@@ -136,7 +136,7 @@ require_once __DIR__ . '/_layout.php';
   <div class="adm-form-card" style="margin-top:20px">
     <div class="adm-form-title"><span class="material-symbols-rounded">upload_file</span> Agregar / actualizar horario</div>
     <form data-proc="horarios" data-accion="horario_guardar" id="form-hor" enctype="multipart/form-data">
-      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="horario_guardar">
       <div class="adm-form-grid cols-3">
         <div class="adm-field"><label>Maestro <span style="color:var(--tsj-pink)">*</span></label>

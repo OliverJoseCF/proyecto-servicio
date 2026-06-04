@@ -40,7 +40,7 @@ if ($accion === 'horario_guardar') {
     $profesor_id = intVal('profesor_id');
     $carrera_id  = intVal('carrera_id');
     $semestre    = str('semestre', 10);
-    $imagen      = str('imagen_horario', 500);
+    $imagen      = null; // se asigna solo si hay upload
     if (!$profesor_id) jsonErr('Selecciona un profesor');
 
     // Upload de archivo si viene
@@ -55,15 +55,22 @@ if ($accion === 'horario_guardar') {
         $imagen = $fname;
     }
 
-    $existe = $db->prepare('SELECT id_horario FROM horarios WHERE id_profesor=? AND id_carrera<=>?');
-    $existe->execute([$profesor_id, $carrera_id ?: null]);
+    // Buscar si ya existe un horario para ese profesor+carrera
+    $carreraParam = $carrera_id ?: null;
+    $existe = $db->prepare(
+        'SELECT id_horario, imagen_horario FROM horarios WHERE id_profesor=?
+         AND (id_carrera = ? OR (id_carrera IS NULL AND ? IS NULL))'
+    );
+    $existe->execute([$profesor_id, $carreraParam, $carreraParam]);
     if ($row = $existe->fetch()) {
+        // Si no se subió archivo nuevo, conservar el existente
+        $imagenFinal = $imagen ?? $row['imagen_horario'];
         $db->prepare('UPDATE horarios SET semestre=?,imagen_horario=?,updated_at=NOW() WHERE id_horario=?')
-           ->execute([$semestre,$imagen ?: null,$row['id_horario']]);
+           ->execute([$semestre, $imagenFinal, $row['id_horario']]);
         jsonOk('Horario actualizado');
     } else {
         $db->prepare('INSERT INTO horarios (id_profesor,id_carrera,semestre,imagen_horario) VALUES (?,?,?,?)')
-           ->execute([$profesor_id,$carrera_id ?: null,$semestre,$imagen ?: null]);
+           ->execute([$profesor_id, $carrera_id ?: null, $semestre, $imagen]);
         jsonOk('Horario guardado', ['id' => $db->lastInsertId()]);
     }
 }

@@ -18,13 +18,14 @@ $theme_v  = filemtime(dirname(__DIR__) . '/shared/assets/css/theme.css');
 $admin_v  = filemtime(__DIR__ . '/assets/css/admin.css');
 
 $nav = [
-    'dashboard'     => ['label' => 'Dashboard',           'icon' => 'dashboard',      'href' => $base . '/admin/'],
-    'visitantes'    => ['label' => 'Visitantes',          'icon' => 'badge',          'href' => $base . '/admin/visitantes.php'],
-    'biblioteca'    => ['label' => 'Biblioteca',          'icon' => 'menu_book',      'href' => $base . '/admin/biblioteca.php'],
-    'convenios'     => ['label' => 'Convenios',           'icon' => 'handshake',      'href' => $base . '/admin/convenios.php'],
-    'horarios'      => ['label' => 'Buscar Maestro',      'icon' => 'calendar_month', 'href' => $base . '/admin/horarios.php'],
-    'requisitos'    => ['label' => 'Serv. Social / Residencia', 'icon' => 'checklist', 'href' => $base . '/admin/requisitos.php'],
-    'configuracion' => ['label' => 'Configuración',       'icon' => 'settings',       'href' => $base . '/admin/configuracion.php'],
+    'dashboard'     => ['label' => 'Dashboard',                'icon' => 'dashboard',        'href' => $base . '/admin/'],
+    'inicio'        => ['label' => 'Inicio del portal',        'icon' => 'home',             'href' => $base . '/admin/inicio.php'],
+    'visitantes'    => ['label' => 'Visitantes',               'icon' => 'badge',            'href' => $base . '/admin/visitantes.php'],
+    'biblioteca'    => ['label' => 'Biblioteca',               'icon' => 'menu_book',        'href' => $base . '/admin/biblioteca.php'],
+    'convenios'     => ['label' => 'Convenios',                'icon' => 'handshake',        'href' => $base . '/admin/convenios.php'],
+    'horarios'      => ['label' => 'Buscar Maestro',           'icon' => 'calendar_month',   'href' => $base . '/admin/horarios.php'],
+    'requisitos'    => ['label' => 'Serv. Social / Residencia','icon' => 'checklist',        'href' => $base . '/admin/requisitos.php'],
+    'configuracion' => ['label' => 'Configuración',            'icon' => 'settings',         'href' => $base . '/admin/configuracion.php'],
 ];
 ?>
 <!DOCTYPE html>

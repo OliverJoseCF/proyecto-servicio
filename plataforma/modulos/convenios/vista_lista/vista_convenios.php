@@ -1,129 +1,209 @@
 <?php
 require_once __DIR__ . '/../src/security_headers.php';
-require_once __DIR__ . '/../src/pages/conexion.php';
+require_once __DIR__ . '/../../../shared/config.php';
 
+// ── Filtros GET ──────────────────────────────────────────────────
 $carrerasValidas = ['IADEV','IM','ISC','II','LG','IGE'];
-$carreraNombres  = [
-    'IADEV' => 'Ingeniería en Animación Digital y Efectos Visuales',
+$tiposValidos    = ['residencia','servicio_social','practicas','otro'];
+$sectoresValidos = ['privado','publico','ac','otro'];
+
+$carrera = isset($_GET['carrera']) && in_array($_GET['carrera'], $carrerasValidas, true) ? $_GET['carrera'] : '';
+$tipo    = isset($_GET['tipo'])    && in_array($_GET['tipo'],    $tiposValidos,    true) ? $_GET['tipo']    : '';
+$sector  = isset($_GET['sector'])  && in_array($_GET['sector'],  $sectoresValidos,  true) ? $_GET['sector']  : '';
+
+$carreraNombres = [
+    'IADEV' => 'Ing. en Animación Digital y Efectos Visuales',
     'IM'    => 'Ingeniería Mecatrónica',
-    'ISC'   => 'Ingeniería en Sistemas Computacionales',
+    'ISC'   => 'Ing. en Sistemas Computacionales',
     'II'    => 'Ingeniería Industrial',
     'LG'    => 'Gastronomía',
-    'IGE'   => 'Ingeniería en Gestión Empresarial',
+    'IGE'   => 'Ing. en Gestión Empresarial',
+];
+$tipoLabels = [
+    'residencia'     => 'Residencia profesional',
+    'servicio_social'=> 'Servicio social',
+    'practicas'      => 'Prácticas profesionales',
+    'otro'           => 'Otro',
+];
+$sectorLabels = [
+    'privado' => 'Privado',
+    'publico' => 'Público',
+    'ac'      => 'Asociación Civil',
+    'otro'    => 'Otro',
 ];
 
-$carrera = isset($_GET['carrera']) ? trim($_GET['carrera']) : '';
-if ($carrera !== '' && !in_array($carrera, $carrerasValidas, true)) {
-    $carrera = '';
+// ── Query dinámica ───────────────────────────────────────────────
+try {
+    $db     = getPDO(DB_NAME);
+    $where  = ['cv.activo = 1'];
+    $params = [];
+
+    if ($carrera !== '') {
+        $where[]  = 'c.clave = ?';
+        $params[] = $carrera;
+    }
+    if ($tipo !== '') {
+        $where[]  = 'cv.tipo_convenio = ?';
+        $params[] = $tipo;
+    }
+    if ($sector !== '') {
+        $where[]  = 'cv.sector = ?';
+        $params[] = $sector;
+    }
+
+    $sql = 'SELECT cv.id, cv.nombre, cv.tipo_convenio, cv.sector,
+                   cv.nombre_contacto, cv.correo_contacto, cv.telefono_contacto,
+                   cv.logo, cv.vencimiento,
+                   c.clave AS carrera_clave, c.nombre AS carrera_nombre
+            FROM convenios cv
+            LEFT JOIN carreras c ON cv.carrera_id = c.id
+            WHERE ' . implode(' AND ', $where) . '
+            ORDER BY cv.nombre';
+
+    $stmt = $db->prepare($sql);
+    $stmt->execute($params);
+    $convenios = $stmt->fetchAll();
+    $db_ok = true;
+} catch (\Throwable $e) {
+    $convenios = [];
+    $db_ok     = false;
 }
 
-$resultado = null;
-if ($carrera !== '') {
-    try {
-        $stmt = $conn->prepare('SELECT id, nombre, convenio, logo, contacto, vencimiento FROM convenios WHERE carrera = ?');
-        $stmt->bind_param('s', $carrera);
-        $stmt->execute();
-        $resultado = $stmt->get_result();
-        $stmt->close();
-    } catch (mysqli_sql_exception $e) {
-        error_log('Error vista_convenios: ' . $e->getMessage());
-    }
-}
-if ($resultado === null) {
-    try {
-        $resultado = $conn->query('SELECT id, nombre, convenio, logo, contacto, vencimiento FROM convenios');
-    } catch (mysqli_sql_exception $e) {
-        error_log('Error vista_convenios fallback: ' . $e->getMessage());
-    }
-}
-$conn->close();
-
-$nombreCarrera = ($carrera !== '' && isset($carreraNombres[$carrera])) ? $carreraNombres[$carrera] : '';
+$nombreCarrera = $carrera !== '' && isset($carreraNombres[$carrera]) ? $carreraNombres[$carrera] : '';
 
 $tsj_module    = 'convenios';
 $tsj_title     = 'Convenios' . ($nombreCarrera ? ' — ' . $nombreCarrera : '');
-$tsj_extra_css = [
-    'estilo/estilo.css',
-    'https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css',
-];
+$tsj_extra_css = ['estilo/estilo.css'];
 $tsj_no_security_headers = true;
 require_once __DIR__ . '/../../../shared/header.php';
 ?>
 
-<main id="main">
+<style>
+.filtros-bar {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    padding: 16px 24px; background: #f8f9ff;
+    border-bottom: 1px solid #e8eaf2; margin-bottom: 20px;
+}
+.filtro-label { font-size: 12px; font-weight: 700; color: #8892a8; text-transform: uppercase; letter-spacing: 1px; }
+.filtro-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.filtro-pill {
+    padding: 5px 14px; border-radius: 99px; font-size: 12px; font-weight: 600;
+    border: 1.5px solid #d0d5e8; background: #fff; color: #4a5170;
+    text-decoration: none; transition: all .18s;
+}
+.filtro-pill:hover { border-color: #32129a; color: #32129a; }
+.filtro-pill.active { background: #32129a; color: #fff; border-color: #32129a; }
+.conv-table-wrap { padding: 0 24px 40px; overflow-x: auto; }
+.conv-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.conv-table th {
+    background: #f0f2f7; color: #4a5170; font-weight: 700;
+    padding: 10px 14px; text-align: left; font-size: 12px;
+    text-transform: uppercase; letter-spacing: .5px; border-bottom: 2px solid #e8eaf2;
+}
+.conv-table td { padding: 12px 14px; border-bottom: 1px solid #f0f2f7; vertical-align: middle; }
+.conv-table tr:hover td { background: #f8f9ff; }
+.badge {
+    display: inline-block; padding: 3px 10px; border-radius: 99px;
+    font-size: 11px; font-weight: 700;
+}
+.badge-tipo    { background: #ede9ff; color: #32129a; }
+.badge-sector  { background: #e0f2fe; color: #0369a1; }
+.badge-vence   { background: #fef3c7; color: #92400e; }
+.badge-vencido { background: #fee2e2; color: #991b1b; }
+.conv-empty { text-align: center; padding: 3rem; color: #9ca3af; }
+.fila-busqueda { display:flex;align-items:center;gap:12px;padding:20px 24px 0; }
+.fila-busqueda h1 { font-size:1.4rem;font-weight:700;color:#1a0960;margin:0; }
+</style>
 
+<main id="main">
   <div class="fila-busqueda">
-    <h1>Convenios<?= $nombreCarrera ? ' — ' . htmlspecialchars($nombreCarrera, ENT_QUOTES, 'UTF-8') : '' ?></h1>
-    <div class="botones-container">
-      <a href="../index.php" aria-label="Volver al inicio de convenios">
-        <img src="img/icono-regresar.png" alt="" aria-hidden="true" class="btn-volver" />
-      </a>
+    <h1>Convenios<?= $nombreCarrera ? ' — ' . htmlspecialchars($nombreCarrera) : '' ?></h1>
+    <a href="../index.php" style="margin-left:auto;color:#32129a;font-size:13px;font-weight:600;text-decoration:none">
+      ← Volver
+    </a>
+  </div>
+
+  <!-- ── Filtros ────────────────────────────────────────────── -->
+  <?php
+  // Construir URL base manteniendo los filtros actuales excepto el que se cambia
+  function filtroUrl(string $campo, string $val): string {
+      $params = array_filter([
+          'carrera' => $_GET['carrera'] ?? '',
+          'tipo'    => $_GET['tipo']    ?? '',
+          'sector'  => $_GET['sector']  ?? '',
+      ]);
+      if ($val === '') {
+          unset($params[$campo]);
+      } else {
+          $params[$campo] = $val;
+      }
+      return '?' . http_build_query($params);
+  }
+  ?>
+  <div class="filtros-bar">
+    <span class="filtro-label">Tipo:</span>
+    <div class="filtro-pills">
+      <a href="<?= filtroUrl('tipo','') ?>" class="filtro-pill <?= $tipo===''?'active':'' ?>">Todos</a>
+      <?php foreach ($tipoLabels as $k => $l): ?>
+      <a href="<?= filtroUrl('tipo',$k) ?>" class="filtro-pill <?= $tipo===$k?'active':'' ?>"><?= $l ?></a>
+      <?php endforeach; ?>
+    </div>
+    <span class="filtro-label" style="margin-left:16px">Sector:</span>
+    <div class="filtro-pills">
+      <a href="<?= filtroUrl('sector','') ?>" class="filtro-pill <?= $sector===''?'active':'' ?>">Todos</a>
+      <?php foreach ($sectorLabels as $k => $l): ?>
+      <a href="<?= filtroUrl('sector',$k) ?>" class="filtro-pill <?= $sector===$k?'active':'' ?>"><?= $l ?></a>
+      <?php endforeach; ?>
     </div>
   </div>
 
-  <div class="datatable-container">
-    <table id="example" class="display" style="width:100%">
+  <!-- ── Tabla ─────────────────────────────────────────────── -->
+  <div class="conv-table-wrap">
+    <table class="conv-table">
       <thead>
         <tr>
-          <th scope="col">Id</th>
-          <th scope="col">Nombre</th>
-          <th scope="col">Convenio</th>
-          <th scope="col">Marca</th>
-          <th scope="col">Contacto</th>
-          <th scope="col">Vencimiento</th>
+          <th>Empresa</th>
+          <th>Tipo</th>
+          <th>Sector</th>
+          <th>Carrera</th>
+          <th>Contacto</th>
+          <th>Correo</th>
+          <th>Vencimiento</th>
         </tr>
       </thead>
       <tbody>
-      <?php if ($resultado): ?>
-        <?php while ($fila = $resultado->fetch_assoc()): ?>
-          <?php
-            $logoFile  = !empty($fila['logo']) ? basename($fila['logo']) : '';
-            $id        = (int) $fila['id'];
-            $fechaVenc = ($t = strtotime($fila['vencimiento'])) ? date('d/m/Y', $t) : '—';
-          ?>
-          <tr class="data-row" data-href="../vista_empresa/index.php?id=<?= $id ?>">
-            <td><?= $id ?></td>
-            <td><?= htmlspecialchars($fila['nombre'],   ENT_QUOTES, 'UTF-8') ?></td>
-            <td><?= htmlspecialchars($fila['convenio'], ENT_QUOTES, 'UTF-8') ?></td>
-            <td>
-              <?php if ($logoFile): ?>
-                <img src="../src/pages/upload/<?= htmlspecialchars($logoFile, ENT_QUOTES, 'UTF-8') ?>"
-                     width="50" height="50" style="object-fit:contain;"
-                     alt="Logo de <?= htmlspecialchars($fila['nombre'], ENT_QUOTES, 'UTF-8') ?>" />
-              <?php endif; ?>
-            </td>
-            <td><?= htmlspecialchars($fila['contacto'], ENT_QUOTES, 'UTF-8') ?></td>
-            <td><?= htmlspecialchars($fechaVenc, ENT_QUOTES, 'UTF-8') ?></td>
-          </tr>
-        <?php endwhile; ?>
-      <?php endif; ?>
+        <?php if (empty($convenios)): ?>
+        <tr><td colspan="7" class="conv-empty">No hay convenios con los filtros seleccionados.</td></tr>
+        <?php endif; ?>
+        <?php foreach ($convenios as $cv):
+          $venceTs = $cv['vencimiento'] ? strtotime($cv['vencimiento']) : null;
+          $hoyTs   = time();
+          $vencida = $venceTs && $venceTs < $hoyTs;
+          $fechaStr= $venceTs ? date('d/m/Y', $venceTs) : '—';
+        ?>
+        <tr>
+          <td style="font-weight:600;color:#1a0960"><?= htmlspecialchars($cv['nombre']) ?></td>
+          <td><span class="badge badge-tipo"><?= htmlspecialchars($tipoLabels[$cv['tipo_convenio']] ?? $cv['tipo_convenio']) ?></span></td>
+          <td><span class="badge badge-sector"><?= htmlspecialchars($sectorLabels[$cv['sector']] ?? $cv['sector']) ?></span></td>
+          <td><?= htmlspecialchars($cv['carrera_clave'] ?? '—') ?></td>
+          <td><?= htmlspecialchars($cv['nombre_contacto'] ?? '—') ?></td>
+          <td>
+            <?php if ($cv['correo_contacto']): ?>
+              <a href="mailto:<?= htmlspecialchars($cv['correo_contacto']) ?>" style="color:#32129a">
+                <?= htmlspecialchars($cv['correo_contacto']) ?>
+              </a>
+            <?php else: ?>—<?php endif; ?>
+          </td>
+          <td>
+            <span class="badge <?= $vencida ? 'badge-vencido' : 'badge-vence' ?>">
+              <?= htmlspecialchars($fechaStr) ?>
+            </span>
+          </td>
+        </tr>
+        <?php endforeach; ?>
       </tbody>
     </table>
   </div>
-
 </main>
-
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-        crossorigin="anonymous" defer></script>
-<script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"
-        integrity="sha384-AenwROccLjIcbIsJuEZmrLlBzwrhvO94q+wm9RwETq4Kkqv9npFR2qbpdMhsehX3"
-        crossorigin="anonymous" defer></script>
-<script src="https://cdn.datatables.net/2.2.2/js/dataTables.jquery.min.js"
-        integrity="sha384-ZSs6LKr2GoUPDyHrN+rCQgyHL1yUyok5xMniSrgeRG7rUvA6vTmxronM1eZOfjgz"
-        crossorigin="anonymous" defer></script>
-<script src="https://cdn.datatables.net/buttons/3.2.0/js/dataTables.buttons.min.js"
-        integrity="sha384-1yo9s/77ZWiY2Xvn1BPaWyS3ErmUO+k734D+PxbLD2Iv8WJt4miQdnhv8IiMMY7j"
-        crossorigin="anonymous" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
-        integrity="sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG"
-        crossorigin="anonymous" defer></script>
-<script src="https://cdn.datatables.net/buttons/3.2.0/js/buttons.html5.min.js"
-        integrity="sha384-MjweF+FY5MNbjB5ONlHWtlrou29MgBI/+acgSv4n5CBD79xUbMbLyka8NeCoK0D7"
-        crossorigin="anonymous" defer></script>
-<script src="https://cdn.datatables.net/buttons/3.2.0/js/buttons.print.min.js"
-        integrity="sha384-FvTRywo5HrkPlBKFrm2tT8aKxIcI/VU819roC/K/8UrVwrl4XsF3RKRKiCAKWNly"
-        crossorigin="anonymous" defer></script>
-<script src="script_convenios.js" defer></script>
 
 <?php require_once __DIR__ . '/../../../shared/footer.php'; ?>

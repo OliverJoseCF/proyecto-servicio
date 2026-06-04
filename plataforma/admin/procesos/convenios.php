@@ -8,6 +8,7 @@ $db     = db();
 if ($accion === 'convenio_agregar') {
     $nombre     = str('nombre', 300);
     $tipo       = str('tipo_convenio', 100);
+    $sector     = str('sector', 20) ?: 'privado';
     $carrera_id = intVal('carrera_id');
     $contacto   = str('nombre_contacto', 200);
     $correo     = str('correo_contacto', 254);
@@ -15,9 +16,9 @@ if ($accion === 'convenio_agregar') {
     $logo       = str('logo', 500);
     $vence      = str('vencimiento', 10) ?: null;
     if (!$nombre) jsonErr('El nombre de la empresa es requerido');
-    $db->prepare('INSERT INTO convenios (nombre,tipo_convenio,carrera_id,nombre_contacto,correo_contacto,telefono_contacto,logo,vencimiento)
-                  VALUES (?,?,?,?,?,?,?,?)')
-       ->execute([$nombre,$tipo,$carrera_id ?: null,$contacto,$correo,$telefono,$logo ?: null,$vence]);
+    $db->prepare('INSERT INTO convenios (nombre,tipo_convenio,sector,carrera_id,nombre_contacto,correo_contacto,telefono_contacto,logo,vencimiento)
+                  VALUES (?,?,?,?,?,?,?,?,?)')
+       ->execute([$nombre,$tipo,$sector,$carrera_id ?: null,$contacto,$correo,$telefono,$logo ?: null,$vence]);
     jsonOk('Convenio agregado', ['id' => $db->lastInsertId()]);
 }
 
@@ -25,6 +26,7 @@ if ($accion === 'convenio_editar') {
     $id         = intVal('id');
     $nombre     = str('nombre', 300);
     $tipo       = str('tipo_convenio', 100);
+    $sector     = str('sector', 20) ?: 'privado';
     $carrera_id = intVal('carrera_id');
     $contacto   = str('nombre_contacto', 200);
     $correo     = str('correo_contacto', 254);
@@ -32,8 +34,8 @@ if ($accion === 'convenio_editar') {
     $logo       = str('logo', 500);
     $vence      = str('vencimiento', 10) ?: null;
     if (!$id || !$nombre) jsonErr('Datos incompletos');
-    $db->prepare('UPDATE convenios SET nombre=?,tipo_convenio=?,carrera_id=?,nombre_contacto=?,correo_contacto=?,telefono_contacto=?,logo=?,vencimiento=? WHERE id=?')
-       ->execute([$nombre,$tipo,$carrera_id ?: null,$contacto,$correo,$telefono,$logo ?: null,$vence,$id]);
+    $db->prepare('UPDATE convenios SET nombre=?,tipo_convenio=?,sector=?,carrera_id=?,nombre_contacto=?,correo_contacto=?,telefono_contacto=?,logo=?,vencimiento=? WHERE id=?')
+       ->execute([$nombre,$tipo,$sector,$carrera_id ?: null,$contacto,$correo,$telefono,$logo ?: null,$vence,$id]);
     jsonOk('Convenio actualizado');
 }
 

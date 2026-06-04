@@ -29,7 +29,7 @@ try {
     $db_ok = false;
 }
 
-$csrf      = getCsrfToken();
+$csrf      = csrfToken();
 $base_img  = PLATAFORMA_URL . '/modulos/visitantes/imagenes/';
 
 require_once __DIR__ . '/_layout.php';
@@ -93,7 +93,7 @@ require_once __DIR__ . '/_layout.php';
   <div class="adm-form-card" style="margin-top:20px" id="form-dir-wrap">
     <div class="adm-form-title"><span class="material-symbols-rounded">person_add</span> <span id="form-dir-titulo">Agregar persona al directorio</span></div>
     <form data-proc="visitantes" data-accion="directorio_agregar" id="form-dir">
-      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="directorio_agregar" id="dir-accion">
       <input type="hidden" name="id" id="dir-id">
       <div class="adm-form-grid cols-3">
@@ -101,6 +101,8 @@ require_once __DIR__ . '/_layout.php';
         <div class="adm-field"><label>Puesto / Área</label><input type="text" name="puesto" id="dir-puesto"></div>
         <div class="adm-field"><label>Correo electrónico</label><input type="email" name="correo" id="dir-correo"></div>
         <div class="adm-field"><label>Teléfono</label><input type="tel" name="telefono" id="dir-telefono" placeholder="S/N"></div>
+        <div class="adm-field"><label>Extensión</label><input type="text" name="extension" id="dir-extension" placeholder="Ej. Ext. 101"></div>
+        <div class="adm-field"><label>Ubicación física</label><input type="text" name="ubicacion_fisica" id="dir-ubicacion" placeholder="Ej. Módulo A, Planta Baja"></div>
         <div class="adm-field"><label>Foto (nombre de archivo)</label><input type="text" name="foto" id="dir-foto" placeholder="ej. miguel.png"></div>
       </div>
       <div class="adm-form-actions">
@@ -155,7 +157,7 @@ require_once __DIR__ . '/_layout.php';
   <div class="adm-form-card" style="margin-top:20px">
     <div class="adm-form-title"><span class="material-symbols-rounded">school</span> <span id="form-doc-titulo">Agregar docente</span></div>
     <form data-proc="visitantes" data-accion="docente_agregar" id="form-doc">
-      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="docente_agregar" id="doc-accion">
       <input type="hidden" name="id" id="doc-id">
       <div class="adm-form-grid cols-3">
@@ -204,7 +206,7 @@ require_once __DIR__ . '/_layout.php';
   <div class="adm-form-card" style="margin-top:20px" id="form-coord-wrap" style="display:none">
     <div class="adm-form-title"><span class="material-symbols-rounded">manage_accounts</span> Editar coordinador</div>
     <form data-proc="visitantes" data-accion="coord_editar" id="form-coord">
-      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="coord_editar">
       <input type="hidden" name="id" id="coord-id">
       <div class="adm-form-grid cols-2">
@@ -228,7 +230,7 @@ require_once __DIR__ . '/_layout.php';
     </div>
     <div class="adm-section-body">
       <form data-proc="visitantes" data-accion="materias_guardar" class="form-materias">
-        <input type="hidden" name="csrf" value="<?= $csrf ?>">
+        <input type="hidden" name="_csrf" value="<?= $csrf ?>">
         <input type="hidden" name="accion" value="materias_guardar">
         <input type="hidden" name="carrera_id" value="<?= $c['id'] ?>">
         <div class="adm-list-editor" id="mat-list-<?= $c['id'] ?>">
@@ -295,7 +297,7 @@ require_once __DIR__ . '/_layout.php';
   <div class="adm-form-card" style="margin-top:20px">
     <div class="adm-form-title"><span class="material-symbols-rounded">person_add</span> <span id="form-sec-titulo">Agregar secretaria</span></div>
     <form data-proc="visitantes" data-accion="secretaria_agregar" id="form-sec">
-      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="secretaria_agregar" id="sec-accion">
       <input type="hidden" name="id" id="sec-id">
       <div class="adm-form-grid cols-2">
@@ -317,7 +319,7 @@ require_once __DIR__ . '/_layout.php';
   <div class="adm-form-card">
     <div class="adm-form-title"><span class="material-symbols-rounded">how_to_reg</span> Nuevo Ingreso — Configuración</div>
     <form data-proc="visitantes" data-accion="nuevo_ingreso_guardar">
-      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="nuevo_ingreso_guardar">
       <div class="adm-form-grid cols-2">
         <div class="adm-field"><label>Día del examen (del mes)</label><input type="number" name="dia_examen" value="<?= (int)($ni['dia_examen'] ?? 20) ?>" min="1" max="31" required></div>
@@ -384,8 +386,10 @@ function abrirEditar(tipo, p){
   document.getElementById('dir-nombre').value  = p.nombre||'';
   document.getElementById('dir-puesto').value  = p.puesto||'';
   document.getElementById('dir-correo').value  = p.correo||'';
-  document.getElementById('dir-telefono').value= p.telefono||'';
-  document.getElementById('dir-foto').value    = p.foto||'';
+  document.getElementById('dir-telefono').value  = p.telefono||'';
+  document.getElementById('dir-extension').value = p.extension||'';
+  document.getElementById('dir-ubicacion').value  = p.ubicacion_fisica||'';
+  document.getElementById('dir-foto').value       = p.foto||'';
   document.getElementById('form-dir-titulo').textContent = 'Editar: '+p.nombre;
   document.getElementById('form-dir-wrap').scrollIntoView({behavior:'smooth'});
 }

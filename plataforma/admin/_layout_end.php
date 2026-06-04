@@ -115,7 +115,7 @@ document.addEventListener('submit', function(e) {
 function confirmarEliminar(modulo, accion, id, rowId) {
   if (!confirm('¿Estás seguro de que deseas eliminar este elemento? Esta acción no se puede deshacer.')) return;
   // Obtener el CSRF del primer formulario de la página
-  var csrfEl = document.querySelector('input[name="csrf"]');
+  var csrfEl = document.querySelector('input[name="_csrf"]');
   var csrf   = csrfEl ? csrfEl.value : '';
   adminFetch(modulo, { csrf: csrf, accion: accion, id: id })
     .then(function(json) {

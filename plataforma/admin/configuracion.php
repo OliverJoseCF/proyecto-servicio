@@ -23,7 +23,7 @@ function cfgVal(string $key, string $default = ''): string {
     return htmlspecialchars($cfg[$key] ?? $default);
 }
 
-$csrf = getCsrfToken();
+$csrf = csrfToken();
 require_once __DIR__ . '/_layout.php';
 ?>
 
@@ -48,7 +48,7 @@ require_once __DIR__ . '/_layout.php';
   <div class="adm-form-card">
     <div class="adm-form-title"><span class="material-symbols-rounded">info</span> Datos generales del portal</div>
     <form data-proc="configuracion" data-accion="guardar_config">
-      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="guardar_config">
       <div class="adm-form-grid cols-2">
         <div class="adm-field"><label>Nombre de la institución</label><input type="text" name="nombre_institucion" value="<?= cfgVal('nombre_institucion','Tecnológico Superior de Jalisco') ?>" required></div>
@@ -66,7 +66,7 @@ require_once __DIR__ . '/_layout.php';
   <div class="adm-form-card">
     <div class="adm-form-title"><span class="material-symbols-rounded">location_on</span> Dirección y contacto (footer)</div>
     <form data-proc="configuracion" data-accion="guardar_config">
-      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="guardar_config">
       <div class="adm-form-grid cols-2">
         <div class="adm-field"><label>Dirección</label><input type="text" name="direccion" value="<?= cfgVal('direccion','Carretera Chapala-Jocotepec km 7.5, Ajijic, Chapala, Jalisco') ?>"></div>
@@ -88,7 +88,7 @@ require_once __DIR__ . '/_layout.php';
   <div class="adm-form-card">
     <div class="adm-form-title"><span class="material-symbols-rounded">mail</span> Correos institucionales</div>
     <form data-proc="configuracion" data-accion="guardar_correos">
-      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="guardar_correos">
       <div class="adm-form-grid cols-2">
         <?php
@@ -120,7 +120,7 @@ require_once __DIR__ . '/_layout.php';
   <div class="adm-form-card">
     <div class="adm-form-title"><span class="material-symbols-rounded">share</span> Redes sociales del campus</div>
     <form data-proc="configuracion" data-accion="guardar_redes">
-      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="guardar_redes">
       <div class="adm-form-grid cols-2">
         <div class="adm-field"><label>Facebook</label><input type="url" name="facebook_url" value="<?= cfgVal('facebook_url','https://www.facebook.com/TecSJ/') ?>"></div>
@@ -146,7 +146,7 @@ require_once __DIR__ . '/_layout.php';
       El nuevo hash se escribe automáticamente en <strong>shared/config.local.php</strong>.
     </div>
     <form data-proc="configuracion" data-accion="cambiar_password">
-      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="cambiar_password">
       <div class="adm-form-grid cols-2">
         <div class="adm-field">

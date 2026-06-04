@@ -18,7 +18,7 @@ try {
     $db_ok    = false;
 }
 
-$csrf = getCsrfToken();
+$csrf = csrfToken();
 require_once __DIR__ . '/_layout.php';
 ?>
 
@@ -87,7 +87,7 @@ require_once __DIR__ . '/_layout.php';
   <div class="adm-form-card" style="margin-top:20px">
     <div class="adm-form-title"><span class="material-symbols-rounded">handshake</span> <span id="form-conv-titulo">Agregar convenio</span></div>
     <form data-proc="convenios" data-accion="convenio_agregar" id="form-conv">
-      <input type="hidden" name="csrf" value="<?= $csrf ?>">
+      <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="convenio_agregar" id="conv-accion">
       <input type="hidden" name="id" id="conv-id">
       <div class="adm-form-grid cols-3">
@@ -97,6 +97,14 @@ require_once __DIR__ . '/_layout.php';
             <option value="residencia">Residencia profesional</option>
             <option value="servicio_social">Servicio social</option>
             <option value="practicas">Prácticas profesionales</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div class="adm-field"><label>Sector</label>
+          <select name="sector" id="conv-sector">
+            <option value="privado">Privado</option>
+            <option value="publico">Público</option>
+            <option value="ac">Asociación Civil</option>
             <option value="otro">Otro</option>
           </select>
         </div>
@@ -175,6 +183,8 @@ function abrirEditarConv(cv){
   document.getElementById('conv-logo').value    = cv.logo||'';
   const tipo = document.getElementById('conv-tipo');
   for(let o of tipo.options){ if(o.value===cv.tipo_convenio){ o.selected=true; break; } }
+  const sec = document.getElementById('conv-sector');
+  for(let o of sec.options){ if(o.value===cv.sector){ o.selected=true; break; } }
   const car = document.getElementById('conv-carrera');
   for(let o of car.options){ if(o.value==cv.carrera_id){ o.selected=true; break; } }
   document.getElementById('form-conv-titulo').textContent='Editar: '+cv.nombre;

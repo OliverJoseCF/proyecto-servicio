@@ -35,7 +35,7 @@ try {
     $db_ok = false;
 }
 
-$csrf = getCsrfToken();
+$csrf = csrfToken();
 require_once __DIR__ . '/_layout.php';
 
 // Helper para renderizar un tab de tipo
@@ -52,7 +52,7 @@ function renderTipoTab(string $tipo, array $d, string $csrf): void {
     </div>
     <div class="adm-section-body">
       <form data-proc="requisitos" data-accion="requisitos_guardar">
-        <input type="hidden" name="csrf" value="<?= $csrf ?>">
+        <input type="hidden" name="_csrf" value="<?= $csrf ?>">
         <input type="hidden" name="accion" value="requisitos_guardar">
         <input type="hidden" name="tipo" value="<?= $tipo ?>">
         <div class="adm-list-editor" id="req-list-<?= $tipo ?>">
@@ -86,7 +86,7 @@ function renderTipoTab(string $tipo, array $d, string $csrf): void {
     </div>
     <div class="adm-section-body">
       <form data-proc="requisitos" data-accion="timeline_guardar">
-        <input type="hidden" name="csrf" value="<?= $csrf ?>">
+        <input type="hidden" name="_csrf" value="<?= $csrf ?>">
         <input type="hidden" name="accion" value="timeline_guardar">
         <input type="hidden" name="tipo" value="<?= $tipo ?>">
         <div id="fases-<?= $tipo ?>">
@@ -144,7 +144,7 @@ function renderTipoTab(string $tipo, array $d, string $csrf): void {
       </div>
       <div class="adm-form-card" style="margin-top:14px" id="form-doc-wrap-<?= $tipo ?>">
         <form data-proc="requisitos" data-accion="doc_agregar" class="form-doc" id="form-doc-<?= $tipo ?>">
-          <input type="hidden" name="csrf" value="<?= $csrf ?>">
+          <input type="hidden" name="_csrf" value="<?= $csrf ?>">
           <input type="hidden" name="accion" value="doc_agregar" class="doc-accion">
           <input type="hidden" name="tipo" value="<?= $tipo ?>">
           <input type="hidden" name="id" class="doc-id">
@@ -178,7 +178,7 @@ function renderTipoTab(string $tipo, array $d, string $csrf): void {
     </div>
     <div class="adm-section-body">
       <form data-proc="requisitos" data-accion="faq_guardar">
-        <input type="hidden" name="csrf" value="<?= $csrf ?>">
+        <input type="hidden" name="_csrf" value="<?= $csrf ?>">
         <input type="hidden" name="accion" value="faq_guardar">
         <input type="hidden" name="tipo" value="<?= $tipo ?>">
         <div id="faqs-<?= $tipo ?>">
