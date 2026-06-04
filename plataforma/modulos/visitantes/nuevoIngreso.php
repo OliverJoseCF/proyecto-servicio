@@ -5,7 +5,12 @@ $tsj_extra_css = ['style.css'];
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 <main id="main">
-  <h1 class="vis-page-title">Nuevo Ingreso</h1>
+
+  <div class="tsj-page-header">
+    <div class="tsj-page-header-line"></div>
+    <h1>Inscripción y <span class="tsj-accent">Reinscripción</span></h1>
+    <p class="tsj-page-header-sub">Requisitos de admisión y generación de comprobante para el examen</p>
+  </div>
 
   <div class="contenido">
     <div class="requisitos">

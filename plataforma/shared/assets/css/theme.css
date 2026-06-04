@@ -1229,3 +1229,46 @@ body {
   .tsj-table thead th,
   .tsj-table tbody td { padding: 10px 12px; }
 }
+
+/* ================================================================
+   PAGE HEADER — estilo unificado para todos los módulos
+   Uso: <div class="tsj-page-header">
+          <div class="tsj-page-header-line"></div>
+          <h1>Nombre del <span class="tsj-accent">Módulo</span></h1>
+          <p class="tsj-page-header-sub">Descripción breve</p>
+        </div>
+   ================================================================ */
+/* Cuando el page-header es el primer elemento del main,
+   el padding-top del contenedor padre puede desplazarlo.
+   Se neutraliza aquí para que quede al mismo nivel en todos los módulos. */
+.main-content > .tsj-page-header:first-child,
+.contenedor > .contenido-centrado > .tsj-page-header:first-child,
+main > .tsj-page-header:first-child {
+  margin-top: 0;
+}
+
+.tsj-page-header {
+  text-align: center;
+  padding: 36px 24px 24px;
+  position: relative;
+}
+.tsj-page-header-line {
+  width: 40px;
+  height: 3px;
+  background: var(--tsj-pink);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+.tsj-page-header h1 {
+  font-family: var(--tsj-font);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--tsj-blue);
+  margin: 0 0 8px;
+}
+.tsj-accent { color: var(--tsj-pink); }
+.tsj-page-header-sub {
+  font-size: 0.88rem;
+  color: var(--tsj-gray-600);
+  margin: 0;
+}

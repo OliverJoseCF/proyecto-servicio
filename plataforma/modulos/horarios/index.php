@@ -67,7 +67,11 @@ require_once __DIR__ . '/../../shared/header.php';
 
 <main id="main" class="main-content">
 
-  <h1 class="section-title">Buscar Maestro</h1>
+  <div class="tsj-page-header">
+    <div class="tsj-page-header-line"></div>
+    <h1>Buscar <span class="tsj-accent">Maestro</span></h1>
+    <p class="tsj-page-header-sub">Encuentra a tus maestros y consulta sus horarios por carrera</p>
+  </div>
 
   <section class="filtros" aria-label="Filtros de búsqueda">
     <p class="section-subtitle">Filtrar por:</p>

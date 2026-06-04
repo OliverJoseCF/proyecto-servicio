@@ -7,9 +7,10 @@ require_once __DIR__ . '/../../shared/header.php';
 
 <main id="main">
 
-  <div class="header">
-    <h1>Tecnológico Superior de Jalisco</h1>
-    <p class="header-sub">Campus Chapala — Portal institucional</p>
+  <div class="tsj-page-header">
+    <div class="tsj-page-header-line"></div>
+    <h1>Portal <span class="tsj-accent">Institucional</span></h1>
+    <p class="tsj-page-header-sub">Directorio, planes de estudio y servicios del Campus Chapala</p>
   </div>
 
   <div class="menu-wrapper">

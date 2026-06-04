@@ -11,7 +11,11 @@ require_once __DIR__ . '/../../shared/header.php';
 <main id="main" class="contenedor">
   <div class="contenido-centrado">
 
-    <h1 class="sr-only">Residencia Profesional — TSJ Chapala</h1>
+    <div class="tsj-page-header">
+      <div class="tsj-page-header-line"></div>
+      <h1>Serv. Social / <span class="tsj-accent">Residencia</span></h1>
+      <p class="tsj-page-header-sub">Requisitos, documentos y pasos del proceso</p>
+    </div>
 
     <nav class="navegacion-secciones" aria-label="Secciones del módulo">
       <a href="residencia.php" class="boton-navegacion active" aria-current="page">Residencia</a>

@@ -19,14 +19,10 @@ $_csrf_token = csrfToken();
 
 <main id="main">
 
-  <div class="w-full p-4">
-    <div class="oferta">
-      <div class="w-full text-center">
-        <div class="flex justify-center items-center">
-          <h1 class="text-convenios font-bold text-4xl text-base_blue-500 mb-11 -mt-7">Convenios</h1>
-        </div>
-      </div>
-    </div>
+  <div class="tsj-page-header">
+    <div class="tsj-page-header-line"></div>
+    <h1>Convenios <span class="tsj-accent">Empresariales</span></h1>
+    <p class="tsj-page-header-sub">Empresas vinculadas para residencia profesional, servicio social y prácticas</p>
   </div>
 
   <!-- Cards de carreras -->

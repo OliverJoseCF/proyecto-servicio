@@ -19,11 +19,12 @@ $base_img = (defined('PLATAFORMA_URL') ? PLATAFORMA_URL : '/plataforma') . '/mod
 ?>
 
 <main id="main">
-  <a href="index.php" class="top-right" aria-label="Volver al menú principal">
-    <img src="imagenes/casa.png" alt="">
-  </a>
 
-  <h1 class="vis-page-title">Directorio Institucional</h1>
+  <div class="tsj-page-header">
+    <div class="tsj-page-header-line"></div>
+    <h1>Directorio <span class="tsj-accent">Institucional</span></h1>
+    <p class="tsj-page-header-sub">Personal del campus: departamento, extensión, ubicación y correo de contacto</p>
+  </div>
 
   <div class="container">
     <div class="tabla-scroll">

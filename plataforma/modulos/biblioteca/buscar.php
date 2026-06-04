@@ -32,11 +32,10 @@ require_once __DIR__ . '/../../shared/header.php';
   </div>
   <?php endif; ?>
 
-  <!-- Encabezado de página -->
-  <div class="page-header">
-    <div class="page-header-line" aria-hidden="true"></div>
-    <h1>Catálogo de <span class="accent">Libros</span></h1>
-    <p class="page-header-sub">Busca y solicita préstamos del acervo bibliotecario</p>
+  <div class="tsj-page-header">
+    <div class="tsj-page-header-line"></div>
+    <h1>Catálogo de <span class="tsj-accent">Libros</span></h1>
+    <p class="tsj-page-header-sub">Busca y solicita préstamos del acervo bibliotecario</p>
   </div>
 
   <div class="container pb-5">
