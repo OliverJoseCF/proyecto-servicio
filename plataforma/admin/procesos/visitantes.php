@@ -146,6 +146,29 @@ if ($accion === 'secretaria_eliminar') {
     jsonOk('Secretaria eliminada');
 }
 
+// ══ OFERTA ACADÉMICA ════════════════════════════════════════════
+if ($accion === 'oferta_guardar') {
+    $clavesValidas = ['ISC','II','IM','IADEV','IGE','LG'];
+    $mapaCfg = [
+        'ISC'   => 'desc_ISC',
+        'II'    => 'desc_II',
+        'IM'    => 'desc_IM',
+        'IADEV' => 'desc_IADEV',
+        'IGE'   => 'desc_IGE',
+        'LG'    => 'desc_LG',
+    ];
+    $desc = $_POST['desc'] ?? [];
+    if (!is_array($desc)) jsonErr('Datos inválidos');
+
+    $stmt = $db->prepare('INSERT INTO configuracion (clave, valor) VALUES (:k,:v)
+                          ON DUPLICATE KEY UPDATE valor = VALUES(valor)');
+    foreach ($clavesValidas as $clave) {
+        $valor = mb_substr(trim($desc[$clave] ?? ''), 0, 500);
+        $stmt->execute([':k' => $mapaCfg[$clave], ':v' => $valor]);
+    }
+    jsonOk('Descripciones de oferta académica guardadas');
+}
+
 // ══ NUEVO INGRESO ══════════════════════════════════════════════
 if ($accion === 'nuevo_ingreso_guardar') {
     $dia    = postInt('dia_examen');

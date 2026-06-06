@@ -466,6 +466,108 @@ body {
 /* Offset body para header fixed */
 .tsj-body-offset { margin-top: var(--tsj-header-h); }
 
+/* ── Dropdown "Oferta Académica" en nav escritorio ───────────── */
+.tsj-nav li.tsj-has-dropdown { position: relative; }
+
+.tsj-nav li.tsj-has-dropdown > a {
+  gap: 4px;
+}
+.tsj-nav li.tsj-has-dropdown > a .tsj-dropdown-arrow {
+  font-size: 16px;
+  transition: transform .2s;
+  margin-left: 2px;
+}
+.tsj-nav li.tsj-has-dropdown.open > a .tsj-dropdown-arrow,
+.tsj-nav li.tsj-has-dropdown:focus-within > a .tsj-dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.tsj-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  min-width: 260px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(20,10,80,.16);
+  border: 1px solid #e8eaf2;
+  padding: 6px;
+  /* Puente invisible de 8px entre el link y el panel para que el mouse no pierda el área */
+  padding-top: 14px;
+  margin-top: -8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+  z-index: 9999;
+}
+/* Abierto vía JS (.open) o teclado (focus-within) */
+.tsj-nav li.tsj-has-dropdown.open .tsj-dropdown,
+.tsj-nav li.tsj-has-dropdown:focus-within .tsj-dropdown {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+.tsj-nav li.tsj-has-dropdown .tsj-dropdown a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a0960;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .15s;
+  letter-spacing: 0;
+  text-transform: none;
+  background: transparent;
+  position: static;
+}
+.tsj-nav li.tsj-has-dropdown .tsj-dropdown a::after { display: none; }
+.tsj-nav li.tsj-has-dropdown .tsj-dropdown a:hover {
+  background: #f0edff;
+  color: #32129a;
+}
+.tsj-nav li.tsj-has-dropdown .tsj-dropdown a .material-symbols-rounded {
+  font-size: 18px;
+  color: #8892a8;
+  flex-shrink: 0;
+}
+.tsj-nav li.tsj-has-dropdown .tsj-dropdown a:hover .material-symbols-rounded { color: #32129a; }
+
+/* Dropdown en menú móvil */
+.tsj-menu-subitems {
+  display: none;
+  flex-direction: column;
+  padding-left: 28px;
+  gap: 2px;
+  margin-bottom: 4px;
+}
+.tsj-menu-subitems.open { display: flex; }
+.tsj-menu-toggle {
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--tsj-font);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--tsj-gray-700);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 11px 16px;
+  border-radius: var(--tsj-radius);
+  margin-bottom: 2px;
+  transition: background var(--tsj-transition), color var(--tsj-transition);
+}
+.tsj-menu-toggle:hover { background: var(--tsj-blue-50); color: var(--tsj-blue); }
+.tsj-menu-toggle .material-symbols-rounded { font-size: 20px; color: var(--tsj-gray-400); flex-shrink: 0; }
+.tsj-menu-toggle .tsj-toggle-arrow { margin-left: auto; font-size: 18px; transition: transform .2s; }
+.tsj-menu-toggle.open .tsj-toggle-arrow { transform: rotate(180deg); }
+
 /* Responsive header */
 @media (max-width: 820px) {
   /* En móvil: marca | auth | hamburguesa */

@@ -43,12 +43,21 @@ if (is_string($tsj_extra_css)) {
 $base = PLATAFORMA_URL;
 
 $nav_items = [
-    'visitantes' => ['label' => 'Directorio',               'href' => $base . '/modulos/visitantes/index.php',      'icon' => 'contacts'],
+    'visitantes' => ['label' => 'Directorio',               'href' => $base . '/modulos/visitantes/Directorio.php', 'icon' => 'contacts'],
     'biblioteca' => ['label' => 'Biblioteca',               'href' => $base . '/modulos/biblioteca/buscar.php',     'icon' => 'menu_book'],
     'convenios'  => ['label' => 'Convenios',                'href' => $base . '/modulos/convenios/index.php',       'icon' => 'handshake'],
     'horarios'   => ['label' => 'Buscar Maestro',           'href' => $base . '/modulos/horarios/index.php',        'icon' => 'manage_search'],
     'requisitos' => ['label' => 'Serv. Social / Residencia','href' => $base . '/modulos/requisitos/residencia.php', 'icon' => 'checklist'],
-    'inscripcion'=> ['label' => 'Inscripción',              'href' => $base . '/modulos/visitantes/nuevoIngreso.php','icon' => 'school'],
+];
+
+// Sub-items de Oferta Académica (dropdown)
+$oferta_carreras = [
+    ['label' => 'Ing. en Sistemas Computacionales',           'href' => $base . '/modulos/visitantes/MateriasSistemas.php',   'icon' => 'computer'],
+    ['label' => 'Ingeniería Industrial',                       'href' => $base . '/modulos/visitantes/MateriasIndustrial.php',  'icon' => 'precision_manufacturing'],
+    ['label' => 'Ingeniería Mecatrónica',                      'href' => $base . '/modulos/visitantes/MateriasMecatronica.php', 'icon' => 'settings_suggest'],
+    ['label' => 'Animación Digital y Efectos Visuales',        'href' => $base . '/modulos/visitantes/MateriasAnimacion.php',   'icon' => 'animation'],
+    ['label' => 'Ing. en Gestión Empresarial',                 'href' => $base . '/modulos/visitantes/MateriasGestion.php',     'icon' => 'business_center'],
+    ['label' => 'Gastronomía',                                 'href' => $base . '/modulos/visitantes/GastronomiaMaterias.php', 'icon' => 'restaurant'],
 ];
 ?>
 <!DOCTYPE html>
@@ -127,6 +136,24 @@ $nav_items = [
             </a>
           </li>
         <?php endforeach; ?>
+
+        <!-- Dropdown Oferta Académica -->
+        <li class="tsj-has-dropdown">
+          <a href="<?= $base ?>/modulos/visitantes/ofertaAcademica.php"
+             <?= $tsj_module === 'oferta' ? 'class="active" aria-current="page"' : '' ?>
+             aria-haspopup="true">
+            Oferta Académica
+            <span class="material-symbols-rounded tsj-dropdown-arrow" aria-hidden="true">expand_more</span>
+          </a>
+          <div class="tsj-dropdown" role="menu">
+            <?php foreach ($oferta_carreras as $carrera): ?>
+            <a href="<?= htmlspecialchars($carrera['href'], ENT_QUOTES, 'UTF-8') ?>" role="menuitem">
+              <span class="material-symbols-rounded" aria-hidden="true"><?= $carrera['icon'] ?></span>
+              <?= htmlspecialchars($carrera['label'], ENT_QUOTES, 'UTF-8') ?>
+            </a>
+            <?php endforeach; ?>
+          </div>
+        </li>
       </ul>
     </nav>
 
@@ -192,6 +219,22 @@ $nav_items = [
       </a>
     <?php endforeach; ?>
 
+    <!-- Oferta Académica con toggle en móvil -->
+    <button class="tsj-menu-toggle <?= $tsj_module === 'oferta' ? 'open' : '' ?>"
+            id="tsj-oferta-toggle" aria-expanded="<?= $tsj_module === 'oferta' ? 'true' : 'false' ?>">
+      <span class="material-symbols-rounded" aria-hidden="true">school</span>
+      Oferta Académica
+      <span class="material-symbols-rounded tsj-toggle-arrow" aria-hidden="true">expand_more</span>
+    </button>
+    <div class="tsj-menu-subitems <?= $tsj_module === 'oferta' ? 'open' : '' ?>" id="tsj-oferta-subitems">
+      <?php foreach ($oferta_carreras as $carrera): ?>
+      <a class="tsj-menu-item" href="<?= htmlspecialchars($carrera['href'], ENT_QUOTES, 'UTF-8') ?>">
+        <span class="material-symbols-rounded" aria-hidden="true"><?= $carrera['icon'] ?></span>
+        <?= htmlspecialchars($carrera['label'], ENT_QUOTES, 'UTF-8') ?>
+      </a>
+      <?php endforeach; ?>
+    </div>
+
   </div>
 </nav>
 
@@ -199,3 +242,54 @@ $nav_items = [
 <?php if (!$tsj_has_hero): ?>
 <div class="tsj-body-offset" aria-hidden="true"></div>
 <?php endif; ?>
+
+<script>
+(function () {
+  // ── Dropdown escritorio: toggle con click ────────────────────
+  var liDropdown = document.querySelector('.tsj-nav li.tsj-has-dropdown');
+  if (liDropdown) {
+    var triggerLink = liDropdown.querySelector(':scope > a');
+
+    triggerLink.addEventListener('click', function (e) {
+      // Si ya está abierto y se hace clic, navegar a la página de oferta
+      if (liDropdown.classList.contains('open')) {
+        liDropdown.classList.remove('open');
+        return; // deja que el href funcione normalmente
+      }
+      // Si está cerrado, abrir el dropdown sin navegar
+      e.preventDefault();
+      liDropdown.classList.add('open');
+    });
+
+    // Cerrar al hacer clic fuera
+    document.addEventListener('click', function (e) {
+      if (!liDropdown.contains(e.target)) {
+        liDropdown.classList.remove('open');
+      }
+    });
+
+    // Cerrar con ESC
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') liDropdown.classList.remove('open');
+    });
+
+    // Cerrar al seleccionar una carrera
+    liDropdown.querySelectorAll('.tsj-dropdown a').forEach(function (a) {
+      a.addEventListener('click', function () {
+        liDropdown.classList.remove('open');
+      });
+    });
+  }
+
+  // ── Toggle Oferta Académica en menú móvil ───────────────────
+  var toggle   = document.getElementById('tsj-oferta-toggle');
+  var subitems = document.getElementById('tsj-oferta-subitems');
+  if (toggle && subitems) {
+    toggle.addEventListener('click', function () {
+      var open = subitems.classList.toggle('open');
+      toggle.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', open);
+    });
+  }
+})();
+</script>

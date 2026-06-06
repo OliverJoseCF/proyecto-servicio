@@ -45,7 +45,7 @@ require_once __DIR__ . '/_layout.php';
 <div class="adm-tabs">
   <?php
   $tabs = ['directorio'=>'Directorio','docentes'=>'Docentes','coord'=>'Coordinadores',
-           'materias'=>'Planes de Estudio','secretarias'=>'Secretarías','servicios'=>'Nuevo Ingreso'];
+           'materias'=>'Planes de Estudio','oferta'=>'Oferta Académica','secretarias'=>'Secretarías','servicios'=>'Nuevo Ingreso'];
   foreach ($tabs as $key => $label): ?>
     <button class="adm-tab <?= $key==='directorio'?'active':'' ?>"
             data-tab-group="vis" data-tab="<?= $key ?>" onclick="showTab('vis','<?= $key ?>')">
@@ -58,7 +58,7 @@ require_once __DIR__ . '/_layout.php';
 <div class="adm-tab-panel active" data-tab-group="vis" data-tab="directorio">
   <div class="adm-table-wrap">
     <table class="adm-table">
-      <thead><tr><th>Foto</th><th>Nombre</th><th>Puesto / Área</th><th>Correo</th><th>Teléfono</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Foto</th><th>Nombre</th><th>Puesto / Área</th><th>Ubicación</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr></thead>
       <tbody>
         <?php if (empty($directorio)): ?>
         <tr><td colspan="7" class="adm-table-empty">Sin personas registradas.</td></tr>
@@ -70,9 +70,14 @@ require_once __DIR__ . '/_layout.php';
                  style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--tsj-blue-100)" alt="">
           </td>
           <td style="font-weight:600;color:var(--tsj-blue)"><?= htmlspecialchars($p['nombre']) ?></td>
-          <td><?= htmlspecialchars($p['puesto'] ?? '') ?></td>
-          <td><a href="mailto:<?= htmlspecialchars($p['correo'] ?? '') ?>" style="color:var(--tsj-blue)"><?= htmlspecialchars($p['correo'] ?? '') ?></a></td>
-          <td><?= htmlspecialchars($p['telefono'] ?? 'S/N') ?></td>
+          <td><?= htmlspecialchars($p['puesto'] ?? '—') ?></td>
+          <td style="font-size:12.5px;color:var(--tsj-gray-600)">
+            <?= htmlspecialchars($p['ubicacion_fisica'] ?? '—') ?>
+            <?php if (!empty($p['extension']) && $p['extension'] !== 'S/N'): ?>
+              <span style="display:block;color:var(--tsj-gray-400);font-size:11.5px">Ext. <?= htmlspecialchars($p['extension']) ?></span>
+            <?php endif; ?>
+          </td>
+          <td><a href="mailto:<?= htmlspecialchars($p['correo'] ?? '') ?>" style="color:var(--tsj-blue);font-size:12.5px"><?= htmlspecialchars($p['correo'] ?? '—') ?></a></td>
           <td>
             <?php if ($p['activo']): ?>
               <span class="adm-status adm-status--ok">Visible</span>
@@ -282,6 +287,77 @@ require_once __DIR__ . '/_layout.php';
   </div>
 </div>
 
+<!-- ══ TAB: Oferta Académica ═══════════════════════════════════ -->
+<div class="adm-tab-panel" data-tab-group="vis" data-tab="oferta">
+
+  <div class="adm-pending" style="margin-bottom:20px">
+    <span class="material-symbols-rounded">info</span>
+    <span>Aquí editas la descripción de cada carrera que aparece en la página pública de <strong>Oferta Académica</strong>. Los planes de estudio (materias) se editan en la pestaña <strong>Planes de Estudio</strong>.</span>
+  </div>
+
+  <?php
+  $oferta_info = [
+    'ISC'   => ['nombre'=>'Ing. en Sistemas Computacionales',          'icono'=>'computer',                'key'=>'desc_ISC'],
+    'II'    => ['nombre'=>'Ingeniería Industrial',                      'icono'=>'precision_manufacturing', 'key'=>'desc_II'],
+    'IM'    => ['nombre'=>'Ingeniería Mecatrónica',                     'icono'=>'settings_suggest',        'key'=>'desc_IM'],
+    'IADEV' => ['nombre'=>'Ing. en Animación Digital y Efectos Visuales','icono'=>'animation',             'key'=>'desc_IADEV'],
+    'IGE'   => ['nombre'=>'Ing. en Gestión Empresarial',               'icono'=>'business_center',         'key'=>'desc_IGE'],
+    'LG'    => ['nombre'=>'Gastronomía',                                'icono'=>'restaurant',              'key'=>'desc_LG'],
+  ];
+
+  // Cargar descripciones guardadas en BD (tabla configuracion)
+  $descsCfg = [];
+  try {
+    $rowsCfg = getPDO(DB_NAME)->query("SELECT clave,valor FROM configuracion WHERE clave LIKE 'desc_%'")->fetchAll();
+    foreach ($rowsCfg as $r) $descsCfg[$r['clave']] = $r['valor'];
+  } catch (\Throwable $e) {}
+
+  $defaults = [
+    'desc_ISC'   => 'Desarrolla software, sistemas y soluciones tecnológicas de alto impacto.',
+    'desc_II'    => 'Optimiza procesos productivos y gestiona sistemas industriales.',
+    'desc_IM'    => 'Integra mecánica, electrónica y control automático.',
+    'desc_IADEV' => 'Crea personajes, mundos virtuales y efectos para cine y videojuegos.',
+    'desc_IGE'   => 'Dirige organizaciones con enfoque estratégico e innovación.',
+    'desc_LG'    => 'Domina el arte culinario, gestión de restaurantes y cocina creativa.',
+  ];
+  ?>
+
+  <form id="form-oferta">
+    <input type="hidden" name="_csrf" value="<?= $csrf ?>">
+    <input type="hidden" name="accion" value="oferta_guardar">
+    <div class="adm-form-grid cols-2">
+      <?php foreach ($oferta_info as $clave => $info): ?>
+      <div class="adm-form-card" style="padding:18px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="width:36px;height:36px;background:var(--tsj-blue);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <span class="material-symbols-rounded" style="color:#fff;font-size:20px"><?= $info['icono'] ?></span>
+          </div>
+          <div>
+            <div style="font-weight:700;font-size:13px;color:var(--tsj-blue)"><?= htmlspecialchars($clave) ?></div>
+            <div style="font-size:12px;color:var(--tsj-gray-600)"><?= htmlspecialchars($info['nombre']) ?></div>
+          </div>
+        </div>
+        <div class="adm-field" style="margin:0">
+          <label>Descripción breve (aparece en la tarjeta pública)</label>
+          <textarea name="desc[<?= $clave ?>]" rows="2" style="min-height:60px"><?= htmlspecialchars($descsCfg[$info['key']] ?? $defaults[$info['key']]) ?></textarea>
+        </div>
+      </div>
+      <?php endforeach; ?>
+    </div>
+    <div class="adm-form-actions" style="margin-top:20px">
+      <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar descripciones</button>
+    </div>
+  </form>
+
+  <div class="adm-form-card" style="margin-top:24px;background:var(--tsj-gray-50)">
+    <div class="adm-form-title"><span class="material-symbols-rounded">open_in_new</span> Vista pública</div>
+    <p style="font-size:13px;color:var(--tsj-gray-600);margin:0 0 12px">Así ve el alumno la página de Oferta Académica con las descripciones que configures aquí.</p>
+    <a href="<?= PLATAFORMA_URL ?>/modulos/visitantes/ofertaAcademica.php" target="_blank" class="adm-btn adm-btn--ghost">
+      <span class="material-symbols-rounded">open_in_new</span> Ver Oferta Académica
+    </a>
+  </div>
+</div>
+
 <!-- ══ TAB: Secretarías ════════════════════════════════════════ -->
 <div class="adm-tab-panel" data-tab-group="vis" data-tab="secretarias">
   <div class="adm-table-wrap">
@@ -360,6 +436,23 @@ require_once __DIR__ . '/_layout.php';
 </div>
 
 <script>
+// ── Oferta Académica: handler propio para array anidado desc[clave] ──
+(function () {
+  var form = document.getElementById('form-oferta');
+  if (!form) return;
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var base = document.querySelector('meta[name="plataforma-url"]')?.content || '/plataforma';
+    var btn  = form.querySelector('[type="submit"]');
+    if (btn) btn.disabled = true;
+    fetch(base + '/admin/procesos/visitantes.php', { method: 'POST', body: new FormData(form) })
+      .then(function (r) { return r.json(); })
+      .then(function (json) { showToast(json.msg, json.ok ? 'ok' : 'error'); })
+      .catch(function (err) { showToast('Error: ' + err.message, 'error'); })
+      .finally(function () { if (btn) btn.disabled = false; });
+  });
+})();
+
 // ── Toggle visibilidad ──────────────────────────────────────────
 function toggleActivo(modulo, accion, id, btn) {
   var csrfEl = document.querySelector('input[name="_csrf"]');
