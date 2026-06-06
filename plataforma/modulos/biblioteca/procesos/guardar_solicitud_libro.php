@@ -1,15 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../shared/lib/auth.php';
 require_once __DIR__ . '/../../../shared/lib/RateLimit.php';
-
-try {
-    require '../config/conexion.php';
-} catch (\Throwable $e) {
-    error_log('guardar_solicitud_libro DB error: ' . $e->getMessage());
-    $_SESSION['flash_error'] = 'Error de conexión. Inténtalo de nuevo más tarde.';
-    header('Location: ../buscar.php');
-    exit;
-}
+require_once __DIR__ . '/../../../shared/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ../buscar.php');
@@ -36,42 +28,51 @@ if (!csrfVerify()) {
 $nombre_libro   = trim($_POST['nombre_libro']   ?? '');
 $codigo_libro   = trim($_POST['codigo_libro']   ?? '');
 $nombre_usuario = trim($_POST['nombre_usuario'] ?? '');
-$fecha          = trim($_POST['fecha_solicitud'] ?? '');
+$tipo           = $_POST['tipo'] ?? 'prestamo';
+$tipo           = in_array($tipo, ['prestamo','consulta_sala'], true) ? $tipo : 'prestamo';
 
-// Validaciones
-if ($nombre_libro === '' || $codigo_libro === '' || $nombre_usuario === '' || $fecha === '') {
+if ($nombre_libro === '' || $codigo_libro === '' || $nombre_usuario === '') {
     $_SESSION['flash_error'] = 'Todos los campos son obligatorios.';
     header('Location: ../solicitudDeLibros.php?titulo=' . urlencode($nombre_libro) . '&codigo=' . urlencode($codigo_libro));
     exit;
 }
-if (mb_strlen($nombre_usuario) > 255) {
-    $_SESSION['flash_error'] = 'El nombre de usuario es demasiado largo.';
-    header('Location: ../solicitudDeLibros.php?titulo=' . urlencode($nombre_libro) . '&codigo=' . urlencode($codigo_libro));
-    exit;
-}
-$fechaObj = DateTime::createFromFormat('Y-m-d', $fecha);
-if (!$fechaObj || $fechaObj->format('Y-m-d') !== $fecha) {
-    $_SESSION['flash_error'] = 'La fecha no tiene un formato válido.';
+if (mb_strlen($nombre_usuario) > 150) {
+    $_SESSION['flash_error'] = 'El nombre es demasiado largo.';
     header('Location: ../solicitudDeLibros.php?titulo=' . urlencode($nombre_libro) . '&codigo=' . urlencode($codigo_libro));
     exit;
 }
 
-$sql  = 'INSERT INTO solicitud_libros (nombre_libro, codigo_libro, nombre_usuario, fecha_solicitud, estado, entregado)
-         VALUES (?, ?, ?, ?, ?, ?)';
-$stmt = $conexion->prepare($sql);
-$estado    = 'Pendiente';
-$entregado = 0;
-$stmt->bind_param('sssssi', $nombre_libro, $codigo_libro, $nombre_usuario, $fecha, $estado, $entregado);
+try {
+    $db  = getPDO(DB_NAME);
 
-if ($stmt->execute()) {
+    // Buscar libro por código para obtener su id
+    $libro = $db->prepare('SELECT id FROM libros WHERE codigo = ? AND activo = 1 LIMIT 1');
+    $libro->execute([mb_substr($codigo_libro, 0, 30)]);
+    $libroRow = $libro->fetch();
+
+    if (!$libroRow) {
+        $_SESSION['flash_error'] = 'El libro no fue encontrado o ya no está disponible.';
+        header('Location: ../buscar.php');
+        exit;
+    }
+
+    $db->prepare(
+        'INSERT INTO solicitudes_biblioteca (libro_id, estudiante_nombre, estudiante_control, tipo)
+         VALUES (?, ?, ?, ?)'
+    )->execute([
+        $libroRow['id'],
+        mb_substr($nombre_usuario, 0, 150),
+        '',   // No. control — el formulario público no lo pide, se deja vacío
+        $tipo,
+    ]);
+
     $rl->record($ip);
     $_SESSION['flash_ok'] = '¡Solicitud enviada! El administrador la revisará pronto.';
-} else {
-    error_log('guardar_solicitud_libro error: ' . $conexion->error);
+
+} catch (\Throwable $e) {
+    error_log('guardar_solicitud_libro error: ' . $e->getMessage());
     $_SESSION['flash_error'] = 'Error al procesar la solicitud. Inténtalo de nuevo.';
 }
 
-$stmt->close();
-$conexion->close();
 header('Location: ../buscar.php');
 exit;

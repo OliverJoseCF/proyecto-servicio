@@ -85,7 +85,7 @@ function renderTipoTab(string $tipo, array $d, string $csrf): void {
       </button>
     </div>
     <div class="adm-section-body">
-      <form data-proc="requisitos" data-accion="timeline_guardar">
+      <form class="form-multipart" data-accion-mp="timeline_guardar">
         <input type="hidden" name="_csrf" value="<?= $csrf ?>">
         <input type="hidden" name="accion" value="timeline_guardar">
         <input type="hidden" name="tipo" value="<?= $tipo ?>">
@@ -177,7 +177,7 @@ function renderTipoTab(string $tipo, array $d, string $csrf): void {
       </button>
     </div>
     <div class="adm-section-body">
-      <form data-proc="requisitos" data-accion="faq_guardar">
+      <form class="form-multipart" data-accion-mp="faq_guardar">
         <input type="hidden" name="_csrf" value="<?= $csrf ?>">
         <input type="hidden" name="accion" value="faq_guardar">
         <input type="hidden" name="tipo" value="<?= $tipo ?>">

@@ -28,9 +28,21 @@ if ($accion === 'profesor_editar') {
     jsonOk('Profesor actualizado');
 }
 
+if ($accion === 'profesor_toggle') {
+    $id = postInt('id');
+    if (!$id) jsonErr('ID inválido');
+    $db->prepare('UPDATE profesores SET activo = 1 - activo WHERE id_profesor=?')->execute([$id]);
+    $activo = (int)$db->query("SELECT activo FROM profesores WHERE id_profesor=$id")->fetchColumn();
+    jsonOk($activo ? 'Maestro activado' : 'Maestro desactivado', ['activo' => $activo]);
+}
+
 if ($accion === 'profesor_eliminar') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
+    $count = $db->prepare('SELECT COUNT(*) FROM horarios WHERE id_profesor=?');
+    $count->execute([$id]);
+    if ((int)$count->fetchColumn() > 0)
+        jsonErr('El maestro tiene horarios registrados. Elimina sus horarios primero.');
     $db->prepare('DELETE FROM profesores WHERE id_profesor=?')->execute([$id]);
     jsonOk('Profesor eliminado');
 }
@@ -43,6 +55,9 @@ if ($accion === 'horario_guardar') {
     $imagen      = null; // se asigna solo si hay upload
     if (!$profesor_id) jsonErr('Selecciona un profesor');
 
+    $dir    = dirname(__DIR__, 2) . '/modulos/horarios/horarios/';
+    $urlBase = PLATAFORMA_URL . '/modulos/horarios/horarios/';
+
     // Upload de archivo si viene
     if (isset($_FILES['archivo_horario']) && $_FILES['archivo_horario']['error'] === UPLOAD_ERR_OK) {
         $ext     = strtolower(pathinfo($_FILES['archivo_horario']['name'], PATHINFO_EXTENSION));
@@ -54,12 +69,12 @@ if ($accion === 'horario_guardar') {
         if ($_FILES['archivo_horario']['size'] > $maxSize)
             jsonErr('El archivo supera el límite de 5 MB');
 
-        $dir = dirname(__DIR__, 2) . '/modulos/horarios/horarios/';
         if (!is_dir($dir)) mkdir($dir, 0755, true);
 
         $fname = 'horario_' . $profesor_id . '_' . bin2hex(random_bytes(6)) . '.' . $ext;
         move_uploaded_file($_FILES['archivo_horario']['tmp_name'], $dir . $fname);
-        $imagen = $fname;
+        // Guardar URL absoluta para que el frontend no dependa del directorio actual
+        $imagen = $urlBase . $fname;
     }
 
     // Buscar si ya existe un horario para ese profesor+carrera
@@ -70,7 +85,11 @@ if ($accion === 'horario_guardar') {
     );
     $existe->execute([$profesor_id, $carreraParam, $carreraParam]);
     if ($row = $existe->fetch()) {
-        // Si no se subió archivo nuevo, conservar el existente
+        // Si se sube archivo nuevo, borrar el archivo viejo del disco
+        if ($imagen !== null && $row['imagen_horario']) {
+            $oldFile = $dir . basename($row['imagen_horario']);
+            if (file_exists($oldFile)) @unlink($oldFile);
+        }
         $imagenFinal = $imagen ?? $row['imagen_horario'];
         $db->prepare('UPDATE horarios SET semestre=?,imagen_horario=?,updated_at=NOW() WHERE id_horario=?')
            ->execute([$semestre, $imagenFinal, $row['id_horario']]);
@@ -85,7 +104,16 @@ if ($accion === 'horario_guardar') {
 if ($accion === 'horario_eliminar') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
+    $row = $db->prepare('SELECT imagen_horario FROM horarios WHERE id_horario=?');
+    $row->execute([$id]);
+    $h = $row->fetch();
     $db->prepare('DELETE FROM horarios WHERE id_horario=?')->execute([$id]);
+    // Borrar archivo del disco si existe
+    if ($h && $h['imagen_horario']) {
+        $dir  = dirname(__DIR__, 2) . '/modulos/horarios/horarios/';
+        $file = $dir . basename($h['imagen_horario']);
+        if (file_exists($file)) @unlink($file);
+    }
     jsonOk('Horario eliminado');
 }
 

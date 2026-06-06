@@ -54,28 +54,37 @@ $nombre_empresa  = preg_replace('/[\r\n\x00]/', '', $nombre_empresa);
 $correo_empresa  = preg_replace('/[\r\n\x00]/', '', $correo_empresa);
 $nombre_contacto = preg_replace('/[\r\n\x00]/', '', $nombre_contacto);
 
-$to      = VINCULACION_EMAIL;
-$subject = '=?UTF-8?B?' . base64_encode('Nueva sugerencia de empresa: ' . $nombre_empresa) . '?=';
-$body    = "Se ha recibido una nueva sugerencia de empresa para establecer un convenio.\n\n"
-         . "Nombre de la empresa: " . $nombre_empresa  . "\n"
-         . "Correo de contacto con la empresa: " . $correo_empresa  . "\n"
-         . "Nombre de la persona con la que se contactará: " . $nombre_contacto . "\n\n"
-         . "-- Plataforma de Convenios TecSJ --";
-
-$headers = implode("\r\n", [
-    'From: no-reply@tecsj.edu.mx',
-    'Reply-To: ' . $correo_empresa,
-    'Content-Type: text/plain; charset=UTF-8',
-    'Content-Transfer-Encoding: base64',
-]);
-
-$sent = mail($to, $subject, base64_encode($body), $headers);
-
-if ($sent) {
-    $rl->record($ip); // contar envíos exitosos también
-    echo json_encode(['success' => true, 'message' => 'Sugerencia enviada correctamente.']);
-} else {
-    error_log('sugerir_empresa: mail() falló para IP ' . $ip);
+// Guardar en BD para que el admin pueda verla y gestionarla
+try {
+    require_once __DIR__ . '/../../../../shared/config.php';
+    $db = getPDO(DB_NAME);
+    $db->prepare(
+        'INSERT INTO sugerencias_empresa (nombre_empresa, correo_empresa, nombre_contacto, ip_origen)
+         VALUES (?, ?, ?, ?)'
+    )->execute([$nombre_empresa, $correo_empresa, $nombre_contacto, mb_substr($ip, 0, 45)]);
+} catch (\Throwable $e) {
+    error_log('sugerir_empresa DB error: ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'No se pudo enviar el correo. Intenta más tarde.']);
+    echo json_encode(['success' => false, 'message' => 'Error al guardar la sugerencia. Intenta más tarde.']);
+    exit();
 }
+
+// Intentar enviar correo de notificación (fallo no crítico — ya está en BD)
+if (defined('VINCULACION_EMAIL') && VINCULACION_EMAIL) {
+    $subject = '=?UTF-8?B?' . base64_encode('Nueva sugerencia de empresa: ' . $nombre_empresa) . '?=';
+    $body    = "Se ha recibido una nueva sugerencia de empresa para establecer un convenio.\n\n"
+             . "Nombre de la empresa: " . $nombre_empresa  . "\n"
+             . "Correo de contacto: "   . $correo_empresa  . "\n"
+             . "Nombre del contacto: "  . $nombre_contacto . "\n\n"
+             . "-- Plataforma de Convenios TecSJ --";
+    $headers = implode("\r\n", [
+        'From: no-reply@tecsj.edu.mx',
+        'Reply-To: ' . $correo_empresa,
+        'Content-Type: text/plain; charset=UTF-8',
+        'Content-Transfer-Encoding: base64',
+    ]);
+    @mail(VINCULACION_EMAIL, $subject, base64_encode($body), $headers);
+}
+
+$rl->record($ip);
+echo json_encode(['success' => true, 'message' => 'Sugerencia enviada correctamente.']);

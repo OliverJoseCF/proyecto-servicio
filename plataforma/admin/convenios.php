@@ -10,7 +10,7 @@ $adm_title = 'Convenios';
 try {
     $db          = getPDO(DB_NAME);
     $carreras    = $db->query('SELECT * FROM carreras ORDER BY orden')->fetchAll();
-    $convenios   = $db->query('SELECT cv.*,c.clave carrera_clave,c.nombre carrera_nombre FROM convenios cv LEFT JOIN carreras c ON cv.carrera_id=c.id ORDER BY cv.nombre')->fetchAll();
+    $convenios   = $db->query('SELECT cv.*,c.clave carrera_clave,c.nombre carrera_nombre FROM convenios cv LEFT JOIN carreras c ON cv.carrera_id=c.id ORDER BY cv.activo DESC, cv.nombre')->fetchAll();
     $sugerencias = $db->query('SELECT * FROM sugerencias_empresa WHERE estado="pendiente" ORDER BY created_at DESC')->fetchAll();
     $db_ok = true;
 } catch (\Throwable $e) {
@@ -50,25 +50,36 @@ require_once __DIR__ . '/_layout.php';
 
   <div class="adm-table-wrap">
     <table class="adm-table">
-      <thead><tr><th>Empresa</th><th>Tipo</th><th>Carrera</th><th>Contacto</th><th>Correo</th><th>Vencimiento</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Empresa</th><th>Tipo</th><th>Carrera</th><th>Contacto</th><th>Correo</th><th>Vencimiento</th><th>Estado</th><th>Acciones</th></tr></thead>
       <tbody id="conv-tbody">
         <?php if (empty($convenios)): ?>
-        <tr><td colspan="7" class="adm-table-empty">Sin convenios registrados.</td></tr>
+        <tr><td colspan="8" class="adm-table-empty">Sin convenios registrados.</td></tr>
         <?php endif; ?>
         <?php foreach ($convenios as $cv):
           $vence   = $cv['vencimiento'] ? new DateTime($cv['vencimiento']) : null;
           $hoy     = new DateTime();
           $status  = !$vence ? 'info' : ($hoy > $vence ? 'danger' : ($vence->diff($hoy)->days <= 30 ? 'warn' : 'ok'));
-          $estLabel= ['ok'=>'Vigente','warn'=>'Por vencer','danger'=>'Vencido','info'=>'Sin fecha'];
         ?>
-        <tr id="cv-<?= $cv['id'] ?>" data-carrera="<?= htmlspecialchars($cv['carrera_clave'] ?? '') ?>">
+        <tr id="cv-<?= $cv['id'] ?>" data-carrera="<?= htmlspecialchars($cv['carrera_clave'] ?? '') ?>"
+            <?= !$cv['activo'] ? 'style="opacity:.5"' : '' ?>>
           <td style="font-weight:600"><?= htmlspecialchars($cv['nombre']) ?></td>
           <td><span class="adm-status adm-status--info"><?= htmlspecialchars($cv['tipo_convenio']) ?></span></td>
           <td><?= htmlspecialchars($cv['carrera_clave'] ?? '—') ?></td>
           <td><?= htmlspecialchars($cv['nombre_contacto'] ?? '') ?></td>
           <td><?= $cv['correo_contacto'] ? '<a href="mailto:'.htmlspecialchars($cv['correo_contacto']).'" style="color:var(--tsj-blue)">'.htmlspecialchars($cv['correo_contacto']).'</a>' : '—' ?></td>
           <td><span class="adm-status adm-status--<?= $status ?>"><?= $cv['vencimiento'] ? htmlspecialchars($cv['vencimiento']) : 'Sin fecha' ?></span></td>
+          <td>
+            <?php if ($cv['activo']): ?>
+              <span class="adm-status adm-status--ok">Activo</span>
+            <?php else: ?>
+              <span class="adm-status adm-status--warn">Inactivo</span>
+            <?php endif; ?>
+          </td>
           <td class="actions">
+            <button class="adm-btn adm-btn--ghost adm-btn--sm" title="<?= $cv['activo'] ? 'Desactivar' : 'Activar' ?>"
+                    onclick="toggleActivo('convenios','convenio_toggle',<?= $cv['id'] ?>,this)">
+              <span class="material-symbols-rounded"><?= $cv['activo'] ? 'visibility_off' : 'visibility' ?></span>
+            </button>
             <button class="adm-btn adm-btn--ghost adm-btn--sm"
                     onclick="abrirEditarConv(<?= htmlspecialchars(json_encode($cv)) ?>)">
               <span class="material-symbols-rounded">edit</span>
@@ -86,7 +97,7 @@ require_once __DIR__ . '/_layout.php';
 
   <div class="adm-form-card" style="margin-top:20px">
     <div class="adm-form-title"><span class="material-symbols-rounded">handshake</span> <span id="form-conv-titulo">Agregar convenio</span></div>
-    <form data-proc="convenios" data-accion="convenio_agregar" id="form-conv">
+    <form data-proc="convenios" data-reload id="form-conv">
       <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="convenio_agregar" id="conv-accion">
       <input type="hidden" name="id" id="conv-id">
@@ -163,6 +174,27 @@ require_once __DIR__ . '/_layout.php';
 </div>
 
 <script>
+function toggleActivo(modulo, accion, id, btn) {
+  var csrfEl = document.querySelector('input[name="_csrf"]');
+  var csrf   = csrfEl ? csrfEl.value : '';
+  adminFetch(modulo, { _csrf: csrf, accion: accion, id: id })
+    .then(function (json) {
+      if (json.ok) {
+        var row   = btn.closest('tr');
+        var icon  = btn.querySelector('.material-symbols-rounded');
+        var badge = row.querySelector('.adm-status:last-of-type');
+        var activo = json.activo;
+        row.style.opacity = activo ? '' : '0.5';
+        icon.textContent  = activo ? 'visibility_off' : 'visibility';
+        btn.title         = activo ? 'Desactivar' : 'Activar';
+        if (badge) {
+          badge.textContent = activo ? 'Activo' : 'Inactivo';
+          badge.className   = 'adm-status ' + (activo ? 'adm-status--ok' : 'adm-status--warn');
+        }
+      }
+    });
+}
+
 function filtrarConvenios(clave){
   document.querySelectorAll('#conv-pills .adm-career-pill').forEach(b=>{
     b.classList.toggle('active', b.textContent.trim()===(clave||'Todos'));
@@ -200,7 +232,7 @@ function resetFormConv(){
 function procesarSug(id, tipo, rowId, csrf){
   const accion = tipo==='aceptar'?'sugerencia_aceptar':'sugerencia_rechazar';
   if(!confirm(tipo==='aceptar'?'¿Aceptar esta sugerencia?':'¿Rechazar esta sugerencia?')) return;
-  adminFetch('convenios',{csrf,accion,id})
+  adminFetch('convenios',{_csrf: csrf, accion, id})
     .then(r=>{ if(r.ok) document.getElementById(rowId)?.remove(); });
 }
 

@@ -10,7 +10,7 @@ $adm_title = 'Buscar Maestro';
 try {
     $db        = getPDO(DB_NAME);
     $carreras  = $db->query('SELECT * FROM carreras ORDER BY orden')->fetchAll();
-    $profesores= $db->query('SELECT * FROM profesores ORDER BY apellido,nombre')->fetchAll();
+    $profesores= $db->query('SELECT * FROM profesores ORDER BY activo DESC, apellido, nombre')->fetchAll();
     $horarios  = $db->query('SELECT h.*,p.nombre,p.apellido,p.foto,c.clave carrera_clave,c.nombre carrera_nombre
                               FROM horarios h
                               JOIN profesores p ON h.id_profesor=p.id_profesor
@@ -47,13 +47,13 @@ require_once __DIR__ . '/_layout.php';
 <div class="adm-tab-panel active" data-tab-group="hor" data-tab="maestros">
   <div class="adm-table-wrap">
     <table class="adm-table">
-      <thead><tr><th>Foto</th><th>Nombre</th><th>Apellido</th><th>Correo</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Foto</th><th>Nombre</th><th>Apellido</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr></thead>
       <tbody>
         <?php if (empty($profesores)): ?>
-        <tr><td colspan="5" class="adm-table-empty">Sin maestros registrados.</td></tr>
+        <tr><td colspan="6" class="adm-table-empty">Sin maestros registrados.</td></tr>
         <?php endif; ?>
         <?php foreach ($profesores as $p): ?>
-        <tr id="prof-<?= $p['id_profesor'] ?>">
+        <tr id="prof-<?= $p['id_profesor'] ?>" <?= !$p['activo'] ? 'style="opacity:.5"' : '' ?>>
           <td class="col-photo">
             <img src="<?= $p['foto'] ? $base_img.htmlspecialchars($p['foto']) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='38'%3E%3Crect width='38' height='38' fill='%23e5e7eb'/%3E%3C/svg%3E" ?>"
                  style="width:38px;height:38px;border-radius:50%;object-fit:cover" alt="">
@@ -61,7 +61,18 @@ require_once __DIR__ . '/_layout.php';
           <td style="font-weight:600"><?= htmlspecialchars($p['nombre']) ?></td>
           <td><?= htmlspecialchars($p['apellido']) ?></td>
           <td><?= $p['correo'] ? '<a href="mailto:'.htmlspecialchars($p['correo']).'" style="color:var(--tsj-blue);font-size:12.5px">'.htmlspecialchars($p['correo']).'</a>' : '—' ?></td>
+          <td>
+            <?php if ($p['activo']): ?>
+              <span class="adm-status adm-status--ok">Activo</span>
+            <?php else: ?>
+              <span class="adm-status adm-status--warn">Inactivo</span>
+            <?php endif; ?>
+          </td>
           <td class="actions">
+            <button class="adm-btn adm-btn--ghost adm-btn--sm" title="<?= $p['activo'] ? 'Desactivar' : 'Activar' ?>"
+                    onclick="toggleActivo('horarios','profesor_toggle',<?= $p['id_profesor'] ?>,this)">
+              <span class="material-symbols-rounded"><?= $p['activo'] ? 'visibility_off' : 'visibility' ?></span>
+            </button>
             <button class="adm-btn adm-btn--ghost adm-btn--sm"
                     onclick="abrirEditarProf(<?= htmlspecialchars(json_encode($p)) ?>)">
               <span class="material-symbols-rounded">edit</span>
@@ -79,7 +90,7 @@ require_once __DIR__ . '/_layout.php';
 
   <div class="adm-form-card" style="margin-top:20px">
     <div class="adm-form-title"><span class="material-symbols-rounded">school</span> <span id="form-prof-titulo">Agregar maestro</span></div>
-    <form data-proc="horarios" data-accion="profesor_agregar" id="form-prof">
+    <form data-proc="horarios" data-reload id="form-prof">
       <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="profesor_agregar" id="prof-accion">
       <input type="hidden" name="id" id="prof-id">
@@ -176,6 +187,27 @@ require_once __DIR__ . '/_layout.php';
 </div>
 
 <script>
+function toggleActivo(modulo, accion, id, btn) {
+  var csrfEl = document.querySelector('input[name="_csrf"]');
+  var csrf   = csrfEl ? csrfEl.value : '';
+  adminFetch(modulo, { _csrf: csrf, accion: accion, id: id })
+    .then(function (json) {
+      if (json.ok) {
+        var row   = btn.closest('tr');
+        var icon  = btn.querySelector('.material-symbols-rounded');
+        var badge = row.querySelector('.adm-status');
+        var activo = json.activo;
+        row.style.opacity = activo ? '' : '0.5';
+        icon.textContent  = activo ? 'visibility_off' : 'visibility';
+        btn.title         = activo ? 'Desactivar' : 'Activar';
+        if (badge) {
+          badge.textContent = activo ? 'Activo' : 'Inactivo';
+          badge.className   = 'adm-status ' + (activo ? 'adm-status--ok' : 'adm-status--warn');
+        }
+      }
+    });
+}
+
 function abrirEditarProf(p){
   document.getElementById('prof-accion').value   = 'profesor_editar';
   document.getElementById('prof-id').value       = p.id_profesor;

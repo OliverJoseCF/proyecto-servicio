@@ -76,7 +76,7 @@ require_once __DIR__ . '/_layout.php';
 
   <div class="adm-form-card" style="margin-top:20px">
     <div class="adm-form-title"><span class="material-symbols-rounded">library_add</span> <span id="form-lib-titulo">Agregar libro</span></div>
-    <form data-proc="biblioteca" data-accion="libro_agregar" id="form-lib">
+    <form data-proc="biblioteca" data-reload id="form-lib">
       <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="libro_agregar" id="lib-accion">
       <input type="hidden" name="id" id="lib-id">
@@ -192,14 +192,14 @@ function resetFormLib(){
 }
 function marcarDevuelto(id, rowId, csrf){
   if(!confirm('¿Marcar este préstamo como devuelto?')) return;
-  adminFetch('biblioteca',{csrf,accion:'prestamo_devuelto',id})
+  adminFetch('biblioteca',{_csrf: csrf, accion:'prestamo_devuelto', id})
     .then(r=>{ if(r.ok) document.getElementById(rowId)?.remove(); });
 }
 function procesarSol(id, tipo, rowId, csrf){
   const accion = tipo==='aprobar'?'solicitud_aprobar':'solicitud_rechazar';
   const msg    = tipo==='aprobar'?'¿Aprobar esta solicitud?':'¿Rechazar esta solicitud?';
   if(!confirm(msg)) return;
-  adminFetch('biblioteca',{csrf,accion,id})
+  adminFetch('biblioteca',{_csrf: csrf, accion, id})
     .then(r=>{ if(r.ok) document.getElementById(rowId)?.remove(); });
 }
 // Activar tab solicitudes si viene desde dashboard

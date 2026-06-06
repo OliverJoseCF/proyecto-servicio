@@ -40,8 +40,12 @@ if ($accion === 'libro_editar') {
 if ($accion === 'libro_eliminar') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
-    $db->prepare('DELETE FROM libros WHERE id=?')->execute([$id]);
-    jsonOk('Libro eliminado');
+    $stmt = $db->prepare('SELECT COUNT(*) FROM prestamos WHERE libro_id=? AND devuelto=0');
+    $stmt->execute([$id]);
+    if ((int)$stmt->fetchColumn() > 0) jsonErr('No se puede eliminar: el libro tiene préstamos activos. Espera a que sean devueltos.');
+    // Soft-delete: conserva el historial de préstamos
+    $db->prepare('UPDATE libros SET activo=0 WHERE id=?')->execute([$id]);
+    jsonOk('Libro eliminado del catálogo');
 }
 
 // ══ PRÉSTAMOS ════════════════════════════════════════════════════

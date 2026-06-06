@@ -1,10 +1,35 @@
 <?php
 $tsj_module    = 'requisitos';
-$tsj_title     = 'Convenios — Residencia Profesional';
+$tsj_title     = 'Residencia Profesional';
 $tsj_extra_css = [
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css',
     'assets/css/style.css',
 ];
+require_once __DIR__ . '/../../shared/config.php';
+
+try {
+    $db   = getPDO(DB_NAME);
+    $tipo = 'residencia';
+
+    $requisitos  = $db->prepare('SELECT texto FROM requisitos_items WHERE tipo=? AND activo=1 ORDER BY orden');
+    $requisitos->execute([$tipo]);
+    $requisitos  = $requisitos->fetchAll();
+
+    $fases       = $db->prepare('SELECT * FROM timeline_fases WHERE tipo=? AND activo=1 ORDER BY orden');
+    $fases->execute([$tipo]);
+    $fases       = $fases->fetchAll();
+
+    $documentos  = $db->prepare('SELECT * FROM documentos_descargables WHERE tipo=? AND activo=1 ORDER BY orden');
+    $documentos->execute([$tipo]);
+    $documentos  = $documentos->fetchAll();
+
+    $faqs        = $db->prepare('SELECT pregunta, respuesta FROM faq WHERE tipo=? AND activo=1 ORDER BY orden');
+    $faqs->execute([$tipo]);
+    $faqs        = $faqs->fetchAll();
+} catch (\Throwable $e) {
+    $requisitos = $fases = $documentos = $faqs = [];
+}
+
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 
@@ -37,77 +62,37 @@ require_once __DIR__ . '/../../shared/header.php';
       </div>
     </section>
 
+    <?php if (!empty($fases)): ?>
     <!-- Timeline del Proceso -->
     <section class="tarjeta" aria-label="Timeline del proceso de residencia">
       <h2><i class="fas fa-clock" aria-hidden="true"></i> Timeline del Proceso</h2>
       <ol class="timeline">
+        <?php foreach ($fases as $i => $f): ?>
         <li class="timeline-item">
           <div class="timeline-dot" aria-hidden="true"></div>
-          <h3>Fase 1: Preparación</h3>
-          <p>Reunir documentos y cumplir requisitos académicos (70–80% créditos)</p>
+          <h3>Fase <?= $i + 1 ?>: <?= htmlspecialchars($f['titulo']) ?></h3>
+          <?php if ($f['descripcion']): ?>
+            <p><?= htmlspecialchars($f['descripcion']) ?></p>
+          <?php endif; ?>
+          <?php if ($f['tiempo_referencia']): ?>
+            <p><small><?= htmlspecialchars($f['tiempo_referencia']) ?></small></p>
+          <?php endif; ?>
         </li>
-        <li class="timeline-item">
-          <div class="timeline-dot" aria-hidden="true"></div>
-          <h3>Fase 2: Búsqueda</h3>
-          <p>Encontrar empresa y obtener carta de aceptación</p>
-        </li>
-        <li class="timeline-item">
-          <div class="timeline-dot" aria-hidden="true"></div>
-          <h3>Fase 3: Anteproyecto</h3>
-          <p>Elaborar y presentar anteproyecto</p>
-        </li>
-        <li class="timeline-item">
-          <div class="timeline-dot" aria-hidden="true"></div>
-          <h3>Fase 4: Ejecución</h3>
-          <p>Realizar residencia (480 horas)</p>
-        </li>
-        <li class="timeline-item">
-          <div class="timeline-dot" aria-hidden="true"></div>
-          <h3>Fase 5: Evaluación</h3>
-          <p>Presentar informe final y recibir evaluación</p>
-        </li>
+        <?php endforeach; ?>
       </ol>
     </section>
+    <?php endif; ?>
 
+    <?php if (!empty($requisitos)): ?>
     <!-- Checklist Interactivo -->
     <section class="tarjeta" aria-label="Checklist de requisitos">
       <h2><i class="fas fa-tasks" aria-hidden="true"></i> Checklist de Requisitos</h2>
+      <?php foreach ($requisitos as $i => $req): ?>
       <div class="checklist-item">
-        <input type="checkbox" id="req1">
-        <label for="req1">Haber cursado entre el 70% y el 80% de los créditos</label>
+        <input type="checkbox" id="req<?= $i + 1 ?>">
+        <label for="req<?= $i + 1 ?>"><?= htmlspecialchars($req['texto']) ?></label>
       </div>
-      <div class="checklist-item">
-        <input type="checkbox" id="req2">
-        <label for="req2">No tener materias reprobadas</label>
-      </div>
-      <div class="checklist-item">
-        <input type="checkbox" id="req3">
-        <label for="req3">Tener el servicio social liberado o en proceso</label>
-      </div>
-      <div class="checklist-item">
-        <input type="checkbox" id="req4">
-        <label for="req4">Carta de presentación de la universidad</label>
-      </div>
-      <div class="checklist-item">
-        <input type="checkbox" id="req5">
-        <label for="req5">Carta de aceptación de la empresa</label>
-      </div>
-      <div class="checklist-item">
-        <input type="checkbox" id="req6">
-        <label for="req6">Anteproyecto aprobado</label>
-      </div>
-      <div class="checklist-item">
-        <input type="checkbox" id="req7">
-        <label for="req7">Kárdex o historial académico actualizado</label>
-      </div>
-      <div class="checklist-item">
-        <input type="checkbox" id="req8">
-        <label for="req8">CURP, INE y comprobante de domicilio</label>
-      </div>
-      <div class="checklist-item">
-        <input type="checkbox" id="req9">
-        <label for="req9">Seguro facultativo o particular vigente</label>
-      </div>
+      <?php endforeach; ?>
     </section>
 
     <!-- Barra de Progreso -->
@@ -120,84 +105,41 @@ require_once __DIR__ . '/../../shared/header.php';
       </div>
       <p>Marca los requisitos completados para ver tu progreso</p>
     </section>
+    <?php endif; ?>
 
-    <!-- Documentación Detallada -->
-    <section class="tarjeta" aria-label="Documentación detallada">
-      <h2><i class="fas fa-file-alt" aria-hidden="true"></i> Documentación Detallada</h2>
-      <div class="searchable-content">
-        <h3>Requisitos Académicos:</h3>
-        <ul>
-          <li>Haber cursado entre el 70% y el 80% del total de créditos de la carrera.</li>
-          <li>No tener materias reprobadas (algunas permiten una o dos).</li>
-          <li>Tener el servicio social liberado o en proceso.</li>
-        </ul>
-        <h3>Documentación Solicitada:</h3>
-        <ul>
-          <li>Carta de presentación de la universidad.</li>
-          <li>Carta de aceptación de la empresa u organización.</li>
-          <li>Anteproyecto o plan de trabajo:
-            <ul>
-              <li>Objetivo del proyecto</li>
-              <li>Actividades a realizar</li>
-              <li>Cronograma</li>
-              <li>Resultados esperados</li>
-            </ul>
-          </li>
-          <li>Kárdex o historial académico actualizado</li>
-          <li>CURP, INE y comprobante de domicilio</li>
-          <li>Seguro facultativo o particular vigente</li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- Descargas -->
+    <?php if (!empty($documentos)): ?>
+    <!-- Documentos para Descargar -->
     <section class="tarjeta" aria-label="Documentos para descargar">
       <h2><i class="fas fa-download" aria-hidden="true"></i> Documentos para Descargar</h2>
       <div class="descargas-servicio">
-        <a href="https://drive.google.com/file/d/1oJR4zSpAX6o99eMSuqot4T2DOYhlbAFX/view?usp=sharing"
+        <?php foreach ($documentos as $doc): ?>
+        <a href="<?= htmlspecialchars($doc['url']) ?>"
            target="_blank" rel="noopener noreferrer" class="boton-descarga"
-           aria-label="Descargar Solicitud de Residencia (PDF, abre en nueva pestaña)">
-          <i class="fas fa-file-pdf" aria-hidden="true"></i> Solicitud de Residencia
+           aria-label="Descargar <?= htmlspecialchars($doc['nombre']) ?> (abre en nueva pestaña)">
+          <i class="fas fa-file-pdf" aria-hidden="true"></i> <?= htmlspecialchars($doc['nombre']) ?>
         </a>
-        <a href="https://drive.google.com/file/d/1oMtGJNoBKg2Z8n6q1hL04VrRIbzKaWNC/view?usp=sharing"
-           target="_blank" rel="noopener noreferrer" class="boton-descarga"
-           aria-label="Descargar Formato de Seguimiento y Evaluación (PDF, abre en nueva pestaña)">
-          <i class="fas fa-file-pdf" aria-hidden="true"></i> Seguimiento y Evaluación
-        </a>
+        <?php endforeach; ?>
       </div>
     </section>
+    <?php endif; ?>
 
+    <?php if (!empty($faqs)): ?>
     <!-- FAQ -->
     <section class="tarjeta" aria-label="Preguntas frecuentes">
       <h2><i class="fas fa-question-circle" aria-hidden="true"></i> Preguntas Frecuentes</h2>
+      <?php foreach ($faqs as $faq): ?>
       <div class="faq-item">
         <button class="faq-question" aria-expanded="false">
-          <span>¿Cuánto dura la residencia profesional?</span>
+          <span><?= htmlspecialchars($faq['pregunta']) ?></span>
           <i class="fas fa-chevron-down faq-icon" aria-hidden="true"></i>
         </button>
         <div class="faq-answer" role="region">
-          <p>La residencia profesional tiene una duración de 480 horas, equivalentes a 6 meses de tiempo completo.</p>
+          <p><?= htmlspecialchars($faq['respuesta']) ?></p>
         </div>
       </div>
-      <div class="faq-item">
-        <button class="faq-question" aria-expanded="false">
-          <span>¿Puedo hacer residencia en mi propio trabajo?</span>
-          <i class="fas fa-chevron-down faq-icon" aria-hidden="true"></i>
-        </button>
-        <div class="faq-answer" role="region">
-          <p>Sí, siempre y cuando las actividades estén relacionadas con tu carrera y cumplan con los requisitos académicos.</p>
-        </div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question" aria-expanded="false">
-          <span>¿Qué pasa si no encuentro empresa?</span>
-          <i class="fas fa-chevron-down faq-icon" aria-hidden="true"></i>
-        </button>
-        <div class="faq-answer" role="region">
-          <p>El departamento de residencias tiene convenios con empresas y puede ayudarte a encontrar una opción adecuada.</p>
-        </div>
-      </div>
+      <?php endforeach; ?>
     </section>
+    <?php endif; ?>
 
   </div>
 </main>

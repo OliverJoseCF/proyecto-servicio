@@ -1,10 +1,35 @@
 <?php
 $tsj_module    = 'requisitos';
-$tsj_title     = 'Convenios — Servicio Social';
+$tsj_title     = 'Servicio Social';
 $tsj_extra_css = [
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css',
     'assets/css/style.css',
 ];
+require_once __DIR__ . '/../../shared/config.php';
+
+try {
+    $db   = getPDO(DB_NAME);
+    $tipo = 'servicio_social';
+
+    $requisitos  = $db->prepare('SELECT texto FROM requisitos_items WHERE tipo=? AND activo=1 ORDER BY orden');
+    $requisitos->execute([$tipo]);
+    $requisitos  = $requisitos->fetchAll();
+
+    $fases       = $db->prepare('SELECT * FROM timeline_fases WHERE tipo=? AND activo=1 ORDER BY orden');
+    $fases->execute([$tipo]);
+    $fases       = $fases->fetchAll();
+
+    $documentos  = $db->prepare('SELECT * FROM documentos_descargables WHERE tipo=? AND activo=1 ORDER BY orden');
+    $documentos->execute([$tipo]);
+    $documentos  = $documentos->fetchAll();
+
+    $faqs        = $db->prepare('SELECT pregunta, respuesta FROM faq WHERE tipo=? AND activo=1 ORDER BY orden');
+    $faqs->execute([$tipo]);
+    $faqs        = $faqs->fetchAll();
+} catch (\Throwable $e) {
+    $requisitos = $fases = $documentos = $faqs = [];
+}
+
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 
@@ -22,61 +47,37 @@ require_once __DIR__ . '/../../shared/header.php';
       <a href="servicio-social.php" class="boton-navegacion active" aria-current="page">Servicio Social</a>
     </nav>
 
+    <?php if (!empty($fases)): ?>
     <!-- Timeline del Proceso -->
     <section class="tarjeta" aria-label="Timeline del proceso de servicio social">
       <h2><i class="fas fa-clock" aria-hidden="true"></i> Timeline del Proceso</h2>
       <ol class="timeline">
+        <?php foreach ($fases as $i => $f): ?>
         <li class="timeline-item">
           <div class="timeline-dot" aria-hidden="true"></div>
-          <h3>Fase 1: Requisitos</h3>
-          <p>Cumplir con el 70% de créditos y obtener constancia</p>
+          <h3>Fase <?= $i + 1 ?>: <?= htmlspecialchars($f['titulo']) ?></h3>
+          <?php if ($f['descripcion']): ?>
+            <p><?= htmlspecialchars($f['descripcion']) ?></p>
+          <?php endif; ?>
+          <?php if ($f['tiempo_referencia']): ?>
+            <p><small><?= htmlspecialchars($f['tiempo_referencia']) ?></small></p>
+          <?php endif; ?>
         </li>
-        <li class="timeline-item">
-          <div class="timeline-dot" aria-hidden="true"></div>
-          <h3>Fase 2: Documentos</h3>
-          <p>Llenar y entregar solicitud, carta compromiso y plan de trabajo</p>
-        </li>
-        <li class="timeline-item">
-          <div class="timeline-dot" aria-hidden="true"></div>
-          <h3>Fase 3: Ejecución</h3>
-          <p>Realizar 500 horas en mínimo 6 meses y máximo 2 años</p>
-        </li>
-        <li class="timeline-item">
-          <div class="timeline-dot" aria-hidden="true"></div>
-          <h3>Fase 4: Reportes</h3>
-          <p>Entregar reportes bimestrales y evaluaciones</p>
-        </li>
-        <li class="timeline-item">
-          <div class="timeline-dot" aria-hidden="true"></div>
-          <h3>Fase 5: Liberación</h3>
-          <p>Obtener carta de liberación y constancia final</p>
-        </li>
+        <?php endforeach; ?>
       </ol>
     </section>
+    <?php endif; ?>
 
+    <?php if (!empty($requisitos)): ?>
     <!-- Checklist Interactivo -->
     <section class="tarjeta" aria-label="Checklist de requisitos">
       <h2><i class="fas fa-tasks" aria-hidden="true"></i> Checklist de Requisitos</h2>
+      <?php foreach ($requisitos as $i => $req): ?>
       <div class="checklist-item">
-        <input type="checkbox" id="req1">
-        <label for="req1">Tener acreditado el 70% de los créditos de la carrera</label>
+        <input type="checkbox" id="req<?= $i + 1 ?>">
+        <label for="req<?= $i + 1 ?>"><?= htmlspecialchars($req['texto']) ?></label>
       </div>
-      <div class="checklist-item">
-        <input type="checkbox" id="req2">
-        <label for="req2">Solicitud de servicio social</label>
-      </div>
-      <div class="checklist-item">
-        <input type="checkbox" id="req3">
-        <label for="req3">Carta compromiso firmada</label>
-      </div>
-      <div class="checklist-item">
-        <input type="checkbox" id="req4">
-        <label for="req4">Plan de trabajo aprobado</label>
-      </div>
-      <div class="checklist-item">
-        <input type="checkbox" id="req5">
-        <label for="req5">Constancia de créditos del departamento</label>
-      </div>
+      <?php endforeach; ?>
     </section>
 
     <!-- Barra de Progreso -->
@@ -89,83 +90,41 @@ require_once __DIR__ . '/../../shared/header.php';
       </div>
       <p>Marca los requisitos completados para ver tu progreso</p>
     </section>
+    <?php endif; ?>
 
-    <!-- Información del Servicio Social -->
-    <section class="tarjeta" aria-label="Información del servicio social">
-      <h2><i class="fas fa-info-circle" aria-hidden="true"></i> Información del Servicio Social</h2>
-      <div class="searchable-content">
-        <h3>Requisito Principal:</h3>
-        <p>El requisito único que se requiere para el Servicio Social es tener acreditado el 70% de los créditos de la carrera, no es necesario algo más.</p>
-        <h3>Duración y Créditos:</h3>
-        <p>El servicio social consta de 500 horas, lo cual equivale a 10 créditos y lo deben realizar en un mínimo de 6 meses y un máximo de dos años.</p>
-        <h3>Formatos Requeridos:</h3>
-        <ul>
-          <li>Solicitud de servicio social</li>
-          <li>Carta compromiso, firmada por el interesado</li>
-          <li>Plan de trabajo (llenado en conjunto con la persona que firmará los reportes)</li>
-          <li>Constancia de créditos que expide el departamento de servicio social</li>
-        </ul>
-      </div>
-    </section>
-
+    <?php if (!empty($documentos)): ?>
     <!-- Documentos para Descargar -->
     <section class="tarjeta" aria-label="Documentos para descargar">
       <h2><i class="fas fa-download" aria-hidden="true"></i> Documentos para Descargar</h2>
       <div class="descargas-servicio">
-        <a href="assets/docs/servicio-social/evaluacion-cualitativa.pdf"
+        <?php foreach ($documentos as $doc): ?>
+        <a href="<?= htmlspecialchars($doc['url']) ?>"
            target="_blank" rel="noopener noreferrer" class="boton-descarga"
-           aria-label="Descargar Evaluación Cualitativa (PDF, abre en nueva pestaña)">
-          <i class="fas fa-file-pdf" aria-hidden="true"></i> Evaluación Cualitativa
+           aria-label="Descargar <?= htmlspecialchars($doc['nombre']) ?> (abre en nueva pestaña)">
+          <i class="fas fa-file-pdf" aria-hidden="true"></i> <?= htmlspecialchars($doc['nombre']) ?>
         </a>
-        <a href="assets/docs/servicio-social/carta-compromiso.pdf"
-           target="_blank" rel="noopener noreferrer" class="boton-descarga"
-           aria-label="Descargar Carta Compromiso (PDF, abre en nueva pestaña)">
-          <i class="fas fa-file-pdf" aria-hidden="true"></i> Carta Compromiso
-        </a>
-        <a href="assets/docs/servicio-social/reporte-bimestral-1.pdf"
-           target="_blank" rel="noopener noreferrer" class="boton-descarga"
-           aria-label="Descargar Reporte Bimestral (PDF, abre en nueva pestaña)">
-          <i class="fas fa-file-pdf" aria-hidden="true"></i> Reporte Bimestral
-        </a>
-        <a href="assets/docs/servicio-social/formato-evaluacion.pdf"
-           target="_blank" rel="noopener noreferrer" class="boton-descarga"
-           aria-label="Descargar Formato de Evaluación (PDF, abre en nueva pestaña)">
-          <i class="fas fa-file-pdf" aria-hidden="true"></i> Formato Evaluación
-        </a>
+        <?php endforeach; ?>
       </div>
     </section>
+    <?php endif; ?>
 
+    <?php if (!empty($faqs)): ?>
     <!-- FAQ -->
     <section class="tarjeta" aria-label="Preguntas frecuentes">
       <h2><i class="fas fa-question-circle" aria-hidden="true"></i> Preguntas Frecuentes</h2>
+      <?php foreach ($faqs as $faq): ?>
       <div class="faq-item">
         <button class="faq-question" aria-expanded="false">
-          <span>¿Puedo hacer mi servicio social en una empresa privada?</span>
+          <span><?= htmlspecialchars($faq['pregunta']) ?></span>
           <i class="fas fa-chevron-down faq-icon" aria-hidden="true"></i>
         </button>
         <div class="faq-answer" role="region">
-          <p>Sí, siempre y cuando el proyecto beneficie directamente a la comunidad y cumpla con los objetivos del servicio social.</p>
+          <p><?= htmlspecialchars($faq['respuesta']) ?></p>
         </div>
       </div>
-      <div class="faq-item">
-        <button class="faq-question" aria-expanded="false">
-          <span>¿Qué pasa si no puedo cumplir las 500 horas?</span>
-          <i class="fas fa-chevron-down faq-icon" aria-hidden="true"></i>
-        </button>
-        <div class="faq-answer" role="region">
-          <p>Debes completar las 500 horas obligatoriamente. Si tienes problemas, habla con el departamento de servicio social para buscar soluciones.</p>
-        </div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question" aria-expanded="false">
-          <span>¿Puedo hacer servicio social en mi propia comunidad?</span>
-          <i class="fas fa-chevron-down faq-icon" aria-hidden="true"></i>
-        </button>
-        <div class="faq-answer" role="region">
-          <p>Sí, siempre y cuando el proyecto esté debidamente documentado y aprobado por el departamento de servicio social.</p>
-        </div>
-      </div>
+      <?php endforeach; ?>
     </section>
+    <?php endif; ?>
 
   </div>
 </main>

@@ -42,8 +42,17 @@ if ($accion === 'convenio_editar') {
 if ($accion === 'convenio_eliminar') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
-    $db->prepare('DELETE FROM convenios WHERE id=?')->execute([$id]);
+    // Soft-delete para conservar referencias históricas
+    $db->prepare('UPDATE convenios SET activo=0 WHERE id=?')->execute([$id]);
     jsonOk('Convenio eliminado');
+}
+
+if ($accion === 'convenio_toggle') {
+    $id = postInt('id');
+    if (!$id) jsonErr('ID inválido');
+    $db->prepare('UPDATE convenios SET activo = 1 - activo WHERE id=?')->execute([$id]);
+    $activo = (int)$db->query("SELECT activo FROM convenios WHERE id=$id")->fetchColumn();
+    jsonOk($activo ? 'Convenio activado' : 'Convenio desactivado', ['activo' => $activo]);
 }
 
 // ══ SUGERENCIAS ══════════════════════════════════════════════════
