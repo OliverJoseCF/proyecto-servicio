@@ -25,79 +25,74 @@
   font-weight: 300;
 }
 
+/* ── Botón sugerir empresa ────────────────────────────────── */
+.conv-suggest-bar {
+  display: flex;
+  justify-content: flex-end;
+  max-width: 1100px;
+  margin: 0 auto 16px;
+  padding: 0 20px;
+}
+
 /* ── Cards de carrera ────────────────────────────────────── */
 .cards-container {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  flex-wrap: wrap;
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
+  padding: 0 20px 32px;
 }
 
 .card {
-  width: 360px;
-  min-height: 400px;
+  width: 100%;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   overflow: hidden;
   border-radius: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
   text-decoration: none;
   color: inherit;
+  box-shadow: 0 2px 12px rgba(0,0,0,.08);
+  border: 1px solid #e8eaf2;
+  background: #fff;
   transition: transform 0.3s ease, box-shadow 0.3s;
 }
 .card:hover {
-  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-  transform: scale(1.04);
+  box-shadow: 0 10px 28px rgba(0,0,0,.16);
+  transform: translateY(-4px);
 }
 .card:focus-visible {
   outline: 3px solid var(--tsj-pink, #ff4d63);
   outline-offset: 3px;
 }
-.card::after {
-  content: "";
-  position: absolute;
-  bottom: -50px; left: 50%;
-  transform: translateX(-50%);
-  width: 100%; height: 80px;
-  background: rgba(255,255,255,1);
-  border-radius: 0 0 20px 20px;
+
+/* Franja de color de la carrera (dinámica desde BD) */
+.conv-card-stripe {
+  width: 100%;
+  height: 6px;
+  flex-shrink: 0;
 }
+
 .ing-sistemas {
-  width: 100%; height: 260px;
+  width: 100%; height: 240px;
   flex-shrink: 0;
   object-fit: cover; object-position: center;
 }
+
 .card-text {
   font-family: var(--tsj-font, 'Poppins', sans-serif) !important;
-  width: 100%; background: white;
-  color: var(--conv-text);
+  width: 100%;
+  background: #fff;
   display: flex; align-items: center; justify-content: center;
-  font-size: 22px; font-weight: 800;
+  font-size: 18px; font-weight: 800;
   text-align: center;
-  padding: 16px 12px;
-  overflow: hidden; word-wrap: break-word;
+  padding: 18px 16px;
+  line-height: 1.3;
+  min-height: 70px;
 }
-
-/* Decoración de esquinas */
-.corner-box-top, .corner-box-top-green {
-  position: absolute; top: 15px; left: 15px;
-  height: 55px; width: 55px;
-  display: flex; justify-content: center; align-items: center;
-  border-radius: 5px;
-}
-.corner-box-top       { background-color: var(--conv-orange); }
-.corner-box-top-green { background-color: var(--conv-green); }
-.corner-logo { width: 90%; height: auto; object-fit: contain; }
-.corner-box, .corner-box-green {
-  position: absolute; bottom: 125px; left: 0;
-  height: 16px; width: 100px;
-}
-.corner-box       { background-color: var(--conv-orange); }
-.corner-box-green { background-color: var(--conv-green); }
 
 /* ── Login Modal ────────────────────────────────────────── */
 .login-modal-overlay {
@@ -159,15 +154,18 @@
   font-size: 14px; text-align: center;
 }
 .login-button {
-  position: relative; padding: 10px 20px;
+  position: relative; padding: 10px 24px;
   border-radius: 7px; border: 1px solid var(--conv-text);
   font-size: 14px; text-transform: uppercase;
   font-weight: 600; letter-spacing: 2px;
   background: transparent; color: var(--conv-text);
   overflow: hidden; cursor: pointer;
   transition: all 0.2s ease-in;
-  display: block; margin: 20px auto; width: 200px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 44px;
+  white-space: nowrap;
 }
 .login-button:hover { background: var(--conv-text); color: #fff; }
 .login-button:focus-visible { outline: 2px solid var(--tsj-pink, #ff4d63); outline-offset: 2px; }
@@ -241,14 +239,10 @@
 .suggest-modal .login-input-container { margin-bottom: 16px; }
 
 /* ── Responsive ─────────────────────────────────────────── */
-@media (max-width: 600px) {
-  .card { width: 100%; min-height: 350px; margin: 10px 0; }
-  .card-text { font-size: 18px; padding: 12px; }
+@media (max-width: 700px) {
+  .cards-container { grid-template-columns: 1fr; }
+  .card-text { font-size: 16px; padding: 14px 12px; }
 }
-@media (min-width: 601px) and (max-width: 1024px) {
-  .cards-container { padding: 15px; gap: 15px; }
-  .card { width: calc(50% - 15px); flex: 1 1 calc(50% - 20px); }
-}
-@media (min-width: 1025px) {
-  .card { width: calc(33.33% - 20px); flex: 1 1 calc(33.33% - 20px); }
+@media (min-width: 701px) and (max-width: 1024px) {
+  .cards-container { grid-template-columns: repeat(2, 1fr); }
 }

@@ -100,6 +100,42 @@ require_once __DIR__ . '/_layout.php';
         <div class="adm-field"><label>Correo electrónico</label><input type="email" name="correo" id="prof-correo"></div>
         <div class="adm-field"><label>Foto (nombre de archivo)</label><input type="text" name="foto" id="prof-foto" placeholder="ej. miguel.png"></div>
       </div>
+
+      <!-- ── Integración con Directorio ── -->
+      <div style="margin:16px 0;padding:14px 16px;background:var(--tsj-blue-50);border-radius:10px;border:1.5px solid #e0dcff">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:600;font-size:13.5px;color:var(--tsj-blue)">
+          <input type="checkbox" name="agregar_directorio" id="prof-dir-check"
+                 onchange="toggleDirFields(this.checked)"
+                 style="width:16px;height:16px;accent-color:var(--tsj-blue);cursor:pointer">
+          <span class="material-symbols-rounded" style="font-size:18px">contacts</span>
+          También agregar al Directorio Institucional
+        </label>
+        <p style="margin:6px 0 0 26px;font-size:12px;color:var(--tsj-gray-600)">
+          El maestro aparecerá automáticamente en el Directorio del portal.
+        </p>
+
+        <div id="prof-dir-fields" style="display:none;margin-top:14px">
+          <div class="adm-form-grid cols-2">
+            <div class="adm-field">
+              <label>Puesto / Área</label>
+              <input type="text" name="dir_puesto" id="prof-dir-puesto" placeholder="Ej. Docente ISC">
+            </div>
+            <div class="adm-field">
+              <label>Ubicación física</label>
+              <input type="text" name="dir_ubicacion" id="prof-dir-ubicacion" placeholder="Ej. Módulo B, Planta Alta">
+            </div>
+            <div class="adm-field">
+              <label>Teléfono</label>
+              <input type="tel" name="dir_telefono" id="prof-dir-telefono" placeholder="S/N">
+            </div>
+            <div class="adm-field">
+              <label>Extensión</label>
+              <input type="text" name="dir_extension" id="prof-dir-extension" placeholder="Ej. 101">
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="adm-form-actions">
         <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar maestro</button>
         <button type="button" class="adm-btn adm-btn--ghost" onclick="resetFormProf()">Cancelar</button>
@@ -208,6 +244,9 @@ function toggleActivo(modulo, accion, id, btn) {
     });
 }
 
+function toggleDirFields(show) {
+  document.getElementById('prof-dir-fields').style.display = show ? '' : 'none';
+}
 function abrirEditarProf(p){
   document.getElementById('prof-accion').value   = 'profesor_editar';
   document.getElementById('prof-id').value       = p.id_profesor;
@@ -215,6 +254,9 @@ function abrirEditarProf(p){
   document.getElementById('prof-apellido').value = p.apellido||'';
   document.getElementById('prof-correo').value   = p.correo||'';
   document.getElementById('prof-foto').value     = p.foto||'';
+  // Ocultar sección directorio al editar (ya se gestionó al crear)
+  document.getElementById('prof-dir-check').checked = false;
+  toggleDirFields(false);
   document.getElementById('form-prof-titulo').textContent='Editar: '+p.nombre+' '+p.apellido;
   document.getElementById('form-prof').scrollIntoView({behavior:'smooth'});
 }
@@ -222,6 +264,8 @@ function resetFormProf(){
   document.getElementById('prof-accion').value='profesor_agregar';
   document.getElementById('prof-id').value='';
   document.getElementById('form-prof').reset();
+  document.getElementById('prof-dir-check').checked = false;
+  toggleDirFields(false);
   document.getElementById('form-prof-titulo').textContent='Agregar maestro';
 }
 </script>

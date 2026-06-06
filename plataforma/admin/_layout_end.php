@@ -103,7 +103,7 @@ document.addEventListener('submit', function(e) {
   adminFetch(proc, obj).then(function(json) {
     if (json.ok) {
       // Si el form tiene data-reload, recargar la página
-      if (form.dataset.reload !== undefined || form.classList.contains('form-materias')) {
+      if (form.dataset.reload !== undefined) {
         setTimeout(function(){ location.reload(); }, 900);
       }
     }
@@ -125,6 +125,98 @@ function confirmarEliminar(modulo, accion, id, rowId) {
       }
     });
 }
+
+/* ── Sortable para .adm-list-editor (mouse + touch) ─────────────
+   Usa eventos de mouse directamente — más confiable que HTML5 drag.
+   El handle .adm-list-item-drag inicia el arrastre.
+─────────────────────────────────────────────────────────────── */
+(function () {
+  var state = null; // { ghost, item, editor, offsetY, placeholder }
+
+  function getItemAt(editor, y) {
+    var items = Array.from(editor.querySelectorAll('.adm-list-item'));
+    for (var i = 0; i < items.length; i++) {
+      var r = items[i].getBoundingClientRect();
+      if (y < r.top + r.height / 2) return items[i];
+    }
+    return null; // insertar al final
+  }
+
+  function onMouseMove(e) {
+    if (!state) return;
+    var y = e.clientY;
+
+    // Mover el ghost
+    state.ghost.style.top = (y - state.offsetY + window.scrollY) + 'px';
+
+    // Mover el placeholder dentro del editor
+    var target = getItemAt(state.editor, y);
+    if (target) {
+      state.editor.insertBefore(state.placeholder, target);
+    } else {
+      state.editor.appendChild(state.placeholder);
+    }
+  }
+
+  function onMouseUp() {
+    if (!state) return;
+
+    // Insertar el ítem real donde está el placeholder
+    state.editor.insertBefore(state.item, state.placeholder);
+    state.placeholder.remove();
+    state.ghost.remove();
+
+    // Restaurar apariencia
+    state.item.style.opacity = '';
+    state.item.style.pointerEvents = '';
+
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup',   onMouseUp);
+    document.body.style.userSelect = '';
+    state = null;
+  }
+
+  // Delegar en document — funciona aunque el DOM cambie
+  document.addEventListener('mousedown', function (e) {
+    var handle = e.target.closest('.adm-list-item-drag');
+    if (!handle) return;
+    var item   = handle.closest('.adm-list-item');
+    var editor = item  && item.closest('.adm-list-editor');
+    if (!item || !editor) return;
+
+    e.preventDefault();
+    document.body.style.userSelect = 'none';
+
+    var rect    = item.getBoundingClientRect();
+    var offsetY = e.clientY - rect.top;
+
+    // Ghost: clon visual que sigue al cursor
+    var ghost = item.cloneNode(true);
+    ghost.style.cssText =
+      'position:fixed;left:' + rect.left + 'px;top:' + rect.top + 'px;' +
+      'width:' + rect.width + 'px;opacity:.85;pointer-events:none;z-index:9999;' +
+      'box-shadow:0 8px 24px rgba(20,10,80,.18);border-radius:8px;' +
+      'background:#fff;border:1.5px solid var(--tsj-blue)';
+    document.body.appendChild(ghost);
+
+    // Placeholder: mantiene el espacio en la lista
+    var ph = document.createElement('div');
+    ph.className = 'adm-list-item';
+    ph.style.cssText =
+      'opacity:0;pointer-events:none;height:' + rect.height + 'px;' +
+      'box-sizing:border-box;border:2px dashed var(--tsj-blue);background:var(--tsj-blue-50)';
+    editor.insertBefore(ph, item);
+
+    // Ocultar el ítem original
+    item.style.opacity       = '0';
+    item.style.pointerEvents = 'none';
+
+    state = { ghost: ghost, item: item, editor: editor, offsetY: offsetY, placeholder: ph };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup',   onMouseUp);
+  });
+})();
 </script>
 </body>
 </html>

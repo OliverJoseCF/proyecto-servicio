@@ -11,9 +11,34 @@ if ($accion === 'profesor_agregar') {
     $correo   = str('correo', 254);
     $foto     = str('foto', 500);
     if (!$nombre || !$apellido) jsonErr('Nombre y apellido son requeridos');
+
     $db->prepare('INSERT INTO profesores (nombre,apellido,correo,foto) VALUES (?,?,?,?)')
-       ->execute([$nombre,$apellido,$correo,$foto ?: null]);
-    jsonOk('Profesor agregado', ['id' => $db->lastInsertId()]);
+       ->execute([$nombre, $apellido, $correo, $foto ?: null]);
+    $nuevoId = $db->lastInsertId();
+
+    // Si se marcó "agregar al directorio", crear registro en directorio también
+    if (!empty($_POST['agregar_directorio'])) {
+        $nombreCompleto = trim($nombre . ' ' . $apellido);
+        $puesto         = str('dir_puesto',    150);
+        $ubicacion      = str('dir_ubicacion', 200);
+        $telefono       = str('dir_telefono',  30) ?: 'S/N';
+        $extension      = str('dir_extension', 20);
+        $db->prepare(
+            'INSERT INTO directorio (nombre, puesto, correo, telefono, extension, ubicacion_fisica, foto)
+             VALUES (?, ?, ?, ?, ?, ?, ?)'
+        )->execute([
+            $nombreCompleto,
+            $puesto   ?: null,
+            $correo   ?: null,
+            $telefono,
+            $extension ?: null,
+            $ubicacion ?: null,
+            $foto      ?: null,
+        ]);
+        jsonOk('Maestro agregado y añadido al Directorio institucional', ['id' => $nuevoId]);
+    }
+
+    jsonOk('Profesor agregado', ['id' => $nuevoId]);
 }
 
 if ($accion === 'profesor_editar') {
@@ -24,7 +49,19 @@ if ($accion === 'profesor_editar') {
     $foto     = str('foto', 500);
     if (!$id || !$nombre || !$apellido) jsonErr('Datos incompletos');
     $db->prepare('UPDATE profesores SET nombre=?,apellido=?,correo=?,foto=? WHERE id_profesor=?')
-       ->execute([$nombre,$apellido,$correo,$foto ?: null,$id]);
+       ->execute([$nombre, $apellido, $correo, $foto ?: null, $id]);
+
+    // Sincronizar en directorio si ya existe un registro con ese mismo nombre+correo
+    if ($correo) {
+        $existe = $db->prepare('SELECT id FROM directorio WHERE correo=? LIMIT 1');
+        $existe->execute([$correo]);
+        $dirId = $existe->fetchColumn();
+        if ($dirId) {
+            $db->prepare('UPDATE directorio SET nombre=?, correo=?, foto=? WHERE id=?')
+               ->execute([trim($nombre . ' ' . $apellido), $correo, $foto ?: null, $dirId]);
+        }
+    }
+
     jsonOk('Profesor actualizado');
 }
 

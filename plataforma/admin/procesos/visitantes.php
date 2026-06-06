@@ -147,18 +147,52 @@ if ($accion === 'secretaria_eliminar') {
 }
 
 // ══ CARRERAS ════════════════════════════════════════════════════
+// Helper: sube imagen de portada de carrera y devuelve URL pública
+function subirImagenCarrera(): ?string {
+    if (!isset($_FILES['imagen_portada']) || $_FILES['imagen_portada']['error'] === UPLOAD_ERR_NO_FILE) {
+        return null;
+    }
+    if ($_FILES['imagen_portada']['error'] !== UPLOAD_ERR_OK) {
+        jsonErr('Error al recibir la imagen (código ' . (int)$_FILES['imagen_portada']['error'] . ')');
+    }
+    $ext   = strtolower(pathinfo($_FILES['imagen_portada']['name'], PATHINFO_EXTENSION));
+    $allow = ['jpg','jpeg','png','webp','gif'];
+    if (!in_array($ext, $allow, true)) jsonErr('Formato no permitido. Usa JPG, PNG o WEBP.');
+    if ($_FILES['imagen_portada']['size'] > 5 * 1024 * 1024) jsonErr('La imagen supera 5 MB.');
+    if (!getimagesize($_FILES['imagen_portada']['tmp_name'])) jsonErr('El archivo no es una imagen válida.');
+
+    $dir = dirname(__DIR__, 2) . '/modulos/convenios/assets/images/logo/imagenes/';
+    if (!is_dir($dir)) mkdir($dir, 0755, true);
+
+    $fname = 'carrera_' . bin2hex(random_bytes(6)) . '.' . $ext;
+    move_uploaded_file($_FILES['imagen_portada']['tmp_name'], $dir . $fname);
+
+    $base = defined('PLATAFORMA_URL') ? PLATAFORMA_URL : '/plataforma';
+    return $base . '/modulos/convenios/assets/images/logo/imagenes/' . $fname;
+}
+
 if ($accion === 'carrera_agregar') {
-    $clave  = strtoupper(trim(str('clave', 10)));
-    $nombre = str('nombre', 150);
-    $color  = str('color', 7) ?: '#32129a';
-    $desc   = str('descripcion', 500);
+    $clave    = strtoupper(trim(str('clave', 10)));
+    $nombre   = str('nombre', 150);
+    $color    = str('color', 7) ?: '#32129a';
+    $desc     = str('descripcion', 500);
+    $reticula = str('reticula_url', 1000) ?: null;
     if (!$clave || !$nombre) jsonErr('Clave y nombre son requeridos');
     if (!preg_match('/^[A-Z0-9]{1,10}$/', $clave)) jsonErr('La clave solo puede tener letras mayúsculas y números (máx. 10)');
     if (!preg_match('/^#[0-9a-fA-F]{6}$/', $color)) $color = '#32129a';
+
+    $imagenUrl = subirImagenCarrera() ?? (str('imagen_url', 1000) ?: null);
+
     try {
         $maxOrden = (int)$db->query('SELECT COALESCE(MAX(orden),0)+1 FROM carreras')->fetchColumn();
-        $db->prepare('INSERT INTO carreras (clave, nombre, color, orden) VALUES (?,?,?,?)')
-           ->execute([$clave, $nombre, $color, $maxOrden]);
+        // Intentar con imagen_url; si la columna no existe aún, insertar sin ella
+        try {
+            $db->prepare('INSERT INTO carreras (clave, nombre, color, imagen_url, reticula_url, orden) VALUES (?,?,?,?,?,?)')
+               ->execute([$clave, $nombre, $color, $imagenUrl, $reticula, $maxOrden]);
+        } catch (\PDOException $eCol) {
+            $db->prepare('INSERT INTO carreras (clave, nombre, color, orden) VALUES (?,?,?,?)')
+               ->execute([$clave, $nombre, $color, $maxOrden]);
+        }
         if ($desc !== '') {
             $db->prepare('INSERT INTO configuracion (clave, valor) VALUES (?,?) ON DUPLICATE KEY UPDATE valor = VALUES(valor)')
                ->execute(['desc_' . $clave, $desc]);
@@ -171,13 +205,34 @@ if ($accion === 'carrera_agregar') {
 }
 
 if ($accion === 'carrera_editar') {
-    $id     = postInt('id');
-    $nombre = str('nombre', 150);
-    $color  = str('color', 7) ?: '#32129a';
-    $desc   = str('descripcion', 500);
+    $id       = postInt('id');
+    $nombre   = str('nombre', 150);
+    $color    = str('color', 7) ?: '#32129a';
+    $desc     = str('descripcion', 500);
+    $reticula = str('reticula_url', 1000) ?: null;
     if (!$id || !$nombre) jsonErr('Datos incompletos');
     if (!preg_match('/^#[0-9a-fA-F]{6}$/', $color)) $color = '#32129a';
-    $db->prepare('UPDATE carreras SET nombre=?, color=? WHERE id=?')->execute([$nombre, $color, $id]);
+
+    $imagenNueva = subirImagenCarrera();
+    if ($imagenNueva === null) {
+        $imagenNueva = str('imagen_url', 1000) ?: null;
+    }
+
+    // Construir UPDATE — defensivo por si imagen_url o reticula_url no existen en BD
+    try {
+        if ($imagenNueva !== null) {
+            $db->prepare('UPDATE carreras SET nombre=?, color=?, imagen_url=?, reticula_url=? WHERE id=?')
+               ->execute([$nombre, $color, $imagenNueva, $reticula, $id]);
+        } else {
+            $db->prepare('UPDATE carreras SET nombre=?, color=?, reticula_url=? WHERE id=?')
+               ->execute([$nombre, $color, $reticula, $id]);
+        }
+    } catch (\PDOException $eCol) {
+        // Columnas nuevas no existen aún — actualizar solo las básicas
+        $db->prepare('UPDATE carreras SET nombre=?, color=? WHERE id=?')
+           ->execute([$nombre, $color, $id]);
+    }
+
     $claveRow = $db->prepare('SELECT clave FROM carreras WHERE id=?');
     $claveRow->execute([$id]);
     $clave = $claveRow->fetchColumn();

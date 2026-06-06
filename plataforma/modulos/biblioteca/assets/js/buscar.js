@@ -1,11 +1,9 @@
 (function () {
   'use strict';
 
-  function esc(str) {
-    var d = document.createElement('div');
-    d.textContent = String(str == null ? '' : str);
-    return d.innerHTML;
-  }
+  var PAGINA_SIZE = 30; // libros visibles por "página"
+  var paginaActual = 1;
+  var librosFiltrados = [];
 
   function cargarLibros(callback) {
     fetch('procesos/obtenerLibros.php')
@@ -17,25 +15,122 @@
         if (data.error) throw new Error(data.error);
         callback(null, data);
       })
-      .catch(function (err) {
-        callback(err, null);
-      });
+      .catch(function (err) { callback(err, null); });
+  }
+
+  function crearCard(l) {
+    var ocupado = l.ocupado > 0;
+    var url = 'solicitudDeLibros.php?titulo=' + encodeURIComponent(l.titulo) +
+              '&codigo=' + encodeURIComponent(l.folio);
+
+    var card = document.createElement('div');
+    card.className = 'bib-card';
+
+    var stripe = document.createElement('div');
+    stripe.className = 'bib-card-stripe bib-card-stripe--' + (ocupado ? 'busy' : 'ok');
+    card.appendChild(stripe);
+
+    var body = document.createElement('div');
+    body.className = 'bib-card-body';
+
+    var codigo = document.createElement('span');
+    codigo.className = 'bib-card-codigo';
+    codigo.textContent = l.folio || '—';
+
+    var titulo = document.createElement('div');
+    titulo.className = 'bib-card-titulo';
+    titulo.textContent = l.titulo || '—';
+
+    var autor = document.createElement('div');
+    autor.className = 'bib-card-autor';
+    autor.textContent = l.autor ? 'Autor: ' + l.autor : '';
+
+    body.appendChild(codigo);
+    body.appendChild(titulo);
+    if (l.autor) body.appendChild(autor);
+    card.appendChild(body);
+
+    var footer = document.createElement('div');
+    footer.className = 'bib-card-footer';
+
+    var status = document.createElement('span');
+    status.className = 'bib-status bib-status--' + (ocupado ? 'busy' : 'ok');
+    status.textContent = ocupado ? 'En préstamo' : 'Disponible';
+    footer.appendChild(status);
+
+    if (ocupado) {
+      var btnDis = document.createElement('span');
+      btnDis.className = 'bib-btn--disabled';
+      btnDis.textContent = 'No disponible';
+      footer.appendChild(btnDis);
+    } else {
+      var a = document.createElement('a');
+      a.href = url;
+      a.className = 'bib-btn';
+      a.setAttribute('aria-label', 'Solicitar préstamo de ' + l.titulo);
+      a.innerHTML = '<span class="material-symbols-rounded" style="font-size:15px">book</span>Solicitar';
+      footer.appendChild(a);
+    }
+
+    card.appendChild(footer);
+    return card;
+  }
+
+  function renderPagina() {
+    var grid = document.getElementById('tablaLibros');
+    var paginador = document.getElementById('bib-paginador');
+    if (!grid) return;
+
+    // Limpiar solo las cards, no el paginador
+    Array.from(grid.querySelectorAll('.bib-card, .bib-empty')).forEach(function(el) { el.remove(); });
+
+    if (librosFiltrados.length === 0) {
+      var empty = document.createElement('div');
+      empty.className = 'bib-empty';
+      var searchEl = document.getElementById('searchInput');
+      var text = searchEl ? searchEl.value.trim() : '';
+      empty.innerHTML =
+        '<span class="material-symbols-rounded">search_off</span>' +
+        '<p>' + (text ? 'No se encontraron libros para "' + text + '"' : 'Sin libros en catálogo') + '</p>';
+      grid.insertBefore(empty, paginador);
+      if (paginador) paginador.style.display = 'none';
+      return;
+    }
+
+    var inicio = (paginaActual - 1) * PAGINA_SIZE;
+    var fin    = Math.min(inicio + PAGINA_SIZE, librosFiltrados.length);
+    var frag   = document.createDocumentFragment();
+
+    for (var i = inicio; i < fin; i++) {
+      frag.appendChild(crearCard(librosFiltrados[i]));
+    }
+    grid.insertBefore(frag, paginador);
+
+    // Actualizar paginador
+    if (paginador) {
+      var totalPags = Math.ceil(librosFiltrados.length / PAGINA_SIZE);
+      if (totalPags <= 1) {
+        paginador.style.display = 'none';
+      } else {
+        paginador.style.display = '';
+        document.getElementById('bib-pag-info').textContent =
+          (inicio + 1) + '–' + fin + ' de ' + librosFiltrados.length + ' libros';
+        document.getElementById('bib-pag-prev').disabled = paginaActual <= 1;
+        document.getElementById('bib-pag-next').disabled = paginaActual >= totalPags;
+      }
+    }
   }
 
   function filtrarLibros() {
     var searchEl = document.getElementById('searchInput');
     var fieldEl  = document.getElementById('filterField');
-    var tbody    = document.querySelector('#tablaLibros tbody');
-    if (!tbody) return;
-
     var text  = searchEl ? searchEl.value.toLowerCase() : '';
-    var field = fieldEl  ? fieldEl.value                : 'all';
-    tbody.innerHTML = '';
+    var field = fieldEl  ? fieldEl.value : 'all';
 
     if (!window.todosLosLibros) return;
 
     var camposBusqueda = ['titulo', 'autor', 'folio'];
-    var filtrados = window.todosLosLibros.filter(function (l) {
+    librosFiltrados = window.todosLosLibros.filter(function (l) {
       if (field === 'all') {
         return camposBusqueda.some(function (k) {
           return l[k] && l[k].toString().toLowerCase().includes(text);
@@ -44,78 +139,38 @@
       return l[field] && l[field].toString().toLowerCase().includes(text);
     });
 
-    if (filtrados.length === 0) {
-      tbody.innerHTML =
-        '<tr><td colspan="5" class="empty-state">' +
-        '<i class="fas fa-book-open d-block" aria-hidden="true"></i>' +
-        'No se encontraron libros</td></tr>';
-      return;
-    }
+    paginaActual = 1; // al buscar, volver a página 1
+    renderPagina();
+  }
 
-    filtrados.forEach(function (l) {
-      var ocupado = l.ocupado > 0;
-      var url = 'solicitudDeLibros.php?titulo=' + encodeURIComponent(l.titulo) +
-                '&codigo=' + encodeURIComponent(l.folio);
-
-      var fila = document.createElement('tr');
-
-      var tdId  = document.createElement('td'); tdId.className = 'text-muted'; tdId.textContent = l.id;
-      var tdCod = document.createElement('td');
-      var badge = document.createElement('span'); badge.className = 'badge-code'; badge.textContent = l.folio;
-      tdCod.appendChild(badge);
-
-      var tdTit  = document.createElement('td'); tdTit.className = 'text-start';
-      var divTit = document.createElement('div'); divTit.className = 'book-title'; divTit.textContent = l.titulo;
-      var spanSt = document.createElement('span');
-      spanSt.className = 'status-badge ' + (ocupado ? 'status-busy' : 'status-available');
-      spanSt.textContent = ocupado ? 'En Préstamo' : 'Disponible';
-      tdTit.appendChild(divTit); tdTit.appendChild(spanSt);
-
-      var tdAut = document.createElement('td'); tdAut.textContent = l.autor;
-      var tdAcc = document.createElement('td');
-
-      if (ocupado) {
-        var btn = document.createElement('button');
-        btn.className = 'btn-disabled'; btn.disabled = true; btn.textContent = 'Ocupado';
-        btn.setAttribute('aria-label', 'Libro ' + l.titulo + ' no disponible');
-        tdAcc.appendChild(btn);
-      } else {
-        var a = document.createElement('a');
-        a.href = url; a.className = 'btn btn-gold btn-sm';
-        a.textContent = 'Solicitar';
-        a.setAttribute('aria-label', 'Solicitar préstamo de ' + l.titulo);
-        tdAcc.appendChild(a);
-      }
-
-      fila.appendChild(tdId); fila.appendChild(tdCod); fila.appendChild(tdTit);
-      fila.appendChild(tdAut); fila.appendChild(tdAcc);
-      tbody.appendChild(fila);
-    });
+  function irPagina(delta) {
+    var totalPags = Math.ceil(librosFiltrados.length / PAGINA_SIZE);
+    paginaActual = Math.max(1, Math.min(paginaActual + delta, totalPags));
+    renderPagina();
+    // Scroll suave al inicio del grid
+    var grid = document.getElementById('tablaLibros');
+    if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   // Carga inicial
   cargarLibros(function (err, data) {
+    var grid = document.getElementById('tablaLibros');
     if (err) {
-      var tbody = document.querySelector('#tablaLibros tbody');
-      if (tbody) {
-        tbody.innerHTML =
-          '<tr><td colspan="5" class="empty-state">' +
-          '<i class="fas fa-exclamation-circle d-block" aria-hidden="true"></i>' +
-          'Error al cargar los libros. Intenta recargar la página.' +
-          '</td></tr>';
-      }
+      if (grid) grid.innerHTML =
+        '<div class="bib-empty">' +
+        '<span class="material-symbols-rounded">error</span>' +
+        '<p>Error al cargar los libros. Intenta recargar la página.</p></div>';
       return;
     }
     window.todosLosLibros = data;
-    filtrarLibros();
+    librosFiltrados = data;
+    renderPagina();
   });
 
-  // Refresco automático cada 60s — solo actualiza si el usuario no está escribiendo
+  // Refresco cada 60s si el usuario no está escribiendo
   setInterval(function () {
     var searchEl = document.getElementById('searchInput');
-    var escribiendo = searchEl && document.activeElement === searchEl;
-    if (escribiendo) return;
-
+    if (searchEl && document.activeElement === searchEl) return;
     cargarLibros(function (err, data) {
       if (err || !data) return;
       window.todosLosLibros = data;
@@ -124,4 +179,5 @@
   }, 60000);
 
   window.filtrarLibros = filtrarLibros;
+  window.irPagina      = irPagina;
 })();

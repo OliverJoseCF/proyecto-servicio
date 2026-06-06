@@ -16,64 +16,72 @@ require_once __DIR__ . '/../../shared/header.php';
 // CSRF para el modal de sugerir empresa
 $_csrf_token = csrfToken();
 
-// Carreras desde BD
+// Carreras desde BD (incluye color e imagen_url si existe la columna)
 $carrerasConv = [];
 try {
     $dbConv = getPDO(DB_NAME);
-    $carrerasConv = $dbConv->query('SELECT clave, nombre FROM carreras WHERE activo=1 ORDER BY orden')->fetchAll();
+    // Intentar con imagen_url; si la columna no existe en la BD aún, usar query básica
+    try {
+        $carrerasConv = $dbConv->query('SELECT clave, nombre, color, imagen_url FROM carreras WHERE activo=1 ORDER BY orden')->fetchAll();
+    } catch (\Throwable $e2) {
+        $carrerasConv = $dbConv->query('SELECT clave, nombre, color FROM carreras WHERE activo=1 ORDER BY orden')->fetchAll();
+    }
 } catch (\Throwable $e) {}
 
-// Imágenes y estilos por clave conocida
-$convImgs = [
-    'IADEV' => ['img'=>'assets/images/logo/imagenes/9M6A4513.webp',   'alt'=>'Personas trabajando con tabletas gráficas',                   'box'=>'corner-box-top',       'corner'=>'corner-box'],
-    'IM'    => ['img'=>'assets/images/logo/imagenes/DSC02687_1.webp', 'alt'=>'Personas trabajando en electrónica con laptop',               'box'=>'corner-box-top',       'corner'=>'corner-box'],
-    'ISC'   => ['img'=>'assets/images/logo/imagenes/DSC04199_1.webp', 'alt'=>'Estudiantes en sala de computadoras con iMac',                'box'=>'corner-box-top',       'corner'=>'corner-box'],
-    'II'    => ['img'=>'assets/images/logo/imagenes/DSC07193_1.webp', 'alt'=>'Persona con herramienta eléctrica en taller',                 'box'=>'corner-box-top',       'corner'=>'corner-box'],
-    'LG'    => ['img'=>'assets/images/logo/imagenes/DSC06661_1.webp', 'alt'=>'Estudiante de gastronomía preparando una bebida',             'box'=>'corner-box-top-green', 'corner'=>'corner-box-green'],
-    'IGE'   => ['img'=>'assets/images/logo/imagenes/DSC08323_1.webp', 'alt'=>'Dos mujeres trabajando en laptops',                           'box'=>'corner-box-top',       'corner'=>'corner-box'],
+// Imágenes de fallback por clave (si el admin no ha subido imagen propia)
+$convImgsFallback = [
+    'IADEV' => ['img'=>'assets/images/logo/imagenes/9M6A4513.webp',   'alt'=>'Personas trabajando con tabletas gráficas'],
+    'IM'    => ['img'=>'assets/images/logo/imagenes/DSC02687_1.webp', 'alt'=>'Personas trabajando en electrónica con laptop'],
+    'ISC'   => ['img'=>'assets/images/logo/imagenes/DSC04199_1.webp', 'alt'=>'Estudiantes en sala de computadoras con iMac'],
+    'II'    => ['img'=>'assets/images/logo/imagenes/DSC07193_1.webp', 'alt'=>'Persona con herramienta eléctrica en taller'],
+    'LG'    => ['img'=>'assets/images/logo/imagenes/DSC06661_1.webp', 'alt'=>'Estudiante de gastronomía preparando una bebida'],
+    'IGE'   => ['img'=>'assets/images/logo/imagenes/DSC08323_1.webp', 'alt'=>'Dos mujeres trabajando en laptops'],
 ];
-$convLogoDefault = 'assets/images/logo/gear-svgrepo-com_copy.svg';
-$convImgDefault  = ['img'=>'assets/images/logo/imagenes/DSC04199_1.webp','alt'=>'Carrera','box'=>'corner-box-top','corner'=>'corner-box'];
+$convImgDefault = ['img'=>'assets/images/logo/imagenes/chapala01-2.webp','alt'=>'Carrera'];
 ?>
 
 <main id="main">
 
+  <!-- Título centrado igual que todos los módulos -->
   <div class="tsj-page-header">
     <div class="tsj-page-header-line"></div>
     <h1>Convenios <span class="tsj-accent">Empresariales</span></h1>
     <p class="tsj-page-header-sub">Empresas vinculadas para residencia profesional, servicio social y prácticas</p>
   </div>
 
+  <!-- Botón sugerir empresa alineado a la derecha -->
+  <div class="conv-suggest-bar">
+    <button class="login-button" id="openSuggestModalBtn"
+            aria-expanded="false" aria-controls="suggestModalOverlay"
+            aria-haspopup="dialog">
+      + Sugerir empresa
+    </button>
+  </div>
+
   <!-- Cards de carreras (dinámicas desde BD) -->
   <div class="cards-container w-full p-6 flex justify-center gap-6 flex-wrap">
     <?php foreach ($carrerasConv as $car):
-      $est = $convImgs[$car['clave']] ?? $convImgDefault;
-      $logo = ($car['clave'] === 'LG')
-        ? 'assets/images/logo/graduation-svgrepo-com.svg'
-        : $convLogoDefault;
+      $color = htmlspecialchars($car['color'] ?? '#32129a');
+      // Usar imagen del admin si existe, si no el fallback por clave, si no el default
+      if (!empty($car['imagen_url'])) {
+          $imgSrc = htmlspecialchars($car['imagen_url']);
+          $imgAlt = htmlspecialchars($car['nombre']);
+      } else {
+          $fb     = $convImgsFallback[$car['clave']] ?? $convImgDefault;
+          $imgSrc = htmlspecialchars($fb['img']);
+          $imgAlt = htmlspecialchars($fb['alt']);
+      }
     ?>
     <a href="vista_lista/vista_convenios.php?carrera=<?= urlencode($car['clave']) ?>" class="card">
-      <div class="<?= $est['box'] ?>" aria-hidden="true">
-        <img src="<?= $logo ?>" alt="" class="corner-logo" />
-      </div>
-      <img class="ing-sistemas" src="<?= htmlspecialchars($est['img']) ?>"
-           alt="<?= htmlspecialchars($est['alt']) ?>" width="400" height="300" loading="lazy" />
-      <div class="card-text"><?= htmlspecialchars($car['nombre']) ?></div>
-      <div class="<?= $est['corner'] ?>" aria-hidden="true"></div>
+      <div class="conv-card-stripe" style="background:<?= $color ?>"></div>
+      <img class="ing-sistemas" src="<?= $imgSrc ?>"
+           alt="<?= $imgAlt ?>" width="400" height="300" loading="lazy" />
+      <div class="card-text" style="color:<?= $color ?>"><?= htmlspecialchars($car['nombre']) ?></div>
     </a>
     <?php endforeach; ?>
     <?php if (empty($carrerasConv)): ?>
     <p style="text-align:center;color:#9ca3af;padding:2rem">No hay carreras registradas.</p>
     <?php endif; ?>
-  </div>
-
-  <!-- Sugerir empresa -->
-  <div class="w-full flex flex-col items-center gap-2 mb-6">
-    <button class="login-button" id="openSuggestModalBtn"
-            aria-expanded="false" aria-controls="suggestModalOverlay"
-            aria-haspopup="dialog">
-      Sugerir una empresa
-    </button>
   </div>
 
 </main>

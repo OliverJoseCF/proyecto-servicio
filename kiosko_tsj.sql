@@ -115,12 +115,14 @@ INSERT INTO `avisos` (`titulo`, `descripcion`, `fecha`, `orden`) VALUES
 -- ================================================================
 
 CREATE TABLE `carreras` (
-  `id`     INT UNSIGNED  NOT NULL AUTO_INCREMENT,
-  `clave`  VARCHAR(10)   NOT NULL UNIQUE,
-  `nombre` VARCHAR(150)  NOT NULL,
-  `color`  VARCHAR(7)    NOT NULL DEFAULT '#32129a' COMMENT 'Color hex de la carrera (#rrggbb)',
-  `activo` TINYINT(1)    NOT NULL DEFAULT 1,
-  `orden`  SMALLINT      NOT NULL DEFAULT 0,
+  `id`           INT UNSIGNED   NOT NULL AUTO_INCREMENT,
+  `clave`        VARCHAR(10)    NOT NULL UNIQUE,
+  `nombre`       VARCHAR(150)   NOT NULL,
+  `color`        VARCHAR(7)     NOT NULL DEFAULT '#32129a' COMMENT 'Color hex de la carrera (#rrggbb)',
+  `imagen_url`   VARCHAR(1000)  DEFAULT NULL COMMENT 'URL/ruta de la imagen de portada (card de convenios)',
+  `reticula_url` VARCHAR(1000)  DEFAULT NULL COMMENT 'URL del PDF/imagen del mapa curricular',
+  `activo`       TINYINT(1)     NOT NULL DEFAULT 1,
+  `orden`        SMALLINT       NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

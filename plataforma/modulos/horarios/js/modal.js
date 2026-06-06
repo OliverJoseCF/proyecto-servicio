@@ -1,4 +1,4 @@
-// js/modal.js  —  Lógica del modal de horarios (compartida)
+// js/modal.js  —  Lógica del modal de horarios
 (function () {
   'use strict';
 
@@ -10,42 +10,28 @@
   if (!modal || !contentDiv) return;
 
   function openModal(url) {
-    contentDiv.innerHTML = '';
-
-    if (/\.pdf$/i.test(url)) {
-      var obj   = document.createElement('object');
-      obj.data  = url;
-      obj.type  = 'application/pdf';
-      obj.width = '100%';
-      obj.height = '600px';
-      obj.title = 'Horario del maestro (PDF)';
-      /* Fallback para navegadores sin visor PDF */
-      var fallback = document.createElement('p');
-      fallback.style.padding = '1rem';
-      var fallbackText = document.createTextNode('No se pudo mostrar el PDF. ');
-      var fallbackLink = document.createElement('a');
-      fallbackLink.href = url;
-      fallbackLink.target = '_blank';
-      fallbackLink.rel = 'noopener noreferrer';
-      fallbackLink.textContent = 'Descargarlo aquí';
-      fallback.appendChild(fallbackText);
-      fallback.appendChild(fallbackLink);
-      fallback.appendChild(document.createTextNode('.'));
-      obj.appendChild(fallback);
-      contentDiv.appendChild(obj);
-    } else {
-      var img = document.createElement('img');
-      img.src = url;
-      img.alt = 'Horario del maestro';
-      img.style.width = '100%';
-      contentDiv.appendChild(img);
+    // PDF: abrir en nueva pestaña — más confiable en todos los navegadores
+    if (/\.pdf($|\?)/i.test(url)) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+      return;
     }
+
+    // Imagen: mostrar en modal
+    contentDiv.innerHTML = '';
+    var img = document.createElement('img');
+    img.src   = url;
+    img.alt   = 'Horario del maestro';
+    img.style.cssText = 'width:100%;height:auto;display:block;border-radius:8px';
+    img.onerror = function () {
+      // Si la imagen falla, abrir en nueva pestaña como fallback
+      window.open(url, '_blank', 'noopener,noreferrer');
+      closeModal();
+    };
+    contentDiv.appendChild(img);
 
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-
-    /* Mover foco al botón de cierre para accesibilidad */
     if (closeBtn) closeBtn.focus();
   }
 
@@ -54,8 +40,6 @@
     modal.setAttribute('aria-hidden', 'true');
     contentDiv.innerHTML = '';
     document.body.style.overflow = '';
-
-    /* Devolver el foco al enlace que abrió el modal */
     if (window._modalOpener) {
       window._modalOpener.focus();
       window._modalOpener = null;

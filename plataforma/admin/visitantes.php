@@ -252,7 +252,7 @@ require_once __DIR__ . '/_layout.php';
       <h3 class="adm-section-title"><span class="material-symbols-rounded">list_alt</span> Materias — <?= htmlspecialchars($c['nombre']) ?></h3>
     </div>
     <div class="adm-section-body">
-      <form data-proc="visitantes" data-accion="materias_guardar" class="form-materias">
+      <form class="form-materias-real" data-carrera="<?= $c['id'] ?>">
         <input type="hidden" name="_csrf" value="<?= $csrf ?>">
         <input type="hidden" name="accion" value="materias_guardar">
         <input type="hidden" name="carrera_id" value="<?= $c['id'] ?>">
@@ -347,7 +347,7 @@ require_once __DIR__ . '/_layout.php';
     <!-- Formulario agregar/editar carrera -->
     <div class="adm-form-card" style="margin-top:20px">
       <div class="adm-form-title"><span class="material-symbols-rounded">add_circle</span> <span id="form-car-titulo">Agregar carrera</span></div>
-      <form data-proc="visitantes" data-reload id="form-carrera">
+      <form id="form-carrera" enctype="multipart/form-data">
         <input type="hidden" name="_csrf" value="<?= $csrf ?>">
         <input type="hidden" name="accion" value="carrera_agregar" id="car-accion">
         <input type="hidden" name="id" id="car-id">
@@ -376,6 +376,33 @@ require_once __DIR__ . '/_layout.php';
           <div class="adm-field" style="grid-column:span 2">
             <label>Descripción breve (aparece en la tarjeta pública)</label>
             <textarea name="descripcion" id="car-descripcion" rows="2" placeholder="Breve descripción de la carrera para la página de Oferta Académica"></textarea>
+          </div>
+          <div class="adm-field" style="grid-column:1/-1">
+            <label>URL de la Retícula (mapa curricular)</label>
+            <input type="url" name="reticula_url" id="car-reticula" placeholder="https://… o ruta relativa al PDF/imagen">
+            <span class="adm-field-help">Puede ser un enlace de Google Drive, un PDF en el servidor o una imagen.</span>
+          </div>
+          <div class="adm-field" style="grid-column:1/-1">
+            <label>Imagen de portada <span style="color:var(--tsj-gray-500);font-weight:400;font-size:12px">(aparece en la card de Convenios)</span></label>
+            <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+              <div style="flex:1;min-width:200px">
+                <input type="file" name="imagen_portada" id="car-imagen-file"
+                       accept="image/*,.webp"
+                       onchange="previsualizarPortada(this)">
+                <span class="adm-field-help">JPG, PNG, WEBP — máx. 5 MB. Sube una imagen nueva para reemplazar la actual.</span>
+              </div>
+              <div id="car-imagen-preview-wrap" style="display:none;flex-shrink:0">
+                <img id="car-imagen-preview" src="" alt="Vista previa"
+                     style="width:140px;height:80px;object-fit:cover;border-radius:8px;border:1.5px solid var(--tsj-gray-200)">
+                <div style="font-size:11px;color:var(--tsj-gray-400);text-align:center;margin-top:4px">Vista previa</div>
+              </div>
+            </div>
+            <div style="margin-top:8px">
+              <label style="font-size:12px;color:var(--tsj-gray-500)">O pegar URL externa:</label>
+              <input type="url" name="imagen_url" id="car-imagen-url"
+                     placeholder="https://… (si no subes archivo)"
+                     style="margin-top:4px">
+            </div>
           </div>
         </div>
         <div class="adm-form-actions">
@@ -466,6 +493,23 @@ require_once __DIR__ . '/_layout.php';
 </div>
 
 <script>
+// ── Preview imagen de portada ────────────────────────────────────
+function previsualizarPortada(input) {
+  var wrap = document.getElementById('car-imagen-preview-wrap');
+  var img  = document.getElementById('car-imagen-preview');
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      img.src = e.target.result;
+      wrap.style.display = '';
+    };
+    reader.readAsDataURL(input.files[0]);
+  } else {
+    wrap.style.display = 'none';
+    img.src = '';
+  }
+}
+
 // ── Sincronización color picker ↔ input hex ─────────────────────
 function sincColorHex(hexInput) {
   var val = hexInput.value;
@@ -493,6 +537,13 @@ function abrirEditarCarrera(c) {
   document.getElementById('car-color').value        = color;
   document.getElementById('car-color-hex').value    = color;
   document.getElementById('car-descripcion').value  = '';
+  document.getElementById('car-reticula').value     = c.reticula_url || '';
+  document.getElementById('car-imagen-url').value   = c.imagen_url || '';
+  // Mostrar imagen actual como preview
+  var wrap = document.getElementById('car-imagen-preview-wrap');
+  var prev = document.getElementById('car-imagen-preview');
+  if (c.imagen_url) { prev.src = c.imagen_url; wrap.style.display = ''; }
+  else { wrap.style.display = 'none'; prev.src = ''; }
   document.getElementById('form-car-titulo').textContent = 'Editar: ' + c.nombre;
   document.getElementById('form-carrera').scrollIntoView({ behavior: 'smooth' });
 }
@@ -503,8 +554,54 @@ function resetFormCarrera() {
   document.getElementById('form-carrera').reset();
   document.getElementById('car-color').value        = '#32129a';
   document.getElementById('car-color-hex').value    = '#32129a';
+  document.getElementById('car-reticula').value     = '';
+  document.getElementById('car-imagen-url').value   = '';
+  document.getElementById('car-imagen-preview-wrap').style.display = 'none';
+  document.getElementById('car-imagen-preview').src = '';
   document.getElementById('form-car-titulo').textContent = 'Agregar carrera';
 }
+
+// ── Materias: handler propio para array materias[] (evita aplanamiento) ──
+(function () {
+  var base = document.querySelector('meta[name="plataforma-url"]')?.content || '/plataforma';
+  document.querySelectorAll('.form-materias-real').forEach(function (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var btn = form.querySelector('[type="submit"]');
+      if (btn) btn.disabled = true;
+      fetch(base + '/admin/procesos/visitantes.php', { method: 'POST', body: new FormData(form) })
+        .then(function (r) { return r.json(); })
+        .then(function (json) {
+          showToast(json.msg, json.ok ? 'ok' : 'error');
+          if (json.ok) setTimeout(function () { location.reload(); }, 900);
+        })
+        .catch(function (err) { showToast('Error: ' + err.message, 'error'); })
+        .finally(function () { if (btn) btn.disabled = false; });
+    });
+  });
+})();
+
+// ── Carrera: handler propio (tiene file upload) ──────────────────
+(function () {
+  var base = document.querySelector('meta[name="plataforma-url"]')?.content || '/plataforma';
+  var form = document.getElementById('form-carrera');
+  if (!form) return;
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var btn = form.querySelector('[type="submit"]');
+    if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
+    fetch(base + '/admin/procesos/visitantes.php', { method: 'POST', body: new FormData(form) })
+      .then(function (r) { return r.json(); })
+      .then(function (json) {
+        showToast(json.msg, json.ok ? 'ok' : 'error');
+        if (json.ok) setTimeout(function () { location.reload(); }, 900);
+      })
+      .catch(function (err) { showToast('Error: ' + err.message, 'error'); })
+      .finally(function () {
+        if (btn) { btn.disabled = false; btn.textContent = 'Guardar carrera'; }
+      });
+  });
+})();
 
 // ── Oferta Académica: handler propio para array anidado desc[clave] ──
 (function () {

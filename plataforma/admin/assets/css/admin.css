@@ -155,6 +155,8 @@
 /* ── Main content ──────────────────────────────────────────────── */
 .adm-main {
   flex: 1;
+  min-width: 0;
+  overflow-x: hidden;
   margin-left: 252px;
   display: flex;
   flex-direction: column;
@@ -212,7 +214,6 @@
 .adm-content {
   flex: 1;
   padding: 28px;
-  max-width: 1280px;
   width: 100%;
 }
 
@@ -427,8 +428,12 @@
   border-radius: var(--tsj-radius-lg);
   border: 1px solid var(--tsj-gray-200);
   box-shadow: var(--tsj-shadow-sm);
-  overflow: hidden; overflow-x: auto;
+  overflow-x: auto;
 }
+.adm-table-wrap .adm-table thead th:first-child { border-radius: var(--tsj-radius-lg) 0 0 0; }
+.adm-table-wrap .adm-table thead th:last-child  { border-radius: 0 var(--tsj-radius-lg) 0 0; }
+.adm-table-wrap .adm-table tbody tr:last-child td:first-child { border-radius: 0 0 0 var(--tsj-radius-lg); }
+.adm-table-wrap .adm-table tbody tr:last-child td:last-child  { border-radius: 0 0 var(--tsj-radius-lg) 0; }
 .adm-table {
   width: 100%; border-collapse: collapse;
   font-size: 13.5px;
@@ -446,8 +451,13 @@
   color: var(--tsj-gray-700);
   vertical-align: middle;
 }
-.adm-table tbody tr:hover td { background: var(--tsj-blue-50); }
-.adm-table .actions { display: flex; gap: 6px; align-items: center; }
+.adm-table tbody tr:hover { background: var(--tsj-blue-50); }
+.adm-table tbody tr:hover td { background: transparent; }
+.adm-table .actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
 .adm-table .col-photo img {
   width: 38px; height: 38px;
   border-radius: 50%; object-fit: cover;
@@ -593,7 +603,9 @@
 }
 .adm-list-item-drag {
   color: var(--tsj-gray-400); cursor: grab; flex-shrink: 0;
+  user-select: none;
 }
+.adm-list-item-drag:active { cursor: grabbing; color: var(--tsj-blue); }
 .adm-list-add {
   display: flex; align-items: center; gap: 8px;
   padding: 9px 14px;
