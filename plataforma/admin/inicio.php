@@ -16,6 +16,7 @@ try {
 } catch (\Throwable $e) {
     $avisos = $carrusel = $faqs_g = [];
     $db_ok  = false;
+    $db_err = $e->getMessage();
 }
 
 $csrf = csrfToken();
@@ -42,13 +43,13 @@ require_once __DIR__ . '/_layout.php';
 <div class="adm-tab-panel active" data-tab-group="ini" data-tab="carrusel">
   <div class="adm-table-wrap">
     <table class="adm-table">
-      <thead><tr><th>Vista previa</th><th>Título</th><th>Subtítulo</th><th>URL</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Vista previa</th><th>Título</th><th>Subtítulo</th><th>Estado</th><th>Acciones</th></tr></thead>
       <tbody>
         <?php if (empty($carrusel)): ?>
         <tr><td colspan="5" class="adm-table-empty">Sin imágenes en el carrusel.</td></tr>
         <?php endif; ?>
         <?php foreach ($carrusel as $s): ?>
-        <tr id="car-<?= $s['id'] ?>">
+        <tr id="car-<?= $s['id'] ?>" <?= !$s['activo'] ? 'style="opacity:.5"' : '' ?>>
           <td>
             <img src="<?= htmlspecialchars($s['url']) ?>" alt=""
                  style="width:80px;height:45px;object-fit:cover;border-radius:6px;border:1px solid #e8eaf2"
@@ -56,8 +57,18 @@ require_once __DIR__ . '/_layout.php';
           </td>
           <td style="font-weight:600"><?= htmlspecialchars($s['titulo'] ?? '—') ?></td>
           <td style="font-size:12.5px;color:var(--tsj-gray-600)"><?= htmlspecialchars($s['subtitulo'] ?? '—') ?></td>
-          <td style="font-size:12px;color:var(--tsj-gray-400);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><?= htmlspecialchars($s['url']) ?></td>
+          <td>
+            <?php if ($s['activo']): ?>
+              <span class="adm-status adm-status--ok">Visible</span>
+            <?php else: ?>
+              <span class="adm-status adm-status--warn">Oculta</span>
+            <?php endif; ?>
+          </td>
           <td class="actions">
+            <button class="adm-btn adm-btn--ghost adm-btn--sm" title="<?= $s['activo'] ? 'Ocultar' : 'Mostrar' ?>"
+                    onclick="toggleActivo('inicio','carrusel_toggle',<?= $s['id'] ?>,this)">
+              <span class="material-symbols-rounded"><?= $s['activo'] ? 'visibility_off' : 'visibility' ?></span>
+            </button>
             <button class="adm-btn adm-btn--ghost adm-btn--sm" onclick="abrirEditarCar(<?= htmlspecialchars(json_encode($s)) ?>)">
               <span class="material-symbols-rounded">edit</span>
             </button>
@@ -72,7 +83,7 @@ require_once __DIR__ . '/_layout.php';
   </div>
   <div class="adm-form-card" style="margin-top:20px">
     <div class="adm-form-title"><span class="material-symbols-rounded">add_photo_alternate</span> <span id="form-car-titulo">Agregar imagen al carrusel</span></div>
-    <form data-proc="inicio" id="form-car">
+    <form data-proc="inicio" data-reload id="form-car">
       <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="carrusel_agregar" id="car-accion">
       <input type="hidden" name="id" id="car-id">
@@ -97,17 +108,28 @@ require_once __DIR__ . '/_layout.php';
 <div class="adm-tab-panel" data-tab-group="ini" data-tab="avisos">
   <div class="adm-table-wrap">
     <table class="adm-table">
-      <thead><tr><th>Fecha</th><th>Título</th><th>Descripción</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Fecha</th><th>Título</th><th>Descripción</th><th>Estado</th><th>Acciones</th></tr></thead>
       <tbody>
         <?php if (empty($avisos)): ?>
-        <tr><td colspan="4" class="adm-table-empty">Sin avisos registrados.</td></tr>
+        <tr><td colspan="5" class="adm-table-empty">Sin avisos registrados.</td></tr>
         <?php endif; ?>
         <?php foreach ($avisos as $av): ?>
-        <tr id="av-<?= $av['id'] ?>">
+        <tr id="av-<?= $av['id'] ?>" <?= !$av['activo'] ? 'style="opacity:.5"' : '' ?>>
           <td><span class="adm-status adm-status--info"><?= htmlspecialchars($av['fecha']) ?></span></td>
           <td style="font-weight:600"><?= htmlspecialchars($av['titulo']) ?></td>
           <td style="font-size:12.5px;color:var(--tsj-gray-600)"><?= htmlspecialchars(substr($av['descripcion'] ?? '', 0, 80)) ?><?= strlen($av['descripcion'] ?? '') > 80 ? '…' : '' ?></td>
+          <td>
+            <?php if ($av['activo']): ?>
+              <span class="adm-status adm-status--ok">Visible</span>
+            <?php else: ?>
+              <span class="adm-status adm-status--warn">Oculto</span>
+            <?php endif; ?>
+          </td>
           <td class="actions">
+            <button class="adm-btn adm-btn--ghost adm-btn--sm" title="<?= $av['activo'] ? 'Ocultar' : 'Mostrar' ?>"
+                    onclick="toggleActivo('inicio','aviso_toggle',<?= $av['id'] ?>,this)">
+              <span class="material-symbols-rounded"><?= $av['activo'] ? 'visibility_off' : 'visibility' ?></span>
+            </button>
             <button class="adm-btn adm-btn--ghost adm-btn--sm" onclick="abrirEditarAv(<?= htmlspecialchars(json_encode($av)) ?>)">
               <span class="material-symbols-rounded">edit</span>
             </button>
@@ -122,7 +144,7 @@ require_once __DIR__ . '/_layout.php';
   </div>
   <div class="adm-form-card" style="margin-top:20px">
     <div class="adm-form-title"><span class="material-symbols-rounded">campaign</span> <span id="form-av-titulo">Agregar aviso</span></div>
-    <form data-proc="inicio" id="form-av">
+    <form data-proc="inicio" data-reload id="form-av">
       <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="aviso_agregar" id="av-accion">
       <input type="hidden" name="id" id="av-id">
@@ -147,7 +169,7 @@ require_once __DIR__ . '/_layout.php';
       <span class="material-symbols-rounded">add</span> Agregar pregunta
     </button>
   </div>
-  <form data-proc="inicio" data-accion="faq_general_guardar">
+  <form id="form-faq-g">
     <input type="hidden" name="_csrf" value="<?= $csrf ?>">
     <input type="hidden" name="accion" value="faq_general_guardar">
     <div id="faqs-general">
@@ -207,7 +229,48 @@ function resetFormAv(){
   document.getElementById('form-av-titulo').textContent='Agregar aviso';
 }
 
+// ── Toggle visibilidad (carrusel / avisos) ───────────────────────
+function toggleActivo(modulo, accion, id, btn) {
+  var csrfEl = document.querySelector('input[name="_csrf"]');
+  var csrf   = csrfEl ? csrfEl.value : '';
+  adminFetch(modulo, { _csrf: csrf, accion: accion, id: id })
+    .then(function (json) {
+      if (json.ok) {
+        var row  = btn.closest('tr');
+        var icon = btn.querySelector('.material-symbols-rounded');
+        var badge = row.querySelector('.adm-status');
+        var activo = json.activo;
+        row.style.opacity = activo ? '' : '0.5';
+        icon.textContent  = activo ? 'visibility_off' : 'visibility';
+        btn.title         = activo ? 'Ocultar' : 'Mostrar';
+        if (badge) {
+          badge.textContent  = activo ? 'Visible' : 'Oculto/a';
+          badge.className    = 'adm-status ' + (activo ? 'adm-status--ok' : 'adm-status--warn');
+        }
+      }
+    });
+}
+
 // ── FAQ General ─────────────────────────────────────────────────
+(function () {
+  var formFaq = document.getElementById('form-faq-g');
+  if (!formFaq) return;
+  formFaq.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var base = (document.querySelector('meta[name="plataforma-url"]')?.content || '/plataforma');
+    var btn  = formFaq.querySelector('[type="submit"]');
+    if (btn) btn.disabled = true;
+    fetch(base + '/admin/procesos/inicio.php', { method: 'POST', body: new FormData(formFaq) })
+      .then(function (r) { return r.json(); })
+      .then(function (json) {
+        showToast(json.msg, json.ok ? 'ok' : 'error');
+        if (json.ok) setTimeout(function () { location.reload(); }, 900);
+      })
+      .catch(function (err) { showToast('Error: ' + err.message, 'error'); })
+      .finally(function () { if (btn) btn.disabled = false; });
+  });
+})();
+
 var faqGCount = 100;
 function addFaqG(){
   var c   = document.getElementById('faqs-general');

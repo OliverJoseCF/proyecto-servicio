@@ -42,6 +42,14 @@ if ($accion === 'directorio_eliminar') {
     jsonOk('Persona eliminada');
 }
 
+if ($accion === 'directorio_toggle') {
+    $id = postInt('id');
+    if (!$id) jsonErr('ID inválido');
+    $db->prepare('UPDATE directorio SET activo = 1 - activo WHERE id=?')->execute([$id]);
+    $activo = (int)$db->query("SELECT activo FROM directorio WHERE id=$id")->fetchColumn();
+    jsonOk($activo ? 'Persona visible' : 'Persona oculta', ['activo' => $activo]);
+}
+
 // ══ DOCENTES ════════════════════════════════════════════════════
 if ($accion === 'docente_agregar') {
     $nombre     = str('nombre', 150);
@@ -82,6 +90,13 @@ if ($accion === 'coord_editar') {
     $db->prepare('UPDATE coordinadores SET nombre=?,correo=? WHERE id=?')
        ->execute([$nombre,$correo,$id]);
     jsonOk('Coordinador actualizado');
+}
+
+if ($accion === 'coord_eliminar') {
+    $id = postInt('id');
+    if (!$id) jsonErr('ID inválido');
+    $db->prepare('DELETE FROM coordinadores WHERE id=?')->execute([$id]);
+    jsonOk('Coordinador eliminado');
 }
 
 // ══ MATERIAS ════════════════════════════════════════════════════

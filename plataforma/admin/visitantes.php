@@ -58,13 +58,13 @@ require_once __DIR__ . '/_layout.php';
 <div class="adm-tab-panel active" data-tab-group="vis" data-tab="directorio">
   <div class="adm-table-wrap">
     <table class="adm-table">
-      <thead><tr><th>Foto</th><th>Nombre</th><th>Puesto / Área</th><th>Correo</th><th>Teléfono</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Foto</th><th>Nombre</th><th>Puesto / Área</th><th>Correo</th><th>Teléfono</th><th>Estado</th><th>Acciones</th></tr></thead>
       <tbody>
         <?php if (empty($directorio)): ?>
-        <tr><td colspan="6" class="adm-table-empty">Sin personas registradas.</td></tr>
+        <tr><td colspan="7" class="adm-table-empty">Sin personas registradas.</td></tr>
         <?php endif; ?>
         <?php foreach ($directorio as $p): ?>
-        <tr id="dir-<?= $p['id'] ?>">
+        <tr id="dir-<?= $p['id'] ?>" <?= !$p['activo'] ? 'style="opacity:.5"' : '' ?>>
           <td class="col-photo">
             <img src="<?= $p['foto'] ? $base_img.htmlspecialchars($p['foto']) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='38'%3E%3Crect width='38' height='38' fill='%23e5e7eb'/%3E%3C/svg%3E" ?>"
                  style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--tsj-blue-100)" alt="">
@@ -73,7 +73,18 @@ require_once __DIR__ . '/_layout.php';
           <td><?= htmlspecialchars($p['puesto'] ?? '') ?></td>
           <td><a href="mailto:<?= htmlspecialchars($p['correo'] ?? '') ?>" style="color:var(--tsj-blue)"><?= htmlspecialchars($p['correo'] ?? '') ?></a></td>
           <td><?= htmlspecialchars($p['telefono'] ?? 'S/N') ?></td>
+          <td>
+            <?php if ($p['activo']): ?>
+              <span class="adm-status adm-status--ok">Visible</span>
+            <?php else: ?>
+              <span class="adm-status adm-status--warn">Oculto</span>
+            <?php endif; ?>
+          </td>
           <td class="actions">
+            <button class="adm-btn adm-btn--ghost adm-btn--sm" title="<?= $p['activo'] ? 'Ocultar' : 'Mostrar' ?>"
+                    onclick="toggleActivo('visitantes','directorio_toggle',<?= $p['id'] ?>,this)">
+              <span class="material-symbols-rounded"><?= $p['activo'] ? 'visibility_off' : 'visibility' ?></span>
+            </button>
             <button class="adm-btn adm-btn--ghost adm-btn--sm"
                     onclick="abrirEditar('dir',<?= htmlspecialchars(json_encode($p)) ?>)">
               <span class="material-symbols-rounded">edit</span>
@@ -92,7 +103,7 @@ require_once __DIR__ . '/_layout.php';
   <!-- Formulario agregar/editar directorio -->
   <div class="adm-form-card" style="margin-top:20px" id="form-dir-wrap">
     <div class="adm-form-title"><span class="material-symbols-rounded">person_add</span> <span id="form-dir-titulo">Agregar persona al directorio</span></div>
-    <form data-proc="visitantes" data-accion="directorio_agregar" id="form-dir">
+    <form data-proc="visitantes" data-reload id="form-dir">
       <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="directorio_agregar" id="dir-accion">
       <input type="hidden" name="id" id="dir-id">
@@ -156,7 +167,7 @@ require_once __DIR__ . '/_layout.php';
   </div>
   <div class="adm-form-card" style="margin-top:20px">
     <div class="adm-form-title"><span class="material-symbols-rounded">school</span> <span id="form-doc-titulo">Agregar docente</span></div>
-    <form data-proc="visitantes" data-accion="docente_agregar" id="form-doc">
+    <form data-proc="visitantes" data-reload id="form-doc">
       <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="docente_agregar" id="doc-accion">
       <input type="hidden" name="id" id="doc-id">
@@ -187,6 +198,9 @@ require_once __DIR__ . '/_layout.php';
     <table class="adm-table">
       <thead><tr><th>Carrera</th><th>Nombre del Coordinador</th><th>Correo</th><th>Acciones</th></tr></thead>
       <tbody>
+        <?php if (empty($coordinadores)): ?>
+        <tr><td colspan="4" class="adm-table-empty">Sin coordinadores registrados.</td></tr>
+        <?php endif; ?>
         <?php foreach ($coordinadores as $c): ?>
         <tr id="coord-<?= $c['id'] ?>">
           <td style="font-weight:600;color:var(--tsj-blue)"><?= htmlspecialchars($c['carrera_nombre']) ?></td>
@@ -197,6 +211,10 @@ require_once __DIR__ . '/_layout.php';
                     onclick="abrirEditarCoord(<?= htmlspecialchars(json_encode($c)) ?>)">
               <span class="material-symbols-rounded">edit</span>
             </button>
+            <button class="adm-btn adm-btn--danger adm-btn--sm"
+                    onclick="confirmarEliminar('visitantes','coord_eliminar',<?= $c['id'] ?>,'coord-<?= $c['id'] ?>')">
+              <span class="material-symbols-rounded">delete</span>
+            </button>
           </td>
         </tr>
         <?php endforeach; ?>
@@ -205,7 +223,7 @@ require_once __DIR__ . '/_layout.php';
   </div>
   <div class="adm-form-card" style="margin-top:20px" id="form-coord-wrap" style="display:none">
     <div class="adm-form-title"><span class="material-symbols-rounded">manage_accounts</span> Editar coordinador</div>
-    <form data-proc="visitantes" data-accion="coord_editar" id="form-coord">
+    <form data-proc="visitantes" data-reload id="form-coord">
       <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="coord_editar">
       <input type="hidden" name="id" id="coord-id">
@@ -296,7 +314,7 @@ require_once __DIR__ . '/_layout.php';
   </div>
   <div class="adm-form-card" style="margin-top:20px">
     <div class="adm-form-title"><span class="material-symbols-rounded">person_add</span> <span id="form-sec-titulo">Agregar secretaria</span></div>
-    <form data-proc="visitantes" data-accion="secretaria_agregar" id="form-sec">
+    <form data-proc="visitantes" data-reload id="form-sec">
       <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="secretaria_agregar" id="sec-accion">
       <input type="hidden" name="id" id="sec-id">
@@ -342,6 +360,28 @@ require_once __DIR__ . '/_layout.php';
 </div>
 
 <script>
+// ── Toggle visibilidad ──────────────────────────────────────────
+function toggleActivo(modulo, accion, id, btn) {
+  var csrfEl = document.querySelector('input[name="_csrf"]');
+  var csrf   = csrfEl ? csrfEl.value : '';
+  adminFetch(modulo, { _csrf: csrf, accion: accion, id: id })
+    .then(function (json) {
+      if (json.ok) {
+        var row   = btn.closest('tr');
+        var icon  = btn.querySelector('.material-symbols-rounded');
+        var badge = row.querySelector('.adm-status');
+        var activo = json.activo;
+        row.style.opacity = activo ? '' : '0.5';
+        icon.textContent  = activo ? 'visibility_off' : 'visibility';
+        btn.title         = activo ? 'Ocultar' : 'Mostrar';
+        if (badge) {
+          badge.textContent = activo ? 'Visible' : 'Oculto';
+          badge.className   = 'adm-status ' + (activo ? 'adm-status--ok' : 'adm-status--warn');
+        }
+      }
+    });
+}
+
 // ── Filtros de carrera ──────────────────────────────────────────
 function filtrarDocentes(clave){
   document.querySelectorAll('#doc-pills .adm-career-pill').forEach(b=>{

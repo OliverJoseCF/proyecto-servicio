@@ -2,6 +2,32 @@
 $tsj_module    = 'visitantes';
 $tsj_title     = 'Nuevo Ingreso';
 $tsj_extra_css = ['style.css'];
+require_once __DIR__ . '/../../shared/config.php';
+
+// Cargar configuración dinámica desde BD
+try {
+    $db  = getPDO(DB_NAME);
+    $ni  = $db->query('SELECT * FROM nuevo_ingreso_config LIMIT 1')->fetch();
+} catch (\Throwable $e) {
+    $ni = null;
+}
+
+$dia_examen   = (int)($ni['dia_examen']   ?? 20);
+$hora_examen  = htmlspecialchars($ni['hora_examen']  ?? '08:00:00');
+$lugar_examen = htmlspecialchars($ni['lugar_examen'] ?? 'Tecnológico Superior de Jalisco, Campus Chapala');
+$requisitos   = json_decode($ni['requisitos'] ?? '[]', true) ?: [
+    'Copia de la identificación oficial.',
+    'Certificado de estudios anteriores (original y copia).',
+    'Comprobante de domicilio.',
+    'Fotografías tamaño infantil (4 piezas).',
+    'Formulario de inscripción llenado.',
+];
+
+// Formatear hora para mostrar (08:00:00 → 8:00 AM)
+$horaObj    = DateTime::createFromFormat('H:i:s', $ni['hora_examen'] ?? '08:00:00')
+           ?: DateTime::createFromFormat('H:i', $ni['hora_examen'] ?? '08:00');
+$hora_label = $horaObj ? $horaObj->format('g:i A') : $hora_examen;
+
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 <main id="main">
@@ -17,11 +43,9 @@ require_once __DIR__ . '/../../shared/header.php';
       <h2 class="vis-h2">Requisitos de Admisión</h2>
       <h3 class="vis-h3">Documentación requerida:</h3>
       <ul>
-        <li>Copia de la identificación oficial.</li>
-        <li>Certificado de estudios anteriores (original y copia).</li>
-        <li>Comprobante de domicilio.</li>
-        <li>Fotografías tamaño infantil (4 piezas).</li>
-        <li>Formulario de inscripción llenado.</li>
+        <?php foreach ($requisitos as $req): ?>
+        <li><?= htmlspecialchars($req) ?></li>
+        <?php endforeach; ?>
       </ul>
     </div>
 
@@ -31,11 +55,11 @@ require_once __DIR__ . '/../../shared/header.php';
         <label for="ni-nombre" style="display:block;margin-bottom:6px;font-weight:600;">Nombre del aspirante:</label>
         <input type="text" id="ni-nombre" style="width:100%;padding:8px;border:1.5px solid var(--tsj-gray-200, #e5e7eb);border-radius:6px;" autocomplete="name" required minlength="3" maxlength="100">
       </p>
-      <p>El examen de admisión se llevará a cabo el día:
-        <label for="dia-examen" class="sr-only">Día del examen</label>
-        <input type="number" id="dia-examen" name="dia-examen" value="20" min="1" max="31">
-        . Asegúrate de traer los siguientes documentos:
+      <p>El examen de admisión se llevará a cabo el día <strong><?= $dia_examen ?></strong>
+         a las <strong><?= $hora_label ?></strong>.<br>
+         Lugar: <strong><?= $lugar_examen ?></strong>
       </p>
+      <p>Asegúrate de traer los siguientes documentos:</p>
       <ul>
         <li>Identificación oficial.</li>
         <li>Comprobante de registro al examen.</li>
@@ -57,10 +81,12 @@ require_once __DIR__ . '/../../shared/header.php';
 <script>
 (function(){
   'use strict';
-  var btn = document.getElementById('generarBtn');
+  var btn   = document.getElementById('generarBtn');
   var errEl = document.getElementById('ni-error');
+  var DIA   = <?= $dia_examen ?>;
+  var HORA  = <?= json_encode($hora_label) ?>;
+  var LUGAR = <?= json_encode($lugar_examen) ?>;
 
-  /* Habilitar botón cuando jsPDF haya cargado */
   function checkReady(){
     if (window.jspdf) {
       btn.disabled = false;
@@ -74,7 +100,6 @@ require_once __DIR__ . '/../../shared/header.php';
   btn.addEventListener('click', function(){
     errEl.style.display = 'none';
     var nombre = (document.getElementById('ni-nombre').value || '').trim();
-    var dia    = parseInt(document.getElementById('dia-examen').value, 10) || 20;
 
     if (!nombre) {
       errEl.textContent = 'Por favor ingresa tu nombre.';
@@ -87,7 +112,7 @@ require_once __DIR__ . '/../../shared/header.php';
       var jsPDF = window.jspdf.jsPDF;
       var doc = new jsPDF();
       var fecha = new Date();
-      fecha.setDate(dia);
+      fecha.setDate(DIA);
       var fechaFormateada = fecha.toLocaleDateString("es-MX", { day:'numeric', month:'long', year:'numeric' });
 
       doc.setFontSize(16);
@@ -96,8 +121,8 @@ require_once __DIR__ . '/../../shared/header.php';
       doc.text("El aspirante se ha registrado para presentar el examen de admisión.", 20, 32);
       doc.text("Detalles del examen:", 20, 45);
       doc.text("Fecha: " + fechaFormateada, 20, 55);
-      doc.text("Hora: 8:00 AM", 20, 65);
-      doc.text("Lugar: Tecnológico Superior de Jalisco, Campus Chapala", 20, 75);
+      doc.text("Hora: " + HORA, 20, 65);
+      doc.text("Lugar: " + LUGAR, 20, 75);
       doc.text("Nombre del Aspirante: " + nombre, 20, 90);
       doc.setFontSize(9);
       doc.text("Documento generado automáticamente — solo válido como recordatorio.", 20, 270);

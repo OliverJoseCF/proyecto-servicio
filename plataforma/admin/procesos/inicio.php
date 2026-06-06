@@ -34,16 +34,34 @@ if ($accion === 'aviso_eliminar') {
     jsonOk('Aviso eliminado');
 }
 
+if ($accion === 'aviso_toggle') {
+    $id = postInt('id');
+    if (!$id) jsonErr('ID inválido');
+    $stmt = $db->prepare('UPDATE avisos SET activo = 1 - activo WHERE id=?');
+    $stmt->execute([$id]);
+    $activo = (int)$db->query("SELECT activo FROM avisos WHERE id=$id")->fetchColumn();
+    jsonOk($activo ? 'Aviso visible' : 'Aviso oculto', ['activo' => $activo]);
+}
+
 // ══ FAQ GENERAL ══════════════════════════════════════════════════
 if ($accion === 'faq_general_guardar') {
     $faqs = $_POST['faqs'] ?? [];
     if (!is_array($faqs)) jsonErr('Datos inválidos');
-    $db->prepare('DELETE FROM faq WHERE tipo="general"')->execute();
-    $stmt = $db->prepare('INSERT INTO faq (tipo,pregunta,respuesta,orden) VALUES ("general",?,?,?)');
-    foreach ($faqs as $i => $f) {
+
+    // Validar antes de borrar para no perder datos por preguntas incompletas
+    $validas = [];
+    foreach ($faqs as $f) {
         $preg = mb_substr(trim($f['pregunta'] ?? ''), 0, 500);
         $resp = mb_substr(trim($f['respuesta'] ?? ''), 0, 2000);
-        if ($preg && $resp) $stmt->execute([$preg, $resp, $i + 1]);
+        if ($preg === '') jsonErr('Todas las preguntas deben tener texto');
+        if ($resp === '') jsonErr('La pregunta "' . $preg . '" no tiene respuesta');
+        $validas[] = [$preg, $resp];
+    }
+
+    $db->prepare('DELETE FROM faq WHERE tipo="general"')->execute();
+    $stmt = $db->prepare('INSERT INTO faq (tipo,pregunta,respuesta,orden) VALUES ("general",?,?,?)');
+    foreach ($validas as $i => [$preg, $resp]) {
+        $stmt->execute([$preg, $resp, $i + 1]);
     }
     jsonOk('FAQ general guardada');
 }
@@ -76,6 +94,15 @@ if ($accion === 'carrusel_eliminar') {
     if (!$id) jsonErr('ID inválido');
     $db->prepare('DELETE FROM carrusel_fotos WHERE id=?')->execute([$id]);
     jsonOk('Imagen eliminada del carrusel');
+}
+
+if ($accion === 'carrusel_toggle') {
+    $id = postInt('id');
+    if (!$id) jsonErr('ID inválido');
+    $stmt = $db->prepare('UPDATE carrusel_fotos SET activo = 1 - activo WHERE id=?');
+    $stmt->execute([$id]);
+    $activo = (int)$db->query("SELECT activo FROM carrusel_fotos WHERE id=$id")->fetchColumn();
+    jsonOk($activo ? 'Imagen visible' : 'Imagen oculta', ['activo' => $activo]);
 }
 
 jsonErr('Acción desconocida');
