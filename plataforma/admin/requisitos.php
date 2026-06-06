@@ -143,7 +143,7 @@ function renderTipoTab(string $tipo, array $d, string $csrf): void {
         </table>
       </div>
       <div class="adm-form-card" style="margin-top:14px" id="form-doc-wrap-<?= $tipo ?>">
-        <form data-proc="requisitos" data-accion="doc_agregar" class="form-doc" id="form-doc-<?= $tipo ?>">
+        <form data-proc="requisitos" data-reload class="form-doc" id="form-doc-<?= $tipo ?>">
           <input type="hidden" name="_csrf" value="<?= $csrf ?>">
           <input type="hidden" name="accion" value="doc_agregar" class="doc-accion">
           <input type="hidden" name="tipo" value="<?= $tipo ?>">
@@ -224,6 +224,26 @@ renderTipoTab('servicio_social',$data['servicio_social'],$csrf);
 ?>
 
 <script>
+// Manejador para formularios con arrays anidados (fases/faq) — usa FormData directo
+(function () {
+  var base = document.querySelector('meta[name="plataforma-url"]')?.content || '/plataforma';
+  document.querySelectorAll('.form-multipart').forEach(function (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var btn = form.querySelector('[type="submit"]');
+      if (btn) btn.disabled = true;
+      fetch(base + '/admin/procesos/requisitos.php', { method: 'POST', body: new FormData(form) })
+        .then(function (r) { return r.json(); })
+        .then(function (json) {
+          showToast(json.msg, json.ok ? 'ok' : 'error');
+          if (json.ok) setTimeout(function () { location.reload(); }, 900);
+        })
+        .catch(function (err) { showToast('Error: ' + err.message, 'error'); })
+        .finally(function () { if (btn) btn.disabled = false; });
+    });
+  });
+})();
+
 // Helpers para agregar items dinámicos
 function addItem(listId, name){
   const list = document.getElementById(listId);

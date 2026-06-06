@@ -79,12 +79,20 @@ if ($accion === 'faq_guardar') {
     if (!in_array($tipo, ['residencia','servicio_social'])) jsonErr('Tipo inválido');
     if (!is_array($faqs)) jsonErr('Datos inválidos');
 
-    $db->prepare('DELETE FROM faq WHERE tipo=?')->execute([$tipo]);
-    $stmt = $db->prepare('INSERT INTO faq (tipo,pregunta,respuesta,orden) VALUES (?,?,?,?)');
-    foreach ($faqs as $i => $f) {
+    // Validar antes de borrar para no perder datos por preguntas incompletas
+    $validas = [];
+    foreach ($faqs as $f) {
         $preg = mb_substr(trim($f['pregunta'] ?? ''), 0, 500);
         $resp = mb_substr(trim($f['respuesta'] ?? ''), 0, 2000);
-        if ($preg && $resp) $stmt->execute([$tipo,$preg,$resp,$i + 1]);
+        if ($preg === '') jsonErr('Todas las preguntas deben tener texto');
+        if ($resp === '') jsonErr('La pregunta "' . $preg . '" no tiene respuesta');
+        $validas[] = [$preg, $resp];
+    }
+
+    $db->prepare('DELETE FROM faq WHERE tipo=?')->execute([$tipo]);
+    $stmt = $db->prepare('INSERT INTO faq (tipo,pregunta,respuesta,orden) VALUES (?,?,?,?)');
+    foreach ($validas as $i => [$preg, $resp]) {
+        $stmt->execute([$tipo, $preg, $resp, $i + 1]);
     }
     jsonOk('FAQ guardadas');
 }
