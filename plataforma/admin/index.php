@@ -46,22 +46,22 @@ require_once __DIR__ . '/_layout.php';
 <div class="adm-stats">
   <div class="adm-stat">
     <div class="adm-stat-icon adm-stat-icon--blue"><span class="material-symbols-rounded">menu_book</span></div>
-    <div class="adm-stat-value"><?= $stats['libros'] ?></div>
+    <div class="adm-stat-value" id="stat-libros"><?= $stats['libros'] ?></div>
     <div class="adm-stat-label">Libros en catálogo</div>
   </div>
   <div class="adm-stat">
     <div class="adm-stat-icon adm-stat-icon--green"><span class="material-symbols-rounded">handshake</span></div>
-    <div class="adm-stat-value"><?= $stats['convenios'] ?></div>
+    <div class="adm-stat-value" id="stat-convenios"><?= $stats['convenios'] ?></div>
     <div class="adm-stat-label">Convenios activos</div>
   </div>
   <div class="adm-stat">
     <div class="adm-stat-icon adm-stat-icon--orange"><span class="material-symbols-rounded">school</span></div>
-    <div class="adm-stat-value"><?= $stats['docentes'] ?></div>
+    <div class="adm-stat-value" id="stat-docentes"><?= $stats['docentes'] ?></div>
     <div class="adm-stat-label">Docentes registrados</div>
   </div>
   <div class="adm-stat">
     <div class="adm-stat-icon adm-stat-icon--pink"><span class="material-symbols-rounded">calendar_month</span></div>
-    <div class="adm-stat-value"><?= $stats['horarios'] ?></div>
+    <div class="adm-stat-value" id="stat-horarios"><?= $stats['horarios'] ?></div>
     <div class="adm-stat-label">Horarios publicados</div>
   </div>
 </div>
@@ -160,5 +160,28 @@ require_once __DIR__ . '/_layout.php';
   </a>
 
 </div>
+
+<script>
+(function () {
+  var base = (document.querySelector('meta[name="plataforma-url"]')?.content || '/plataforma');
+  var url  = base + '/admin/procesos/stats.php';
+  var map  = { libros: 'stat-libros', convenios: 'stat-convenios', docentes: 'stat-docentes', horarios: 'stat-horarios' };
+
+  function actualizarStats() {
+    fetch(url)
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data || !data.ok) return;
+        for (var key in map) {
+          var el = document.getElementById(map[key]);
+          if (el && el.textContent !== String(data[key])) el.textContent = data[key];
+        }
+      })
+      .catch(function () {});
+  }
+
+  setInterval(actualizarStats, 30000);
+})();
+</script>
 
 <?php require_once __DIR__ . '/_layout_end.php'; ?>

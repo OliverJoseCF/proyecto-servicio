@@ -7,26 +7,20 @@
     return d.innerHTML;
   }
 
-  fetch('procesos/obtenerLibros.php')
-    .then(function (res) {
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json();
-    })
-    .then(function (data) {
-      if (data.error) throw new Error(data.error);
-      window.todosLosLibros = data;
-      filtrarLibros();
-    })
-    .catch(function () {
-      var tbody = document.querySelector('#tablaLibros tbody');
-      if (tbody) {
-        tbody.innerHTML =
-          '<tr><td colspan="5" class="empty-state">' +
-          '<i class="fas fa-exclamation-circle d-block" aria-hidden="true"></i>' +
-          'Error al cargar los libros. Intenta recargar la página.' +
-          '</td></tr>';
-      }
-    });
+  function cargarLibros(callback) {
+    fetch('procesos/obtenerLibros.php')
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        if (data.error) throw new Error(data.error);
+        callback(null, data);
+      })
+      .catch(function (err) {
+        callback(err, null);
+      });
+  }
 
   function filtrarLibros() {
     var searchEl = document.getElementById('searchInput');
@@ -98,6 +92,36 @@
       tbody.appendChild(fila);
     });
   }
+
+  // Carga inicial
+  cargarLibros(function (err, data) {
+    if (err) {
+      var tbody = document.querySelector('#tablaLibros tbody');
+      if (tbody) {
+        tbody.innerHTML =
+          '<tr><td colspan="5" class="empty-state">' +
+          '<i class="fas fa-exclamation-circle d-block" aria-hidden="true"></i>' +
+          'Error al cargar los libros. Intenta recargar la página.' +
+          '</td></tr>';
+      }
+      return;
+    }
+    window.todosLosLibros = data;
+    filtrarLibros();
+  });
+
+  // Refresco automático cada 60s — solo actualiza si el usuario no está escribiendo
+  setInterval(function () {
+    var searchEl = document.getElementById('searchInput');
+    var escribiendo = searchEl && document.activeElement === searchEl;
+    if (escribiendo) return;
+
+    cargarLibros(function (err, data) {
+      if (err || !data) return;
+      window.todosLosLibros = data;
+      filtrarLibros();
+    });
+  }, 60000);
 
   window.filtrarLibros = filtrarLibros;
 })();
