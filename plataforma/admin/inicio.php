@@ -83,15 +83,27 @@ require_once __DIR__ . '/_layout.php';
   </div>
   <div class="adm-form-card" style="margin-top:20px">
     <div class="adm-form-title"><span class="material-symbols-rounded">add_photo_alternate</span> <span id="form-car-titulo">Agregar imagen al carrusel</span></div>
-    <form data-proc="inicio" data-reload id="form-car">
+    <form data-proc="inicio" data-reload id="form-car" enctype="multipart/form-data">
       <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="carrusel_agregar" id="car-accion">
       <input type="hidden" name="id" id="car-id">
       <div class="adm-form-grid cols-2">
         <div class="adm-field" style="grid-column:1/-1">
-          <label>URL de la imagen <span style="color:var(--tsj-pink)">*</span></label>
-          <input type="url" name="url" id="car-url" placeholder="https://… o ruta relativa" required>
-          <span class="adm-field-help">Puede ser una URL externa o una ruta dentro del servidor.</span>
+          <label>Subir imagen desde tu computadora</label>
+          <input type="file" name="archivo" id="car-archivo"
+                 accept=".jpg,.jpeg,.png,.webp,.gif,.svg,image/*"
+                 onchange="previsualizarImagen(this)">
+          <span class="adm-field-help">JPG, PNG, WEBP, GIF o SVG — máx. 5 MB. Si subes un archivo, se ignora la URL de abajo.</span>
+          <!-- Vista previa -->
+          <div id="car-preview" style="display:none;margin-top:10px">
+            <img id="car-preview-img" src="" alt="Vista previa"
+                 style="max-height:120px;max-width:100%;border-radius:8px;border:1.5px solid var(--tsj-gray-200);object-fit:cover">
+          </div>
+        </div>
+        <div class="adm-field" style="grid-column:1/-1">
+          <label>O pegar URL externa</label>
+          <input type="url" name="url" id="car-url" placeholder="https://ejemplo.com/imagen.jpg">
+          <span class="adm-field-help">Usa esto si la imagen ya está en internet. Deja vacío si subiste un archivo arriba.</span>
         </div>
         <div class="adm-field"><label>Título (opcional)</label><input type="text" name="titulo" id="car-titulo-inp" placeholder="Ej. Semestre 2025-A"></div>
         <div class="adm-field"><label>Subtítulo (opcional)</label><input type="text" name="subtitulo" id="car-subtitulo"></div>
@@ -195,20 +207,46 @@ require_once __DIR__ . '/_layout.php';
 
 <script>
 // ── Carrusel ────────────────────────────────────────────────────
+function previsualizarImagen(input) {
+  var preview    = document.getElementById('car-preview');
+  var previewImg = document.getElementById('car-preview-img');
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      previewImg.src = e.target.result;
+      preview.style.display = '';
+    };
+    reader.readAsDataURL(input.files[0]);
+  } else {
+    preview.style.display = 'none';
+    previewImg.src = '';
+  }
+}
 function abrirEditarCar(s){
   document.getElementById('car-accion').value      = 'carrusel_editar';
   document.getElementById('car-id').value          = s.id;
   document.getElementById('car-url').value         = s.url||'';
   document.getElementById('car-titulo-inp').value  = s.titulo||'';
   document.getElementById('car-subtitulo').value   = s.subtitulo||'';
+  // Mostrar imagen actual como preview si es URL
+  var previewImg = document.getElementById('car-preview-img');
+  var preview    = document.getElementById('car-preview');
+  if (s.url) {
+    previewImg.src = s.url;
+    preview.style.display = '';
+  } else {
+    preview.style.display = 'none';
+  }
   document.getElementById('form-car-titulo').textContent = 'Editar imagen';
   document.getElementById('form-car').scrollIntoView({behavior:'smooth'});
 }
 function resetFormCar(){
-  document.getElementById('car-accion').value='carrusel_agregar';
-  document.getElementById('car-id').value='';
+  document.getElementById('car-accion').value = 'carrusel_agregar';
+  document.getElementById('car-id').value     = '';
   document.getElementById('form-car').reset();
-  document.getElementById('form-car-titulo').textContent='Agregar imagen al carrusel';
+  document.getElementById('car-preview').style.display = 'none';
+  document.getElementById('car-preview-img').src       = '';
+  document.getElementById('form-car-titulo').textContent = 'Agregar imagen al carrusel';
 }
 
 // ── Avisos ──────────────────────────────────────────────────────
