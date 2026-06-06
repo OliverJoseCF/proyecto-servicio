@@ -50,15 +50,26 @@ $nav_items = [
     'requisitos' => ['label' => 'Serv. Social / Residencia','href' => $base . '/modulos/requisitos/residencia.php', 'icon' => 'checklist'],
 ];
 
-// Sub-items de Oferta Académica (dropdown)
-$oferta_carreras = [
-    ['label' => 'Ing. en Sistemas Computacionales',           'href' => $base . '/modulos/visitantes/MateriasSistemas.php',   'icon' => 'computer'],
-    ['label' => 'Ingeniería Industrial',                       'href' => $base . '/modulos/visitantes/MateriasIndustrial.php',  'icon' => 'precision_manufacturing'],
-    ['label' => 'Ingeniería Mecatrónica',                      'href' => $base . '/modulos/visitantes/MateriasMecatronica.php', 'icon' => 'settings_suggest'],
-    ['label' => 'Animación Digital y Efectos Visuales',        'href' => $base . '/modulos/visitantes/MateriasAnimacion.php',   'icon' => 'animation'],
-    ['label' => 'Ing. en Gestión Empresarial',                 'href' => $base . '/modulos/visitantes/MateriasGestion.php',     'icon' => 'business_center'],
-    ['label' => 'Gastronomía',                                 'href' => $base . '/modulos/visitantes/GastronomiaMaterias.php', 'icon' => 'restaurant'],
+// Sub-items de Oferta Académica — cargados desde BD dinámicamente
+$oferta_carreras = [];
+$_iconos_carrera = [
+    'ISC'=>'computer','II'=>'precision_manufacturing','IM'=>'settings_suggest',
+    'IADEV'=>'animation','IGE'=>'business_center','LG'=>'restaurant',
 ];
+try {
+    if (!isset($db)) { $db = getPDO(DB_NAME); }
+    $filas = $db->query('SELECT clave, nombre FROM carreras WHERE activo=1 ORDER BY orden')->fetchAll();
+    foreach ($filas as $f) {
+        $oferta_carreras[] = [
+            'label' => $f['nombre'],
+            'href'  => $base . '/modulos/visitantes/materias.php?carrera=' . urlencode($f['clave']),
+            'icon'  => $_iconos_carrera[$f['clave']] ?? 'school',
+        ];
+    }
+} catch (\Throwable $e) {
+    // Si BD no disponible, el dropdown queda vacío — no rompe el header
+    $oferta_carreras = [];
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -245,42 +256,6 @@ $oferta_carreras = [
 
 <script>
 (function () {
-  // ── Dropdown escritorio: toggle con click ────────────────────
-  var liDropdown = document.querySelector('.tsj-nav li.tsj-has-dropdown');
-  if (liDropdown) {
-    var triggerLink = liDropdown.querySelector(':scope > a');
-
-    triggerLink.addEventListener('click', function (e) {
-      // Si ya está abierto y se hace clic, navegar a la página de oferta
-      if (liDropdown.classList.contains('open')) {
-        liDropdown.classList.remove('open');
-        return; // deja que el href funcione normalmente
-      }
-      // Si está cerrado, abrir el dropdown sin navegar
-      e.preventDefault();
-      liDropdown.classList.add('open');
-    });
-
-    // Cerrar al hacer clic fuera
-    document.addEventListener('click', function (e) {
-      if (!liDropdown.contains(e.target)) {
-        liDropdown.classList.remove('open');
-      }
-    });
-
-    // Cerrar con ESC
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') liDropdown.classList.remove('open');
-    });
-
-    // Cerrar al seleccionar una carrera
-    liDropdown.querySelectorAll('.tsj-dropdown a').forEach(function (a) {
-      a.addEventListener('click', function () {
-        liDropdown.classList.remove('open');
-      });
-    });
-  }
-
   // ── Toggle Oferta Académica en menú móvil ───────────────────
   var toggle   = document.getElementById('tsj-oferta-toggle');
   var subitems = document.getElementById('tsj-oferta-subitems');

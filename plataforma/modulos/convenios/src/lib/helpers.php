@@ -81,7 +81,16 @@ function eliminarLogo(string $logoName): void {
  * @return string|null    Mensaje de error o null si todo es válido
  */
 function validarCamposConvenio(array $post, array &$fields): ?string {
-    static $carrerasValidas  = ['IADEV', 'IM', 'ISC', 'II', 'LG', 'IGE'];
+    // Cargar carreras válidas desde BD en lugar de array estático
+    $carrerasValidas = [];
+    try {
+        require_once dirname(__DIR__, 4) . '/shared/config.php';
+        $dbC = getPDO(DB_NAME);
+        $carrerasValidas = array_column(
+            $dbC->query('SELECT clave FROM carreras WHERE activo=1')->fetchAll(),
+            'clave'
+        );
+    } catch (\Throwable $e) {}
     static $conveniosValidos = ['Servicio Social', 'Prácticas', 'Ambos'];
 
     $empresa      = trim($post['empresa']      ?? '');

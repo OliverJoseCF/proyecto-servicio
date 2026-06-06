@@ -2,23 +2,26 @@
 require_once __DIR__ . '/../src/security_headers.php';
 require_once __DIR__ . '/../../../shared/config.php';
 
+// ── Carreras desde BD ────────────────────────────────────────────
+$carreraNombres  = [];
+$carrerasValidas = [];
+try {
+    $dbC = getPDO(DB_NAME);
+    foreach ($dbC->query('SELECT clave, nombre FROM carreras WHERE activo=1 ORDER BY orden')->fetchAll() as $row) {
+        $carrerasValidas[]              = $row['clave'];
+        $carreraNombres[$row['clave']]  = $row['nombre'];
+    }
+} catch (\Throwable $e) {
+    // fallback vacío — no rompe la página
+}
+
 // ── Filtros GET ──────────────────────────────────────────────────
-$carrerasValidas = ['IADEV','IM','ISC','II','LG','IGE'];
 $tiposValidos    = ['residencia','servicio_social','practicas','otro'];
 $sectoresValidos = ['privado','publico','ac','otro'];
 
 $carrera = isset($_GET['carrera']) && in_array($_GET['carrera'], $carrerasValidas, true) ? $_GET['carrera'] : '';
 $tipo    = isset($_GET['tipo'])    && in_array($_GET['tipo'],    $tiposValidos,    true) ? $_GET['tipo']    : '';
 $sector  = isset($_GET['sector'])  && in_array($_GET['sector'],  $sectoresValidos,  true) ? $_GET['sector']  : '';
-
-$carreraNombres = [
-    'IADEV' => 'Ing. en Animación Digital y Efectos Visuales',
-    'IM'    => 'Ingeniería Mecatrónica',
-    'ISC'   => 'Ing. en Sistemas Computacionales',
-    'II'    => 'Ingeniería Industrial',
-    'LG'    => 'Gastronomía',
-    'IGE'   => 'Ing. en Gestión Empresarial',
-];
 $tipoLabels = [
     'residencia'     => 'Residencia profesional',
     'servicio_social'=> 'Servicio social',

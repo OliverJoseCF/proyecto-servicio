@@ -11,14 +11,13 @@ if (empty($_SESSION['csrf_token'])) {
 $formError = $_SESSION['form_error'] ?? null;
 unset($_SESSION['form_error']);
 
-$carreras = [
-    'IADEV' => 'Ingeniería en Animación Digital y Efectos Visuales',
-    'IM'    => 'Ingeniería Mecatrónica',
-    'ISC'   => 'Ingeniería en Sistemas Computacionales',
-    'II'    => 'Ingeniería Industrial',
-    'LG'    => 'Gastronomía',
-    'IGE'   => 'Ingeniería en Gestión Empresarial',
-];
+$carreras = [];
+try {
+    $dbC = getPDO(DB_NAME);
+    foreach ($dbC->query('SELECT clave, nombre FROM carreras WHERE activo=1 ORDER BY orden')->fetchAll() as $row) {
+        $carreras[$row['clave']] = $row['nombre'];
+    }
+} catch (\Throwable $e) {}
 
 $tsj_module    = 'convenios';
 $tsj_title     = 'Convenios — Registro de Convenio';

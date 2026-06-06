@@ -132,8 +132,8 @@ require_once __DIR__ . '/_layout.php';
 <!-- ══ TAB: Docentes ════════════════════════════════════════════ -->
 <div class="adm-tab-panel" data-tab-group="vis" data-tab="docentes">
   <div class="adm-career-pills" id="doc-pills">
-    <?php foreach ($carreras as $c): ?>
-    <button class="adm-career-pill <?= $c['clave']==='ISC'?'active':'' ?>"
+    <?php foreach ($carreras as $i => $c): ?>
+    <button class="adm-career-pill <?= $i===0?'active':'' ?>"
             onclick="filtrarDocentes('<?= $c['clave'] ?>')">
       <?= htmlspecialchars($c['clave']) ?>
     </button>
@@ -246,8 +246,8 @@ require_once __DIR__ . '/_layout.php';
 
 <!-- ══ TAB: Planes de Estudio ══════════════════════════════════ -->
 <div class="adm-tab-panel" data-tab-group="vis" data-tab="materias">
-  <?php foreach ($carreras as $c): ?>
-  <div class="adm-section" data-carrera-sec="<?= $c['clave'] ?>" style="<?= $c['clave']==='ISC'?'':'display:none;' ?>margin-bottom:20px">
+  <?php foreach ($carreras as $i => $c): ?>
+  <div class="adm-section" data-carrera-sec="<?= $c['clave'] ?>" style="<?= $i===0?'':'display:none;' ?>margin-bottom:20px">
     <div class="adm-section-header">
       <h3 class="adm-section-title"><span class="material-symbols-rounded">list_alt</span> Materias — <?= htmlspecialchars($c['nombre']) ?></h3>
     </div>
@@ -278,8 +278,8 @@ require_once __DIR__ . '/_layout.php';
   </div>
   <?php endforeach; ?>
   <div class="adm-career-pills" style="margin-bottom:16px">
-    <?php foreach ($carreras as $c): ?>
-    <button class="adm-career-pill <?= $c['clave']==='ISC'?'active':'' ?>"
+    <?php foreach ($carreras as $i => $c): ?>
+    <button class="adm-career-pill <?= $i===0?'active':'' ?>"
             onclick="filtrarMaterias('<?= $c['clave'] ?>')">
       <?= htmlspecialchars($c['clave']) ?>
     </button>
@@ -290,72 +290,102 @@ require_once __DIR__ . '/_layout.php';
 <!-- ══ TAB: Oferta Académica ═══════════════════════════════════ -->
 <div class="adm-tab-panel" data-tab-group="vis" data-tab="oferta">
 
-  <div class="adm-pending" style="margin-bottom:20px">
-    <span class="material-symbols-rounded">info</span>
-    <span>Aquí editas la descripción de cada carrera que aparece en la página pública de <strong>Oferta Académica</strong>. Los planes de estudio (materias) se editan en la pestaña <strong>Planes de Estudio</strong>.</span>
-  </div>
+  <!-- ── Sección 1: Gestión de carreras ── -->
+  <div class="adm-section" style="margin-bottom:24px">
+    <div class="adm-section-header">
+      <h3 class="adm-section-title"><span class="material-symbols-rounded">school</span> Carreras registradas</h3>
+      <a href="<?= PLATAFORMA_URL ?>/modulos/visitantes/ofertaAcademica.php" target="_blank" class="adm-btn adm-btn--ghost adm-btn--sm">
+        <span class="material-symbols-rounded">open_in_new</span> Ver página pública
+      </a>
+    </div>
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead><tr><th>Color</th><th>Clave</th><th>Nombre de la carrera</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody id="carreras-tbody">
+          <?php if (empty($carreras)): ?>
+          <tr><td colspan="5" class="adm-table-empty">Sin carreras registradas.</td></tr>
+          <?php endif; ?>
+          <?php foreach ($carreras as $c):
+            $color = htmlspecialchars($c['color'] ?? '#32129a');
+          ?>
+          <tr id="car-<?= $c['id'] ?>" <?= !$c['activo'] ? 'style="opacity:.5"' : '' ?>>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="display:inline-block;width:24px;height:24px;border-radius:6px;background:<?= $color ?>;flex-shrink:0;border:1px solid rgba(0,0,0,.1)"></span>
+                <code style="font-size:11px;color:var(--tsj-gray-600)"><?= $color ?></code>
+              </div>
+            </td>
+            <td><code style="background:<?= $color ?>22;color:<?= $color ?>;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:700"><?= htmlspecialchars($c['clave']) ?></code></td>
+            <td style="font-weight:600"><?= htmlspecialchars($c['nombre']) ?></td>
+            <td>
+              <?php if ($c['activo']): ?>
+                <span class="adm-status adm-status--ok">Activa</span>
+              <?php else: ?>
+                <span class="adm-status adm-status--warn">Inactiva</span>
+              <?php endif; ?>
+            </td>
+            <td class="actions">
+              <button class="adm-btn adm-btn--ghost adm-btn--sm" title="<?= $c['activo'] ? 'Desactivar' : 'Activar' ?>"
+                      onclick="toggleActivo('visitantes','carrera_toggle',<?= $c['id'] ?>,this)">
+                <span class="material-symbols-rounded"><?= $c['activo'] ? 'visibility_off' : 'visibility' ?></span>
+              </button>
+              <button class="adm-btn adm-btn--ghost adm-btn--sm"
+                      onclick="abrirEditarCarrera(<?= htmlspecialchars(json_encode($c)) ?>)">
+                <span class="material-symbols-rounded">edit</span>
+              </button>
+              <button class="adm-btn adm-btn--danger adm-btn--sm"
+                      onclick="confirmarEliminar('visitantes','carrera_eliminar',<?= $c['id'] ?>,'car-<?= $c['id'] ?>')">
+                <span class="material-symbols-rounded">delete</span>
+              </button>
+            </td>
+          </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
 
-  <?php
-  $oferta_info = [
-    'ISC'   => ['nombre'=>'Ing. en Sistemas Computacionales',          'icono'=>'computer',                'key'=>'desc_ISC'],
-    'II'    => ['nombre'=>'Ingeniería Industrial',                      'icono'=>'precision_manufacturing', 'key'=>'desc_II'],
-    'IM'    => ['nombre'=>'Ingeniería Mecatrónica',                     'icono'=>'settings_suggest',        'key'=>'desc_IM'],
-    'IADEV' => ['nombre'=>'Ing. en Animación Digital y Efectos Visuales','icono'=>'animation',             'key'=>'desc_IADEV'],
-    'IGE'   => ['nombre'=>'Ing. en Gestión Empresarial',               'icono'=>'business_center',         'key'=>'desc_IGE'],
-    'LG'    => ['nombre'=>'Gastronomía',                                'icono'=>'restaurant',              'key'=>'desc_LG'],
-  ];
-
-  // Cargar descripciones guardadas en BD (tabla configuracion)
-  $descsCfg = [];
-  try {
-    $rowsCfg = getPDO(DB_NAME)->query("SELECT clave,valor FROM configuracion WHERE clave LIKE 'desc_%'")->fetchAll();
-    foreach ($rowsCfg as $r) $descsCfg[$r['clave']] = $r['valor'];
-  } catch (\Throwable $e) {}
-
-  $defaults = [
-    'desc_ISC'   => 'Desarrolla software, sistemas y soluciones tecnológicas de alto impacto.',
-    'desc_II'    => 'Optimiza procesos productivos y gestiona sistemas industriales.',
-    'desc_IM'    => 'Integra mecánica, electrónica y control automático.',
-    'desc_IADEV' => 'Crea personajes, mundos virtuales y efectos para cine y videojuegos.',
-    'desc_IGE'   => 'Dirige organizaciones con enfoque estratégico e innovación.',
-    'desc_LG'    => 'Domina el arte culinario, gestión de restaurantes y cocina creativa.',
-  ];
-  ?>
-
-  <form id="form-oferta">
-    <input type="hidden" name="_csrf" value="<?= $csrf ?>">
-    <input type="hidden" name="accion" value="oferta_guardar">
-    <div class="adm-form-grid cols-2">
-      <?php foreach ($oferta_info as $clave => $info): ?>
-      <div class="adm-form-card" style="padding:18px">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-          <div style="width:36px;height:36px;background:var(--tsj-blue);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <span class="material-symbols-rounded" style="color:#fff;font-size:20px"><?= $info['icono'] ?></span>
+    <!-- Formulario agregar/editar carrera -->
+    <div class="adm-form-card" style="margin-top:20px">
+      <div class="adm-form-title"><span class="material-symbols-rounded">add_circle</span> <span id="form-car-titulo">Agregar carrera</span></div>
+      <form data-proc="visitantes" data-reload id="form-carrera">
+        <input type="hidden" name="_csrf" value="<?= $csrf ?>">
+        <input type="hidden" name="accion" value="carrera_agregar" id="car-accion">
+        <input type="hidden" name="id" id="car-id">
+        <div class="adm-form-grid cols-3">
+          <div class="adm-field">
+            <label>Clave <span style="color:var(--tsj-pink)">*</span></label>
+            <input type="text" name="clave" id="car-clave" placeholder="Ej. ISC, IM, LG" maxlength="10" required>
+            <span class="adm-field-help">Siglas cortas únicas. No se puede cambiar después.</span>
           </div>
-          <div>
-            <div style="font-weight:700;font-size:13px;color:var(--tsj-blue)"><?= htmlspecialchars($clave) ?></div>
-            <div style="font-size:12px;color:var(--tsj-gray-600)"><?= htmlspecialchars($info['nombre']) ?></div>
+          <div class="adm-field" style="grid-column:span 2">
+            <label>Nombre completo de la carrera <span style="color:var(--tsj-pink)">*</span></label>
+            <input type="text" name="nombre" id="car-nombre" placeholder="Ej. Ingeniería en Sistemas Computacionales" required>
+          </div>
+          <div class="adm-field">
+            <label>Color de la carrera <span style="color:var(--tsj-pink)">*</span></label>
+            <div style="display:flex;align-items:center;gap:10px">
+              <input type="color" name="color" id="car-color" value="#32129a"
+                     style="width:48px;height:38px;border:1.5px solid var(--tsj-gray-200);border-radius:8px;cursor:pointer;padding:2px">
+              <input type="text" id="car-color-hex" value="#32129a" maxlength="7"
+                     style="flex:1;font-family:monospace;font-size:13px"
+                     placeholder="#rrggbb"
+                     oninput="sincColorHex(this)">
+            </div>
+            <span class="adm-field-help">Se aplica en tarjetas, planes de estudio y convenios.</span>
+          </div>
+          <div class="adm-field" style="grid-column:span 2">
+            <label>Descripción breve (aparece en la tarjeta pública)</label>
+            <textarea name="descripcion" id="car-descripcion" rows="2" placeholder="Breve descripción de la carrera para la página de Oferta Académica"></textarea>
           </div>
         </div>
-        <div class="adm-field" style="margin:0">
-          <label>Descripción breve (aparece en la tarjeta pública)</label>
-          <textarea name="desc[<?= $clave ?>]" rows="2" style="min-height:60px"><?= htmlspecialchars($descsCfg[$info['key']] ?? $defaults[$info['key']]) ?></textarea>
+        <div class="adm-form-actions">
+          <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar carrera</button>
+          <button type="button" class="adm-btn adm-btn--ghost" onclick="resetFormCarrera()">Cancelar</button>
         </div>
-      </div>
-      <?php endforeach; ?>
+      </form>
     </div>
-    <div class="adm-form-actions" style="margin-top:20px">
-      <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar descripciones</button>
-    </div>
-  </form>
-
-  <div class="adm-form-card" style="margin-top:24px;background:var(--tsj-gray-50)">
-    <div class="adm-form-title"><span class="material-symbols-rounded">open_in_new</span> Vista pública</div>
-    <p style="font-size:13px;color:var(--tsj-gray-600);margin:0 0 12px">Así ve el alumno la página de Oferta Académica con las descripciones que configures aquí.</p>
-    <a href="<?= PLATAFORMA_URL ?>/modulos/visitantes/ofertaAcademica.php" target="_blank" class="adm-btn adm-btn--ghost">
-      <span class="material-symbols-rounded">open_in_new</span> Ver Oferta Académica
-    </a>
   </div>
+
 </div>
 
 <!-- ══ TAB: Secretarías ════════════════════════════════════════ -->
@@ -436,6 +466,46 @@ require_once __DIR__ . '/_layout.php';
 </div>
 
 <script>
+// ── Sincronización color picker ↔ input hex ─────────────────────
+function sincColorHex(hexInput) {
+  var val = hexInput.value;
+  if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+    document.getElementById('car-color').value = val;
+  }
+}
+document.addEventListener('DOMContentLoaded', function () {
+  var picker = document.getElementById('car-color');
+  if (picker) {
+    picker.addEventListener('input', function () {
+      document.getElementById('car-color-hex').value = picker.value;
+    });
+  }
+});
+
+// ── Carreras ────────────────────────────────────────────────────
+function abrirEditarCarrera(c) {
+  document.getElementById('car-accion').value       = 'carrera_editar';
+  document.getElementById('car-id').value           = c.id;
+  document.getElementById('car-clave').value        = c.clave || '';
+  document.getElementById('car-clave').readOnly     = true;
+  document.getElementById('car-nombre').value       = c.nombre || '';
+  var color = c.color || '#32129a';
+  document.getElementById('car-color').value        = color;
+  document.getElementById('car-color-hex').value    = color;
+  document.getElementById('car-descripcion').value  = '';
+  document.getElementById('form-car-titulo').textContent = 'Editar: ' + c.nombre;
+  document.getElementById('form-carrera').scrollIntoView({ behavior: 'smooth' });
+}
+function resetFormCarrera() {
+  document.getElementById('car-accion').value       = 'carrera_agregar';
+  document.getElementById('car-id').value           = '';
+  document.getElementById('car-clave').readOnly     = false;
+  document.getElementById('form-carrera').reset();
+  document.getElementById('car-color').value        = '#32129a';
+  document.getElementById('car-color-hex').value    = '#32129a';
+  document.getElementById('form-car-titulo').textContent = 'Agregar carrera';
+}
+
 // ── Oferta Académica: handler propio para array anidado desc[clave] ──
 (function () {
   var form = document.getElementById('form-oferta');
@@ -492,7 +562,10 @@ function filtrarMaterias(clave){
     b.classList.toggle('active', b.textContent.trim()===clave);
   });
 }
-document.addEventListener('DOMContentLoaded',()=>filtrarDocentes('ISC'));
+document.addEventListener('DOMContentLoaded', function() {
+  var primerPill = document.querySelector('#doc-pills .adm-career-pill');
+  if (primerPill) filtrarDocentes(primerPill.textContent.trim());
+});
 
 // ── Materia agregar fila ────────────────────────────────────────
 function addMateria(carreraId){

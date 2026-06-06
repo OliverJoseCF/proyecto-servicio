@@ -146,17 +146,88 @@ if ($accion === 'secretaria_eliminar') {
     jsonOk('Secretaria eliminada');
 }
 
+// ══ CARRERAS ════════════════════════════════════════════════════
+if ($accion === 'carrera_agregar') {
+    $clave  = strtoupper(trim(str('clave', 10)));
+    $nombre = str('nombre', 150);
+    $color  = str('color', 7) ?: '#32129a';
+    $desc   = str('descripcion', 500);
+    if (!$clave || !$nombre) jsonErr('Clave y nombre son requeridos');
+    if (!preg_match('/^[A-Z0-9]{1,10}$/', $clave)) jsonErr('La clave solo puede tener letras mayúsculas y números (máx. 10)');
+    if (!preg_match('/^#[0-9a-fA-F]{6}$/', $color)) $color = '#32129a';
+    try {
+        $maxOrden = (int)$db->query('SELECT COALESCE(MAX(orden),0)+1 FROM carreras')->fetchColumn();
+        $db->prepare('INSERT INTO carreras (clave, nombre, color, orden) VALUES (?,?,?,?)')
+           ->execute([$clave, $nombre, $color, $maxOrden]);
+        if ($desc !== '') {
+            $db->prepare('INSERT INTO configuracion (clave, valor) VALUES (?,?) ON DUPLICATE KEY UPDATE valor = VALUES(valor)')
+               ->execute(['desc_' . $clave, $desc]);
+        }
+        jsonOk('Carrera agregada', ['id' => $db->lastInsertId()]);
+    } catch (\PDOException $e) {
+        if ($e->getCode() === '23000') jsonErr('Ya existe una carrera con esa clave');
+        throw $e;
+    }
+}
+
+if ($accion === 'carrera_editar') {
+    $id     = postInt('id');
+    $nombre = str('nombre', 150);
+    $color  = str('color', 7) ?: '#32129a';
+    $desc   = str('descripcion', 500);
+    if (!$id || !$nombre) jsonErr('Datos incompletos');
+    if (!preg_match('/^#[0-9a-fA-F]{6}$/', $color)) $color = '#32129a';
+    $db->prepare('UPDATE carreras SET nombre=?, color=? WHERE id=?')->execute([$nombre, $color, $id]);
+    $claveRow = $db->prepare('SELECT clave FROM carreras WHERE id=?');
+    $claveRow->execute([$id]);
+    $clave = $claveRow->fetchColumn();
+    if ($clave) {
+        $db->prepare('INSERT INTO configuracion (clave, valor) VALUES (?,?) ON DUPLICATE KEY UPDATE valor = VALUES(valor)')
+           ->execute(['desc_' . $clave, $desc]);
+    }
+    jsonOk('Carrera actualizada');
+}
+
+if ($accion === 'carrera_toggle') {
+    $id = postInt('id');
+    if (!$id) jsonErr('ID inválido');
+    $db->prepare('UPDATE carreras SET activo = 1 - activo WHERE id=?')->execute([$id]);
+    $activo = (int)$db->query("SELECT activo FROM carreras WHERE id=$id")->fetchColumn();
+    jsonOk($activo ? 'Carrera activada' : 'Carrera desactivada', ['activo' => $activo]);
+}
+
+if ($accion === 'carrera_eliminar') {
+    $id = postInt('id');
+    if (!$id) jsonErr('ID inválido');
+    // Verificar que no tenga docentes, materias o coordinadores activos
+    $docentes = (int)$db->prepare('SELECT COUNT(*) FROM docentes WHERE carrera_id=?')->execute([$id]) ?
+                $db->prepare('SELECT COUNT(*) FROM docentes WHERE carrera_id=?') : null;
+    $stmtD = $db->prepare('SELECT COUNT(*) FROM docentes WHERE carrera_id=?');
+    $stmtD->execute([$id]);
+    $stmtM = $db->prepare('SELECT COUNT(*) FROM materias WHERE carrera_id=?');
+    $stmtM->execute([$id]);
+    $stmtC = $db->prepare('SELECT COUNT(*) FROM coordinadores WHERE carrera_id=?');
+    $stmtC->execute([$id]);
+    $total = (int)$stmtD->fetchColumn() + (int)$stmtM->fetchColumn() + (int)$stmtC->fetchColumn();
+    if ($total > 0) jsonErr('No se puede eliminar: la carrera tiene docentes, materias o coordinadores asociados. Elimínalos primero.');
+    // Obtener clave para borrar descripción
+    $claveRow = $db->prepare('SELECT clave FROM carreras WHERE id=?');
+    $claveRow->execute([$id]);
+    $clave = $claveRow->fetchColumn();
+    $db->prepare('DELETE FROM carreras WHERE id=?')->execute([$id]);
+    if ($clave) {
+        $db->prepare('DELETE FROM configuracion WHERE clave=?')->execute(['desc_' . $clave]);
+    }
+    jsonOk('Carrera eliminada');
+}
+
 // ══ OFERTA ACADÉMICA ════════════════════════════════════════════
 if ($accion === 'oferta_guardar') {
-    $clavesValidas = ['ISC','II','IM','IADEV','IGE','LG'];
-    $mapaCfg = [
-        'ISC'   => 'desc_ISC',
-        'II'    => 'desc_II',
-        'IM'    => 'desc_IM',
-        'IADEV' => 'desc_IADEV',
-        'IGE'   => 'desc_IGE',
-        'LG'    => 'desc_LG',
-    ];
+    // Obtener claves válidas desde BD
+    $clavesValidas = array_column(
+        $db->query('SELECT clave FROM carreras WHERE activo=1')->fetchAll(),
+        'clave'
+    );
     $desc = $_POST['desc'] ?? [];
     if (!is_array($desc)) jsonErr('Datos inválidos');
 
@@ -164,7 +235,7 @@ if ($accion === 'oferta_guardar') {
                           ON DUPLICATE KEY UPDATE valor = VALUES(valor)');
     foreach ($clavesValidas as $clave) {
         $valor = mb_substr(trim($desc[$clave] ?? ''), 0, 500);
-        $stmt->execute([':k' => $mapaCfg[$clave], ':v' => $valor]);
+        $stmt->execute([':k' => 'desc_' . $clave, ':v' => $valor]);
     }
     jsonOk('Descripciones de oferta académica guardadas');
 }

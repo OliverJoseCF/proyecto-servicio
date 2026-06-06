@@ -98,7 +98,7 @@ try {
 
     <!-- Botón volver -->
     <div style="text-align:center;margin-top:28px">
-      <a href="index.php" style="
+      <a href="ofertaAcademica.php" style="
           display:inline-flex;align-items:center;gap:8px;
           color:var(--tsj-blue,#33179c);font-size:13px;font-weight:600;
           text-decoration:none;padding:9px 20px;
@@ -107,7 +107,7 @@ try {
           font-family:var(--tsj-font,'Poppins',sans-serif)"
          onmouseover="this.style.borderColor='#33179c';this.style.boxShadow='0 2px 8px rgba(51,23,156,.1)'"
          onmouseout="this.style.borderColor='#e8eaf2';this.style.boxShadow='none'">
-        ← Volver al portal institucional
+        ← Volver a Oferta Académica
       </a>
     </div>
 

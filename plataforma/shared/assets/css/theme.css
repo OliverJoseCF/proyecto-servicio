@@ -493,20 +493,30 @@ body {
   box-shadow: 0 8px 32px rgba(20,10,80,.16);
   border: 1px solid #e8eaf2;
   padding: 6px;
-  /* Puente invisible de 8px entre el link y el panel para que el mouse no pierda el área */
-  padding-top: 14px;
-  margin-top: -8px;
   opacity: 0;
   pointer-events: none;
   transition: opacity .18s ease, transform .18s ease;
   z-index: 9999;
 }
-/* Abierto vía JS (.open) o teclado (focus-within) */
+/* Puente invisible que cubre el gap entre el link y el panel */
+.tsj-dropdown::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 0;
+  right: 0;
+  height: 10px;
+}
+/* Abierto vía hover, JS (.open) o teclado (focus-within) */
+.tsj-nav li.tsj-has-dropdown:hover .tsj-dropdown,
 .tsj-nav li.tsj-has-dropdown.open .tsj-dropdown,
 .tsj-nav li.tsj-has-dropdown:focus-within .tsj-dropdown {
   opacity: 1;
   pointer-events: auto;
   transform: translateX(-50%) translateY(0);
+}
+.tsj-nav li.tsj-has-dropdown:hover > a .tsj-dropdown-arrow {
+  transform: rotate(180deg);
 }
 .tsj-nav li.tsj-has-dropdown .tsj-dropdown a {
   display: flex;

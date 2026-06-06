@@ -14,14 +14,14 @@ if (empty($_SESSION['csrf_token'])) {
 require_once __DIR__ . '/../src/pages/conexion.php';
 
 $error = null;
-$carreras = [
-    'IADEV' => 'Ingeniería en Animación Digital y Efectos Visuales',
-    'IM'    => 'Ingeniería Mecatrónica',
-    'ISC'   => 'Ingeniería en Sistemas Computacionales',
-    'II'    => 'Ingeniería Industrial',
-    'LG'    => 'Gastronomía',
-    'IGE'   => 'Ingeniería en Gestión Empresarial',
-];
+$carreras = [];
+try {
+    require_once __DIR__ . '/../../../shared/config.php';
+    $dbC = getPDO(DB_NAME);
+    foreach ($dbC->query('SELECT clave, nombre FROM carreras WHERE activo=1 ORDER BY orden')->fetchAll() as $row) {
+        $carreras[$row['clave']] = $row['nombre'];
+    }
+} catch (\Throwable $e) {}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {

@@ -15,6 +15,25 @@ require_once __DIR__ . '/../../shared/header.php';
 
 // CSRF para el modal de sugerir empresa
 $_csrf_token = csrfToken();
+
+// Carreras desde BD
+$carrerasConv = [];
+try {
+    $dbConv = getPDO(DB_NAME);
+    $carrerasConv = $dbConv->query('SELECT clave, nombre FROM carreras WHERE activo=1 ORDER BY orden')->fetchAll();
+} catch (\Throwable $e) {}
+
+// Imágenes y estilos por clave conocida
+$convImgs = [
+    'IADEV' => ['img'=>'assets/images/logo/imagenes/9M6A4513.webp',   'alt'=>'Personas trabajando con tabletas gráficas',                   'box'=>'corner-box-top',       'corner'=>'corner-box'],
+    'IM'    => ['img'=>'assets/images/logo/imagenes/DSC02687_1.webp', 'alt'=>'Personas trabajando en electrónica con laptop',               'box'=>'corner-box-top',       'corner'=>'corner-box'],
+    'ISC'   => ['img'=>'assets/images/logo/imagenes/DSC04199_1.webp', 'alt'=>'Estudiantes en sala de computadoras con iMac',                'box'=>'corner-box-top',       'corner'=>'corner-box'],
+    'II'    => ['img'=>'assets/images/logo/imagenes/DSC07193_1.webp', 'alt'=>'Persona con herramienta eléctrica en taller',                 'box'=>'corner-box-top',       'corner'=>'corner-box'],
+    'LG'    => ['img'=>'assets/images/logo/imagenes/DSC06661_1.webp', 'alt'=>'Estudiante de gastronomía preparando una bebida',             'box'=>'corner-box-top-green', 'corner'=>'corner-box-green'],
+    'IGE'   => ['img'=>'assets/images/logo/imagenes/DSC08323_1.webp', 'alt'=>'Dos mujeres trabajando en laptops',                           'box'=>'corner-box-top',       'corner'=>'corner-box'],
+];
+$convLogoDefault = 'assets/images/logo/gear-svgrepo-com_copy.svg';
+$convImgDefault  = ['img'=>'assets/images/logo/imagenes/DSC04199_1.webp','alt'=>'Carrera','box'=>'corner-box-top','corner'=>'corner-box'];
 ?>
 
 <main id="main">
@@ -25,50 +44,27 @@ $_csrf_token = csrfToken();
     <p class="tsj-page-header-sub">Empresas vinculadas para residencia profesional, servicio social y prácticas</p>
   </div>
 
-  <!-- Cards de carreras -->
+  <!-- Cards de carreras (dinámicas desde BD) -->
   <div class="cards-container w-full p-6 flex justify-center gap-6 flex-wrap">
-    <a href="vista_lista/vista_convenios.php?carrera=IADEV" class="card">
-      <div class="corner-box-top" aria-hidden="true"><img src="assets/images/logo/gear-svgrepo-com_copy.svg" alt="" class="corner-logo" /></div>
-      <img class="ing-sistemas" src="assets/images/logo/imagenes/9M6A4513.webp"
-           alt="Personas trabajando en computadoras con tabletas gráficas en un aula" width="400" height="300" loading="lazy" />
-      <div class="card-text">Ingeniería en Animación Digital y Efectos Visuales</div>
-      <div class="corner-box" aria-hidden="true"></div>
+    <?php foreach ($carrerasConv as $car):
+      $est = $convImgs[$car['clave']] ?? $convImgDefault;
+      $logo = ($car['clave'] === 'LG')
+        ? 'assets/images/logo/graduation-svgrepo-com.svg'
+        : $convLogoDefault;
+    ?>
+    <a href="vista_lista/vista_convenios.php?carrera=<?= urlencode($car['clave']) ?>" class="card">
+      <div class="<?= $est['box'] ?>" aria-hidden="true">
+        <img src="<?= $logo ?>" alt="" class="corner-logo" />
+      </div>
+      <img class="ing-sistemas" src="<?= htmlspecialchars($est['img']) ?>"
+           alt="<?= htmlspecialchars($est['alt']) ?>" width="400" height="300" loading="lazy" />
+      <div class="card-text"><?= htmlspecialchars($car['nombre']) ?></div>
+      <div class="<?= $est['corner'] ?>" aria-hidden="true"></div>
     </a>
-    <a href="vista_lista/vista_convenios.php?carrera=IM" class="card">
-      <div class="corner-box-top" aria-hidden="true"><img src="assets/images/logo/gear-svgrepo-com_copy.svg" alt="" class="corner-logo" /></div>
-      <img class="ing-sistemas" src="assets/images/logo/imagenes/DSC02687_1.webp"
-           alt="Tres personas trabajando en un proyecto de electrónica con componentes y una laptop" width="400" height="300" loading="lazy" />
-      <div class="card-text">Ingeniería Mecatrónica</div>
-      <div class="corner-box" aria-hidden="true"></div>
-    </a>
-    <a href="vista_lista/vista_convenios.php?carrera=ISC" class="card">
-      <div class="corner-box-top" aria-hidden="true"><img src="assets/images/logo/gear-svgrepo-com_copy.svg" alt="" class="corner-logo" /></div>
-      <img class="ing-sistemas" src="assets/images/logo/imagenes/DSC04199_1.webp"
-           alt="Estudiantes trabajando en una sala de computadoras con equipos iMac" width="400" height="300" loading="lazy" />
-      <div class="card-text">Ingeniería en Sistemas Computacionales</div>
-      <div class="corner-box" aria-hidden="true"></div>
-    </a>
-    <a href="vista_lista/vista_convenios.php?carrera=II" class="card">
-      <div class="corner-box-top" aria-hidden="true"><img src="assets/images/logo/gear-svgrepo-com_copy.svg" alt="" class="corner-logo" /></div>
-      <img class="ing-sistemas" src="assets/images/logo/imagenes/DSC07193_1.webp"
-           alt="Persona trabajando con herramienta eléctrica en un taller con equipo de protección" width="400" height="300" loading="lazy" />
-      <div class="card-text">Ingeniería Industrial</div>
-      <div class="corner-box" aria-hidden="true"></div>
-    </a>
-    <a href="vista_lista/vista_convenios.php?carrera=LG" class="card">
-      <div class="corner-box-top-green" aria-hidden="true"><img src="assets/images/logo/graduation-svgrepo-com.svg" alt="" class="corner-logo" /></div>
-      <img class="ing-sistemas" src="assets/images/logo/imagenes/DSC06661_1.webp"
-           alt="Estudiante de gastronomía preparando una bebida en una coctelera" width="400" height="300" loading="lazy" />
-      <div class="card-text">Gastronomía</div>
-      <div class="corner-box-green" aria-hidden="true"></div>
-    </a>
-    <a href="vista_lista/vista_convenios.php?carrera=IGE" class="card">
-      <div class="corner-box-top" aria-hidden="true"><img src="assets/images/logo/gear-svgrepo-com_copy.svg" alt="" class="corner-logo" /></div>
-      <img class="ing-sistemas" src="assets/images/logo/imagenes/DSC08323_1.webp"
-           alt="Dos mujeres trabajando en laptops en un espacio interior iluminado" width="400" height="300" loading="lazy" />
-      <div class="card-text">Ingeniería en Gestión Empresarial</div>
-      <div class="corner-box" aria-hidden="true"></div>
-    </a>
+    <?php endforeach; ?>
+    <?php if (empty($carrerasConv)): ?>
+    <p style="text-align:center;color:#9ca3af;padding:2rem">No hay carreras registradas.</p>
+    <?php endif; ?>
   </div>
 
   <!-- Sugerir empresa -->

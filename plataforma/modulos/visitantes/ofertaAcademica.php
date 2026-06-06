@@ -4,81 +4,44 @@ $tsj_title  = 'Oferta Académica';
 
 require_once __DIR__ . '/../../shared/config.php';
 
-// Carreras con su info y página de materias
-$carreras = [
-    'ISC' => [
-        'nombre'   => 'Ing. en Sistemas Computacionales',
-        'color'    => '#32129a',
-        'icono'    => 'computer',
-        'desc'     => 'Desarrolla software, sistemas y soluciones tecnológicas de alto impacto.',
-        'href'     => 'MateriasSistemas.php',
-    ],
-    'II'  => [
-        'nombre'   => 'Ingeniería Industrial',
-        'color'    => '#b45309',
-        'icono'    => 'precision_manufacturing',
-        'desc'     => 'Optimiza procesos productivos y gestiona sistemas industriales.',
-        'href'     => 'MateriasIndustrial.php',
-    ],
-    'IM'  => [
-        'nombre'   => 'Ingeniería Mecatrónica',
-        'color'    => '#0369a1',
-        'icono'    => 'settings_suggest',
-        'desc'     => 'Integra mecánica, electrónica y control automático.',
-        'href'     => 'MateriasMecatronica.php',
-    ],
-    'IADEV' => [
-        'nombre'   => 'Ing. en Animación Digital y Efectos Visuales',
-        'color'    => '#7c3aed',
-        'icono'    => 'animation',
-        'desc'     => 'Crea personajes, mundos virtuales y efectos para cine y videojuegos.',
-        'href'     => 'MateriasAnimacion.php',
-    ],
-    'IGE' => [
-        'nombre'   => 'Ing. en Gestión Empresarial',
-        'color'    => '#059669',
-        'icono'    => 'business_center',
-        'desc'     => 'Dirige organizaciones con enfoque estratégico e innovación.',
-        'href'     => 'MateriasGestion.php',
-    ],
-    'LG'  => [
-        'nombre'   => 'Gastronomía',
-        'color'    => '#dc2626',
-        'icono'    => 'restaurant',
-        'desc'     => 'Domina el arte culinario, gestión de restaurantes y cocina creativa.',
-        'href'     => 'GastronomiaMaterias.php',
-    ],
-];
-
 $base = defined('PLATAFORMA_URL') ? PLATAFORMA_URL : '/plataforma';
 
-// Cargar descripciones guardadas por el admin desde BD
-$defaults = [
-    'desc_ISC'   => 'Desarrolla software, sistemas y soluciones tecnológicas de alto impacto.',
-    'desc_II'    => 'Optimiza procesos productivos y gestiona sistemas industriales.',
-    'desc_IM'    => 'Integra mecánica, electrónica y control automático.',
-    'desc_IADEV' => 'Crea personajes, mundos virtuales y efectos para cine y videojuegos.',
-    'desc_IGE'   => 'Dirige organizaciones con enfoque estratégico e innovación.',
-    'desc_LG'    => 'Domina el arte culinario, gestión de restaurantes y cocina creativa.',
+// Íconos por clave conocida (estético, no crítico)
+$iconos = [
+    'ISC'   => 'computer',
+    'II'    => 'precision_manufacturing',
+    'IM'    => 'settings_suggest',
+    'IADEV' => 'animation',
+    'IGE'   => 'business_center',
+    'LG'    => 'restaurant',
 ];
-$descsBD = $defaults;
-try {
-    $dbCfg = getPDO(DB_NAME);
-    $rows  = $dbCfg->query("SELECT clave,valor FROM configuracion WHERE clave LIKE 'desc_%'")->fetchAll();
-    foreach ($rows as $r) {
-        if (isset($descsBD[$r['clave']]) && $r['valor'] !== '') {
-            $descsBD[$r['clave']] = $r['valor'];
-        }
-    }
-} catch (\Throwable $e) {}
+$iconoDefault = 'school';
 
-// Inyectar descripciones en el array de carreras
-$carreras['ISC']['desc']   = $descsBD['desc_ISC'];
-$carreras['II']['desc']    = $descsBD['desc_II'];
-$carreras['IM']['desc']    = $descsBD['desc_IM'];
-$carreras['IADEV']['desc'] = $descsBD['desc_IADEV'];
-$carreras['IGE']['desc']   = $descsBD['desc_IGE'];
-$carreras['LG']['desc']    = $descsBD['desc_LG'];
+// Cargar carreras activas + color + descripción desde BD
+$carreras = [];
+try {
+    $db = getPDO(DB_NAME);
+
+    $descsBD = [];
+    $rows = $db->query("SELECT clave, valor FROM configuracion WHERE clave LIKE 'desc_%'")->fetchAll();
+    foreach ($rows as $r) $descsBD[$r['clave']] = $r['valor'];
+
+    // Incluir color de la BD
+    $filas = $db->query('SELECT id, clave, nombre, color FROM carreras WHERE activo=1 ORDER BY orden')->fetchAll();
+
+    foreach ($filas as $fila) {
+        $clave = $fila['clave'];
+        $carreras[$clave] = [
+            'nombre' => $fila['nombre'],
+            'color'  => $fila['color'] ?: '#32129a',
+            'icono'  => $iconos[$clave] ?? $iconoDefault,
+            'desc'   => $descsBD['desc_' . $clave] ?? '',
+            'href'   => 'materias.php?carrera=' . urlencode($clave),
+        ];
+    }
+} catch (\Throwable $e) {
+    $carreras = [];
+}
 
 $tsj_head_extra = '<style>
 .oa-grid {
