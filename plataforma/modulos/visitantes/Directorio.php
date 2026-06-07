@@ -26,27 +26,39 @@ $tsj_head_extra = '<style>
   padding: 0 20px 56px;
 }
 .dir-card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(51,23,156,.07);
-  border: 1px solid #e8eaf2;
+  background: var(--tsj-white);
+  border-radius: var(--tsj-radius-lg);
+  box-shadow: 0 2px 10px rgba(20,10,80,.06);
+  border: 1px solid var(--tsj-gray-200);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  transition: transform .2s ease, box-shadow .2s ease;
+  position: relative;
+  transition: transform .22s ease, box-shadow .22s ease;
+}
+.dir-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--tsj-blue-dark), var(--tsj-blue));
+  opacity: 0;
+  transition: opacity .22s;
+  z-index: 1;
 }
 .dir-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 28px rgba(51,23,156,.13);
+  box-shadow: 0 12px 32px rgba(26,9,96,.12);
 }
+.dir-card:hover::before { opacity: 1; }
 .dir-card-foto {
   width: 100%;
   height: 200px;
   object-fit: cover;
   object-position: top;
-  background: #f0f2f7;
+  background: var(--tsj-gray-100);
   display: block;
 }
 .dir-card-body {
@@ -59,15 +71,15 @@ $tsj_head_extra = '<style>
 .dir-card-nombre {
   font-size: .97rem;
   font-weight: 700;
-  color: #1a0960;
+  color: var(--tsj-blue-dark);
   line-height: 1.3;
 }
 .dir-card-puesto {
   font-size: .78rem;
   font-weight: 600;
-  color: #32129a;
-  background: #ede9ff;
-  border-radius: 99px;
+  color: var(--tsj-blue);
+  background: var(--tsj-blue-50);
+  border-radius: 999px;
   padding: 3px 10px;
   display: inline-block;
   align-self: center;
@@ -83,17 +95,17 @@ $tsj_head_extra = '<style>
   align-items: flex-start;
   gap: 7px;
   font-size: .78rem;
-  color: #4a5170;
+  color: var(--tsj-gray-600);
   text-align: left;
 }
 .dir-card-row .material-symbols-rounded {
   font-size: 15px;
-  color: #8892a8;
+  color: var(--tsj-gray-400);
   flex-shrink: 0;
   margin-top: 1px;
 }
 .dir-card-row a {
-  color: #32129a;
+  color: var(--tsj-blue);
   text-decoration: none;
   word-break: break-all;
 }
@@ -101,7 +113,7 @@ $tsj_head_extra = '<style>
 .dir-empty {
   text-align: center;
   padding: 4rem 1rem;
-  color: #9ca3af;
+  color: var(--tsj-gray-400);
   font-size: .95rem;
 }
 @media (max-width: 600px) {

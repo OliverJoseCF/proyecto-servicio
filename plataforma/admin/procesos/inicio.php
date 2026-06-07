@@ -39,7 +39,9 @@ if ($accion === 'aviso_toggle') {
     if (!$id) jsonErr('ID inválido');
     $stmt = $db->prepare('UPDATE avisos SET activo = 1 - activo WHERE id=?');
     $stmt->execute([$id]);
-    $activo = (int)$db->query("SELECT activo FROM avisos WHERE id=$id")->fetchColumn();
+    $s = $db->prepare('SELECT activo FROM avisos WHERE id=?');
+    $s->execute([$id]);
+    $activo = (int)$s->fetchColumn();
     jsonOk($activo ? 'Aviso visible' : 'Aviso oculto', ['activo' => $activo]);
 }
 
@@ -169,7 +171,9 @@ if ($accion === 'carrusel_toggle') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('UPDATE carrusel_fotos SET activo = 1 - activo WHERE id=?')->execute([$id]);
-    $activo = (int)$db->query("SELECT activo FROM carrusel_fotos WHERE id=$id")->fetchColumn();
+    $s = $db->prepare('SELECT activo FROM carrusel_fotos WHERE id=?');
+    $s->execute([$id]);
+    $activo = (int)$s->fetchColumn();
     jsonOk($activo ? 'Imagen visible' : 'Imagen oculta', ['activo' => $activo]);
 }
 

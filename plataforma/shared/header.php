@@ -43,6 +43,7 @@ if (is_string($tsj_extra_css)) {
 $base = PLATAFORMA_URL;
 
 $nav_items = [
+    'inicio'     => ['label' => 'Inicio',                   'href' => $base . '/',                                 'icon' => 'home'],
     'visitantes' => ['label' => 'Directorio',               'href' => $base . '/modulos/visitantes/Directorio.php', 'icon' => 'contacts'],
     'biblioteca' => ['label' => 'Biblioteca',               'href' => $base . '/modulos/biblioteca/buscar.php',     'icon' => 'menu_book'],
     'convenios'  => ['label' => 'Convenios',                'href' => $base . '/modulos/convenios/index.php',       'icon' => 'handshake'],

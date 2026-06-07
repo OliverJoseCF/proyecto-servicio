@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ) {
             $rl->reset($ip);
             globalLogin('admin');
-            $dest = $redirect ?: PLATAFORMA_URL . '/';
+            $dest = $redirect ?: PLATAFORMA_URL . '/admin/';
             header('Location: ' . $dest);
             exit;
         } else {

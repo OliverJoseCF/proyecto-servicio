@@ -116,7 +116,7 @@ $nav = [
         </nav>
       </div>
       <div class="adm-topbar-right">
-        <a href="<?= $base ?>/" class="adm-portal-link" target="_blank">
+        <a href="<?= $base ?>/" class="adm-portal-link" target="_blank" rel="noopener noreferrer">
           <span class="material-symbols-rounded">open_in_new</span>
           Ver portal
         </a>

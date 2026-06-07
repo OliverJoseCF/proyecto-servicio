@@ -1,5 +1,5 @@
 <?php
-$tsj_module    = '';
+$tsj_module    = 'inicio';
 $tsj_title     = 'Portal de Servicios';
 $tsj_has_hero  = true;
 $tsj_extra_css = [];

@@ -51,7 +51,9 @@ if ($accion === 'convenio_toggle') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('UPDATE convenios SET activo = 1 - activo WHERE id=?')->execute([$id]);
-    $activo = (int)$db->query("SELECT activo FROM convenios WHERE id=$id")->fetchColumn();
+    $s = $db->prepare('SELECT activo FROM convenios WHERE id=?');
+    $s->execute([$id]);
+    $activo = (int)$s->fetchColumn();
     jsonOk($activo ? 'Convenio activado' : 'Convenio desactivado', ['activo' => $activo]);
 }
 
