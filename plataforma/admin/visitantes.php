@@ -12,6 +12,19 @@ try {
 
     $directorio   = $db->query('SELECT * FROM directorio ORDER BY orden,nombre')->fetchAll();
     $carreras     = $db->query('SELECT * FROM carreras ORDER BY orden')->fetchAll();
+
+    // Descripciones públicas de cada carrera (clave desc_<CLAVE> en configuracion).
+    // Se adjuntan a cada carrera para que el formulario de edición las precargue
+    // y no las borre al guardar.
+    $descCarreras = [];
+    foreach ($db->query("SELECT clave, valor FROM configuracion WHERE clave LIKE 'desc\\_%'")->fetchAll() as $row) {
+        $descCarreras[substr($row['clave'], 5)] = $row['valor'];
+    }
+    foreach ($carreras as &$_c) {
+        $_c['descripcion'] = $descCarreras[$_c['clave']] ?? '';
+    }
+    unset($_c);
+
     $docentes     = $db->query('SELECT d.*,c.clave carrera_clave,c.nombre carrera_nombre FROM docentes d LEFT JOIN carreras c ON d.carrera_id=c.id ORDER BY d.orden,d.nombre')->fetchAll();
     $coordinadores= $db->query('SELECT co.*,c.nombre carrera_nombre FROM coordinadores co JOIN carreras c ON co.carrera_id=c.id ORDER BY c.orden')->fetchAll();
     $secretarias  = $db->query('SELECT * FROM secretarias ORDER BY orden,nombre')->fetchAll();
@@ -246,6 +259,14 @@ require_once __DIR__ . '/_layout.php';
 
 <!-- ══ TAB: Planes de Estudio ══════════════════════════════════ -->
 <div class="adm-tab-panel" data-tab-group="vis" data-tab="materias">
+  <div class="adm-career-pills" style="margin-bottom:16px">
+    <?php foreach ($carreras as $i => $c): ?>
+    <button class="adm-career-pill <?= $i===0?'active':'' ?>"
+            onclick="filtrarMaterias('<?= $c['clave'] ?>')">
+      <?= htmlspecialchars($c['clave']) ?>
+    </button>
+    <?php endforeach; ?>
+  </div>
   <?php foreach ($carreras as $i => $c): ?>
   <div class="adm-section" data-carrera-sec="<?= $c['clave'] ?>" style="<?= $i===0?'':'display:none;' ?>margin-bottom:20px">
     <div class="adm-section-header">
@@ -277,20 +298,14 @@ require_once __DIR__ . '/_layout.php';
     </div>
   </div>
   <?php endforeach; ?>
-  <div class="adm-career-pills" style="margin-bottom:16px">
-    <?php foreach ($carreras as $i => $c): ?>
-    <button class="adm-career-pill <?= $i===0?'active':'' ?>"
-            onclick="filtrarMaterias('<?= $c['clave'] ?>')">
-      <?= htmlspecialchars($c['clave']) ?>
-    </button>
-    <?php endforeach; ?>
-  </div>
 </div>
 
 <!-- ══ TAB: Oferta Académica ═══════════════════════════════════ -->
+<!-- La descripción pública de cada carrera (desc_<CLAVE> en configuracion) se edita
+     desde el formulario de carrera más abajo (campo "Descripción breve"). -->
 <div class="adm-tab-panel" data-tab-group="vis" data-tab="oferta">
 
-  <!-- ── Sección 1: Gestión de carreras ── -->
+  <!-- ── Gestión de carreras ── -->
   <div class="adm-section" style="margin-bottom:24px">
     <div class="adm-section-header">
       <h3 class="adm-section-title"><span class="material-symbols-rounded">school</span> Carreras registradas</h3>
@@ -536,7 +551,7 @@ function abrirEditarCarrera(c) {
   var color = c.color || '#32129a';
   document.getElementById('car-color').value        = color;
   document.getElementById('car-color-hex').value    = color;
-  document.getElementById('car-descripcion').value  = '';
+  document.getElementById('car-descripcion').value  = c.descripcion || '';
   document.getElementById('car-reticula').value     = c.reticula_url || '';
   document.getElementById('car-imagen-url').value   = c.imagen_url || '';
   // Mostrar imagen actual como preview
@@ -600,23 +615,6 @@ function resetFormCarrera() {
       .finally(function () {
         if (btn) { btn.disabled = false; btn.textContent = 'Guardar carrera'; }
       });
-  });
-})();
-
-// ── Oferta Académica: handler propio para array anidado desc[clave] ──
-(function () {
-  var form = document.getElementById('form-oferta');
-  if (!form) return;
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    var base = document.querySelector('meta[name="plataforma-url"]')?.content || '/plataforma';
-    var btn  = form.querySelector('[type="submit"]');
-    if (btn) btn.disabled = true;
-    fetch(base + '/admin/procesos/visitantes.php', { method: 'POST', body: new FormData(form) })
-      .then(function (r) { return r.json(); })
-      .then(function (json) { showToast(json.msg, json.ok ? 'ok' : 'error'); })
-      .catch(function (err) { showToast('Error: ' + err.message, 'error'); })
-      .finally(function () { if (btn) btn.disabled = false; });
   });
 })();
 

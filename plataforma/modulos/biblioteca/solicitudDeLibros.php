@@ -18,34 +18,35 @@ $tsj_head_extra = '<style>
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 
-<main id="main" class="tsj-body-offset">
-  <div class="tsj-section tsj-section--narrow" style="padding-top:40px;padding-bottom:60px">
+<main id="main">
+  <div class="tsj-section tsj-section--narrow" style="padding-top:48px;padding-bottom:64px">
 
     <div style="text-align:center;margin-bottom:32px">
-      <div style="display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;background:var(--tsj-blue-50);border-radius:50%;margin-bottom:16px">
-        <span class="material-symbols-rounded" style="font-size:30px;color:var(--tsj-blue)" aria-hidden="true">menu_book</span>
+      <div style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;background:var(--tsj-blue-50);border-radius:50%;margin-bottom:16px">
+        <span class="material-symbols-rounded" style="font-size:32px;color:var(--tsj-blue)" aria-hidden="true">menu_book</span>
       </div>
       <h1 style="font-family:var(--tsj-font);font-size:clamp(1.5rem,3vw,2rem);font-weight:700;color:var(--tsj-blue);margin:0 0 8px">
         Confirmar <span style="color:var(--tsj-pink)">Solicitud</span>
       </h1>
-      <p style="font-size:0.95rem;color:var(--tsj-gray-600);margin:0">
+      <p style="font-size:0.95rem;color:var(--tsj-gray-500);margin:0">
         Verifica los datos del libro y completa tu información
       </p>
     </div>
 
+    <?php if ($flash_ok): ?>
+      <div class="tsj-alert tsj-alert--success" role="alert" style="margin-bottom:20px">
+        <span class="material-symbols-rounded" style="font-size:18px;vertical-align:middle;margin-right:6px" aria-hidden="true">check_circle</span>
+        <?= htmlspecialchars($flash_ok, ENT_QUOTES, 'UTF-8') ?>
+      </div>
+    <?php endif; ?>
+    <?php if ($flash_error): ?>
+      <div class="tsj-alert tsj-alert--error" role="alert" style="margin-bottom:20px">
+        <span class="material-symbols-rounded" style="font-size:18px;vertical-align:middle;margin-right:6px" aria-hidden="true">error</span>
+        <?= htmlspecialchars($flash_error, ENT_QUOTES, 'UTF-8') ?>
+      </div>
+    <?php endif; ?>
+
     <div class="tsj-card">
-
-      <?php if ($flash_ok): ?>
-        <div class="tsj-alert tsj-alert--success" role="alert">
-          <?= htmlspecialchars($flash_ok, ENT_QUOTES, 'UTF-8') ?>
-        </div>
-      <?php endif; ?>
-      <?php if ($flash_error): ?>
-        <div class="tsj-alert tsj-alert--error" role="alert">
-          <?= htmlspecialchars($flash_error, ENT_QUOTES, 'UTF-8') ?>
-        </div>
-      <?php endif; ?>
-
       <form action="procesos/guardar_solicitud_libro.php" method="POST">
         <?= csrfField() ?>
 
@@ -76,15 +77,12 @@ require_once __DIR__ . '/../../shared/header.php';
           </div>
         </div>
 
-        <div style="height:1px;background:var(--tsj-gray-200);margin:4px 0 18px" aria-hidden="true"></div>
-
         <div class="tsj-form-group">
-          <label for="sol-fecha" class="tsj-label">Fecha de solicitud</label>
-          <input type="date" id="sol-fecha" class="tsj-input"
-                 name="fecha_solicitud"
-                 value="<?= date('Y-m-d') ?>"
-                 min="<?= date('Y-m-d') ?>"
-                 required>
+          <label for="sol-tipo" class="tsj-label">Tipo de solicitud</label>
+          <select id="sol-tipo" name="tipo" class="tsj-input">
+            <option value="prestamo">Préstamo (para llevar a casa)</option>
+            <option value="consulta_sala">Consulta en sala</option>
+          </select>
         </div>
 
         <button type="submit" class="tsj-btn tsj-btn--primary tsj-btn--block tsj-btn--lg" style="margin-top:8px">

@@ -5,7 +5,20 @@ if (!defined('PLATAFORMA_URL')) {
 if (!function_exists('isGlobalAdmin')) {
     require_once __DIR__ . '/lib/auth.php';
 }
+require_once __DIR__ . '/lib/config_data.php';
 $base = PLATAFORMA_URL;
+
+// Datos editables desde Admin → Configuración (con fallback si la BD no responde)
+$f_eslogan   = tsjConfig('eslogan',          'Innovar para transformar a México');
+$f_institu   = tsjConfig('nombre_institucion','Tecnológico Superior de Jalisco');
+$f_campus    = tsjConfig('campus',           'Campus Chapala');
+$f_desc      = tsjConfig('descripcion_portal',
+    'Portal de servicios estudiantiles — consulta de convenios, biblioteca, horarios, requisitos y registro de visitantes.');
+$f_direccion = tsjConfig('direccion',        'Carretera Chapala-Jocotepec km 7.5, Ajijic, Chapala, Jalisco');
+$f_correo    = tsjConfig('correo_general',   'campus.chapala@tsj.edu.mx');
+$f_horario   = tsjConfig('horario_atencion', 'Lun – Vie: 8:00 – 20:00 h');
+$f_sitio     = tsjConfig('sitio_oficial_url','https://www.tecmm.edu.mx');
+$f_redes     = tsjRedesSociales();
 
 // Mapa módulo → página de admin
 $_tsj_admin_links = [
@@ -48,13 +61,12 @@ $nav_items = $nav_items ?? [
                src="<?= $base ?>/shared/assets/img/logo.svg"
                alt="Tecnológico Superior de Jalisco" loading="lazy" />
         </a>
-        <p class="tsj-footer-tagline">Innovar para transformar a México</p>
-        <p class="tsj-footer-name">Tecnológico Superior de Jalisco</p>
-        <p class="tsj-footer-campus">Campus Chapala</p>
+        <p class="tsj-footer-tagline"><?= htmlspecialchars($f_eslogan, ENT_QUOTES, 'UTF-8') ?></p>
+        <p class="tsj-footer-name"><?= htmlspecialchars($f_institu, ENT_QUOTES, 'UTF-8') ?></p>
+        <p class="tsj-footer-campus"><?= htmlspecialchars($f_campus, ENT_QUOTES, 'UTF-8') ?></p>
         <div class="tsj-footer-divider" aria-hidden="true"></div>
         <p class="tsj-footer-desc">
-          Portal de servicios estudiantiles — consulta de convenios,
-          biblioteca, horarios, requisitos y registro de visitantes.
+          <?= htmlspecialchars($f_desc, ENT_QUOTES, 'UTF-8') ?>
         </p>
       </div>
 
@@ -78,32 +90,35 @@ $nav_items = $nav_items ?? [
 
         <div class="tsj-footer-contact-item">
           <span class="material-symbols-rounded tsj-fi" aria-hidden="true">location_on</span>
-          <span>Carretera Chapala‑Jocotepec km 7.5,<br>Ajijic, Chapala, Jalisco</span>
+          <span><?= nl2br(htmlspecialchars($f_direccion, ENT_QUOTES, 'UTF-8')) ?></span>
         </div>
 
         <div class="tsj-footer-contact-item">
           <span class="material-symbols-rounded tsj-fi" aria-hidden="true">mail</span>
-          <span>campus.chapala<br>@tsj.edu.mx</span>
+          <span><a href="mailto:<?= htmlspecialchars($f_correo, ENT_QUOTES, 'UTF-8') ?>" style="color:inherit"><?= htmlspecialchars($f_correo, ENT_QUOTES, 'UTF-8') ?></a></span>
         </div>
 
         <div class="tsj-footer-contact-item">
           <span class="material-symbols-rounded tsj-fi" aria-hidden="true">schedule</span>
-          <span>Lun – Vie: 8:00 – 20:00 h</span>
+          <span><?= htmlspecialchars($f_horario, ENT_QUOTES, 'UTF-8') ?></span>
         </div>
 
+        <?php if (!empty($f_redes)): ?>
         <p class="tsj-footer-social-title">Redes sociales</p>
         <div class="tsj-footer-social">
-          <a href="https://www.facebook.com/TecSJ/" target="_blank" rel="noopener noreferrer"
-             aria-label="Facebook del Tecnológico Superior de Jalisco">
-            <img src="<?= $base ?>/shared/assets/img/facebook.svg"
-                 alt="Facebook" loading="lazy" />
+          <?php foreach ($f_redes as $red): ?>
+          <a href="<?= htmlspecialchars($red['url'], ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer"
+             aria-label="<?= htmlspecialchars($red['label'], ENT_QUOTES, 'UTF-8') ?> del <?= htmlspecialchars($f_institu, ENT_QUOTES, 'UTF-8') ?>">
+            <?php if ($red['tiene_svg']): ?>
+              <img src="<?= $base ?>/shared/assets/img/<?= htmlspecialchars($red['icono'], ENT_QUOTES, 'UTF-8') ?>"
+                   alt="<?= htmlspecialchars($red['label'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy" />
+            <?php else: ?>
+              <span class="material-symbols-rounded" aria-hidden="true">public</span>
+            <?php endif; ?>
           </a>
-          <a href="https://www.youtube.com/@TecSuperiorJalisco" target="_blank" rel="noopener noreferrer"
-             aria-label="YouTube del Tecnológico Superior de Jalisco">
-            <img src="<?= $base ?>/shared/assets/img/youtube.svg"
-                 alt="YouTube" loading="lazy" />
-          </a>
+          <?php endforeach; ?>
         </div>
+        <?php endif; ?>
       </div>
 
     </div>
@@ -134,9 +149,9 @@ $nav_items = $nav_items ?? [
   <!-- ── Barra de copyright ────────────────────────────────── -->
   <div class="tsj-footer-copy">
     <p>
-      © <?= date('Y') ?> Tecnológico Superior de Jalisco — Campus Chapala.
+      © <?= date('Y') ?> <?= htmlspecialchars($f_institu, ENT_QUOTES, 'UTF-8') ?> — <?= htmlspecialchars($f_campus, ENT_QUOTES, 'UTF-8') ?>.
       Todos los derechos reservados.
-      <a href="https://www.tecmm.edu.mx" target="_blank" rel="noopener">tecmm.edu.mx</a>
+      <a href="<?= htmlspecialchars($f_sitio, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener"><?= htmlspecialchars(preg_replace('#^https?://(www\.)?#', '', $f_sitio), ENT_QUOTES, 'UTF-8') ?></a>
     </p>
   </div>
 

@@ -10,12 +10,19 @@ if ($accion === 'guardar_config') {
     $db = db();
     $stmt = $db->prepare('INSERT INTO configuracion (clave, valor) VALUES (:k,:v)
                           ON DUPLICATE KEY UPDATE valor = VALUES(valor)');
+    // Solo persistir los campos efectivamente enviados — esta acción es compartida por
+    // varios formularios (datos generales y dirección/contacto). Guardar campos ausentes
+    // los sobrescribiría con cadena vacía y borraría los datos del otro formulario.
+    $guardados = 0;
     foreach ($campos as $c) {
+        if (!array_key_exists($c, $_POST)) continue;
         // maps_embed_url puede ser muy larga
         $max = in_array($c, ['maps_embed_url','maps_link_url','descripcion_portal']) ? 5000 : 500;
         $v   = str($c, $max);
         $stmt->execute([':k' => $c, ':v' => $v]);
+        $guardados++;
     }
+    if ($guardados === 0) jsonErr('No se recibió ningún campo válido');
     jsonOk('Configuración guardada');
 }
 

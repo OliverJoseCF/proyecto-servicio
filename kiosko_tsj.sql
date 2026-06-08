@@ -12,6 +12,22 @@
 --    • Creación de la BD desde cero (DROP + CREATE)
 --    • Todas las tablas con su estructura completa
 --    • Datos iniciales de todos los módulos
+--
+--  Tablas (21):
+--    configuracion
+--    carrusel_fotos, avisos
+--    carreras
+--    directorio, docentes, coordinadores, materias,
+--    secretarias, nuevo_ingreso_config
+--    libros, prestamos, solicitudes_biblioteca
+--    convenios, sugerencias_empresa
+--    profesores, horarios
+--    requisitos_items, timeline_fases,
+--    documentos_descargables, faq
+--    redes_sociales
+--
+--  Vistas (5):
+--    v_docentes, v_convenios, v_horarios, v_materias, v_coordinadores
 -- ================================================================
 
 SET NAMES utf8mb4;
@@ -61,6 +77,9 @@ INSERT INTO `configuracion` (`clave`, `valor`, `descripcion`) VALUES
   ('correo_servicios',   'servicios@chapala.tecmm.edu.mx',         'Correo de servicios generales'),
   ('facebook_url',       'https://www.facebook.com/TecSJ/',        'Facebook'),
   ('youtube_url',        'https://www.youtube.com/@TecSuperiorJalisco', 'YouTube'),
+  ('instagram_url',      '',                                        'Instagram'),
+  ('twitter_url',        '',                                        'Twitter / X'),
+  ('linkedin_url',       '',                                        'LinkedIn'),
   ('sitio_oficial_url',  'https://www.tecmm.edu.mx',               'Sitio web oficial'),
   ('maps_embed_url',     'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1322.9681638304503!2d-103.22284273653298!3d20.303617966560704!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x842f46d5a7843b5f%3A0x12046fea1ab84e7d!2sTecnol%C3%B3gico%20Superior%20de%20Jalisco%20Chapala!5e0!3m2!1ses-419!2smx!4v1780543430963!5m2!1ses-419!2smx', 'URL del iframe de Google Maps'),
   ('maps_link_url',      'https://maps.app.goo.gl/w3rApmQrocT3j5V88', 'Enlace directo a Google Maps'),
@@ -378,7 +397,7 @@ CREATE TABLE `prestamos` (
   `id`                 INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `libro_id`           INT UNSIGNED NOT NULL,
   `estudiante_nombre`  VARCHAR(150) NOT NULL,
-  `estudiante_control` VARCHAR(15)  NOT NULL,
+  `estudiante_control` VARCHAR(15)  NOT NULL DEFAULT '' COMMENT 'Número de control; vacío cuando proviene de solicitud pública',
   `carrera`            VARCHAR(150),
   `tipo`               ENUM('prestamo','consulta_sala') NOT NULL DEFAULT 'prestamo',
   `fecha_prestamo`     DATE         NOT NULL,
@@ -395,7 +414,7 @@ CREATE TABLE `solicitudes_biblioteca` (
   `id`                 INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `libro_id`           INT UNSIGNED NOT NULL,
   `estudiante_nombre`  VARCHAR(150) NOT NULL,
-  `estudiante_control` VARCHAR(15)  NOT NULL,
+  `estudiante_control` VARCHAR(15)  NOT NULL DEFAULT '' COMMENT 'Número de control; vacío cuando se solicita desde el portal público',
   `carrera`            VARCHAR(150),
   `tipo`               ENUM('prestamo','consulta_sala') NOT NULL DEFAULT 'prestamo',
   `estado`             ENUM('pendiente','aprobada','rechazada') NOT NULL DEFAULT 'pendiente',
@@ -669,20 +688,4 @@ SET SQL_MODE             = @OLD_SQL_MODE;
 
 -- ================================================================
 -- ¡Listo! Base de datos kiosko_tsj creada y lista para usar.
---
--- Tablas (21):
---   configuracion
---   carrusel_fotos, avisos
---   carreras
---   directorio, docentes, coordinadores, materias,
---   secretarias, nuevo_ingreso_config
---   libros, prestamos, solicitudes_biblioteca
---   convenios, sugerencias_empresa
---   profesores, horarios
---   requisitos_items, timeline_fases,
---   documentos_descargables, faq
---   redes_sociales
---
--- Vistas (5):
---   v_docentes, v_convenios, v_horarios, v_materias, v_coordinadores
 -- ================================================================

@@ -67,12 +67,13 @@ try {
     ]);
 
     $rl->record($ip);
-    $_SESSION['flash_ok'] = '¡Solicitud enviada! El administrador la revisará pronto.';
+    $_SESSION['flash_ok'] = '¡Solicitud enviada correctamente! El administrador la revisará pronto.';
+    header('Location: ../solicitudDeLibros.php?titulo=' . urlencode($nombre_libro) . '&codigo=' . urlencode($codigo_libro));
+    exit;
 
 } catch (\Throwable $e) {
     error_log('guardar_solicitud_libro error: ' . $e->getMessage());
     $_SESSION['flash_error'] = 'Error al procesar la solicitud. Inténtalo de nuevo.';
+    header('Location: ../solicitudDeLibros.php?titulo=' . urlencode($nombre_libro) . '&codigo=' . urlencode($codigo_libro));
+    exit;
 }
-
-header('Location: ../buscar.php');
-exit;

@@ -254,9 +254,7 @@ if ($accion === 'carrera_toggle') {
 if ($accion === 'carrera_eliminar') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
-    // Verificar que no tenga docentes, materias o coordinadores activos
-    $docentes = (int)$db->prepare('SELECT COUNT(*) FROM docentes WHERE carrera_id=?')->execute([$id]) ?
-                $db->prepare('SELECT COUNT(*) FROM docentes WHERE carrera_id=?') : null;
+    // Verificar que no tenga docentes, materias o coordinadores asociados
     $stmtD = $db->prepare('SELECT COUNT(*) FROM docentes WHERE carrera_id=?');
     $stmtD->execute([$id]);
     $stmtM = $db->prepare('SELECT COUNT(*) FROM materias WHERE carrera_id=?');
@@ -274,25 +272,6 @@ if ($accion === 'carrera_eliminar') {
         $db->prepare('DELETE FROM configuracion WHERE clave=?')->execute(['desc_' . $clave]);
     }
     jsonOk('Carrera eliminada');
-}
-
-// ══ OFERTA ACADÉMICA ════════════════════════════════════════════
-if ($accion === 'oferta_guardar') {
-    // Obtener claves válidas desde BD
-    $clavesValidas = array_column(
-        $db->query('SELECT clave FROM carreras WHERE activo=1')->fetchAll(),
-        'clave'
-    );
-    $desc = $_POST['desc'] ?? [];
-    if (!is_array($desc)) jsonErr('Datos inválidos');
-
-    $stmt = $db->prepare('INSERT INTO configuracion (clave, valor) VALUES (:k,:v)
-                          ON DUPLICATE KEY UPDATE valor = VALUES(valor)');
-    foreach ($clavesValidas as $clave) {
-        $valor = mb_substr(trim($desc[$clave] ?? ''), 0, 500);
-        $stmt->execute([':k' => 'desc_' . $clave, ':v' => $valor]);
-    }
-    jsonOk('Descripciones de oferta académica guardadas');
 }
 
 // ══ NUEVO INGRESO ══════════════════════════════════════════════

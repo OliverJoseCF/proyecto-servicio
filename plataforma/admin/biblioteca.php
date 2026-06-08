@@ -149,7 +149,7 @@ require_once __DIR__ . '/_layout.php';
         <?php foreach ($solicitudes as $s): ?>
         <tr id="sol-<?= $s['id'] ?>">
           <td style="font-weight:600"><?= htmlspecialchars($s['estudiante_nombre']) ?></td>
-          <td><?= htmlspecialchars($s['estudiante_control']) ?></td>
+          <td><?= $s['estudiante_control'] !== '' ? htmlspecialchars($s['estudiante_control']) : '<span style="color:var(--tsj-gray-400);font-size:12px">—</span>' ?></td>
           <td><?= htmlspecialchars($s['libro_nombre']) ?></td>
           <td><span class="adm-status adm-status--info"><?= $s['tipo']==='prestamo'?'Préstamo':'Consulta sala' ?></span></td>
           <td><?= htmlspecialchars(substr($s['created_at'],0,10)) ?></td>
