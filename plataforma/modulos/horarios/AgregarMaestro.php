@@ -11,8 +11,8 @@ try {
 }
 
 try {
-    $carreras = $pdo->query("SELECT id_carrera, nombre_carrera FROM carreras ORDER BY nombre_carrera")->fetchAll();
-    $materias = $pdo->query("SELECT id_materia, nombre_materia, id_carrera FROM materias ORDER BY nombre_materia")->fetchAll();
+    $carreras = $pdo->query("SELECT id AS id_carrera, nombre AS nombre_carrera FROM carreras ORDER BY nombre")->fetchAll();
+    $materias = $pdo->query("SELECT id AS id_materia, nombre AS nombre_materia, carrera_id AS id_carrera FROM materias ORDER BY nombre")->fetchAll();
 } catch (\PDOException $e) {
     error_log('horarios/AgregarMaestro catalog error: ' . $e->getMessage());
     $carreras = [];
@@ -24,7 +24,7 @@ $profesor  = null;
 if (isset($_GET['editar'])) {
     $stmt = $pdo->prepare("
         SELECT p.id_profesor, p.nombre, p.apellido,
-               h.imagen_horario, h.id_carrera, h.id_materia, h.semestre
+               h.imagen_horario, h.id_carrera, h.semestre
         FROM   profesores p
         JOIN   horarios h ON p.id_profesor = h.id_profesor
         WHERE  p.id_profesor = :id
@@ -90,18 +90,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmtOld->execute(['id'=>$id_profesor]);
                     $oldPath = $stmtOld->fetchColumn();
                     if ($oldPath && file_exists(HORARIOS_DIR . basename($oldPath))) @unlink(HORARIOS_DIR . basename($oldPath));
-                    $pdo->prepare("UPDATE horarios SET imagen_horario=:ruta,id_carrera=:car,id_materia=:mat,semestre=:sem WHERE id_profesor=:id")
-                        ->execute(['ruta'=>$filePathDB,'car'=>$carrera,'mat'=>$materia,'sem'=>$semestre,'id'=>$id_profesor]);
+                    $pdo->prepare("UPDATE horarios SET imagen_horario=:ruta,id_carrera=:car,semestre=:sem WHERE id_profesor=:id")
+                        ->execute(['ruta'=>$filePathDB,'car'=>$carrera,'sem'=>$semestre,'id'=>$id_profesor]);
                 } else {
-                    $pdo->prepare("UPDATE horarios SET id_carrera=:car,id_materia=:mat,semestre=:sem WHERE id_profesor=:id")
-                        ->execute(['car'=>$carrera,'mat'=>$materia,'sem'=>$semestre,'id'=>$id_profesor]);
+                    $pdo->prepare("UPDATE horarios SET id_carrera=:car,semestre=:sem WHERE id_profesor=:id")
+                        ->execute(['car'=>$carrera,'sem'=>$semestre,'id'=>$id_profesor]);
                 }
             } else {
                 $stmt = $pdo->prepare("INSERT INTO profesores (nombre,apellido) VALUES (:nom,:ape)");
                 $stmt->execute(['nom'=>$nombre,'ape'=>$apellido]);
                 $newId = $pdo->lastInsertId();
-                $pdo->prepare("INSERT INTO horarios (id_profesor,imagen_horario,id_carrera,id_materia,semestre) VALUES (:idp,:rut,:car,:mat,:sem)")
-                    ->execute(['idp'=>$newId,'rut'=>$filePathDB,'car'=>$carrera,'mat'=>$materia,'sem'=>$semestre]);
+                $pdo->prepare("INSERT INTO horarios (id_profesor,imagen_horario,id_carrera,semestre) VALUES (:idp,:rut,:car,:sem)")
+                    ->execute(['idp'=>$newId,'rut'=>$filePathDB,'car'=>$carrera,'sem'=>$semestre]);
             }
             $pdo->commit();
             header("Location: VistaAdmin.php");

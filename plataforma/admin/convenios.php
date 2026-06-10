@@ -10,7 +10,7 @@ $adm_title = 'Convenios';
 try {
     $db          = getPDO(DB_NAME);
     $carreras    = $db->query('SELECT * FROM carreras ORDER BY orden')->fetchAll();
-    $convenios   = $db->query('SELECT cv.*,c.clave carrera_clave,c.nombre carrera_nombre FROM convenios cv LEFT JOIN carreras c ON cv.carrera_id=c.id ORDER BY cv.activo DESC, cv.nombre')->fetchAll();
+    $convenios   = $db->query('SELECT cv.*,c.clave carrera_clave,c.nombre carrera_nombre FROM convenios cv LEFT JOIN carreras c ON cv.carrera_id=c.id ORDER BY cv.activo DESC, cv.nombre LIMIT 500')->fetchAll();
     $sugerencias = $db->query('SELECT * FROM sugerencias_empresa WHERE estado="pendiente" ORDER BY created_at DESC')->fetchAll();
     $db_ok = true;
 } catch (\Throwable $e) {

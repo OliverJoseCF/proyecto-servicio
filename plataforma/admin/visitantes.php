@@ -10,8 +10,8 @@ $adm_title = 'Visitantes';
 try {
     $db = getPDO(DB_NAME);
 
-    $directorio   = $db->query('SELECT * FROM directorio ORDER BY orden,nombre')->fetchAll();
-    $carreras     = $db->query('SELECT * FROM carreras ORDER BY orden')->fetchAll();
+    $directorio   = $db->query('SELECT * FROM directorio ORDER BY orden,nombre LIMIT 500')->fetchAll();
+    $carreras     = $db->query('SELECT * FROM carreras ORDER BY orden LIMIT 20')->fetchAll();
 
     // Descripciones públicas de cada carrera (clave desc_<CLAVE> en configuracion).
     // Se adjuntan a cada carrera para que el formulario de edición las precargue
@@ -25,9 +25,9 @@ try {
     }
     unset($_c);
 
-    $docentes     = $db->query('SELECT d.*,c.clave carrera_clave,c.nombre carrera_nombre FROM docentes d LEFT JOIN carreras c ON d.carrera_id=c.id ORDER BY d.orden,d.nombre')->fetchAll();
-    $coordinadores= $db->query('SELECT co.*,c.nombre carrera_nombre FROM coordinadores co JOIN carreras c ON co.carrera_id=c.id ORDER BY c.orden')->fetchAll();
-    $secretarias  = $db->query('SELECT * FROM secretarias ORDER BY orden,nombre')->fetchAll();
+    $docentes     = $db->query('SELECT d.*,c.clave carrera_clave,c.nombre carrera_nombre FROM docentes d LEFT JOIN carreras c ON d.carrera_id=c.id ORDER BY d.orden,d.nombre LIMIT 500')->fetchAll();
+    $coordinadores= $db->query('SELECT co.*,c.nombre carrera_nombre FROM coordinadores co JOIN carreras c ON co.carrera_id=c.id ORDER BY c.orden LIMIT 50')->fetchAll();
+    $secretarias  = $db->query('SELECT * FROM secretarias ORDER BY orden,nombre LIMIT 50')->fetchAll();
     $ni           = $db->query('SELECT * FROM nuevo_ingreso_config LIMIT 1')->fetch();
 
     $materias_por_carrera = [];
@@ -239,7 +239,7 @@ require_once __DIR__ . '/_layout.php';
       </tbody>
     </table>
   </div>
-  <div class="adm-form-card" style="margin-top:20px" id="form-coord-wrap" style="display:none">
+  <div class="adm-form-card" style="margin-top:20px; display:none" id="form-coord-wrap">
     <div class="adm-form-title"><span class="material-symbols-rounded">manage_accounts</span> Editar coordinador</div>
     <form data-proc="visitantes" data-reload id="form-coord">
       <input type="hidden" name="_csrf" value="<?= $csrf ?>">

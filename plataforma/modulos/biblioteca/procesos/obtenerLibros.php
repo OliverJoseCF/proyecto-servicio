@@ -14,11 +14,14 @@ try {
                 l.editorial,
                 l.codigo    AS folio,
                 l.ejemplares,
-                (SELECT COUNT(*)
-                 FROM prestamos p
-                 WHERE p.libro_id = l.id
-                   AND p.devuelto = 0) AS prestamos_activos
+                COALESCE(pa.prestamos_activos, 0) AS prestamos_activos
             FROM libros l
+            LEFT JOIN (
+                SELECT libro_id, COUNT(*) AS prestamos_activos
+                FROM prestamos
+                WHERE devuelto = 0
+                GROUP BY libro_id
+            ) pa ON pa.libro_id = l.id
             WHERE l.activo = 1
             ORDER BY l.nombre ASC";
 

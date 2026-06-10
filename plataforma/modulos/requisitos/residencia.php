@@ -38,7 +38,7 @@ require_once __DIR__ . '/../../shared/header.php';
 
     <div class="tsj-page-header">
       <div class="tsj-page-header-line"></div>
-      <h1>Serv. Social / <span class="tsj-accent">Residencia</span></h1>
+      <h1><span class="tsj-accent">Residencia Profesional</span></h1>
       <p class="tsj-page-header-sub">Requisitos, documentos y pasos del proceso</p>
     </div>
 

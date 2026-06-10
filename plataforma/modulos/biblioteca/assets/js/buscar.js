@@ -167,8 +167,9 @@
     renderPagina();
   });
 
-  // Refresco cada 60s si el usuario no está escribiendo
+  // Refresco cada 60s si el usuario no está escribiendo y la pestaña es visible
   setInterval(function () {
+    if (document.hidden) return;
     var searchEl = document.getElementById('searchInput');
     if (searchEl && document.activeElement === searchEl) return;
     cargarLibros(function (err, data) {

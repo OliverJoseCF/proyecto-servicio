@@ -6,9 +6,10 @@ $db     = db();
 
 // ══ CONVENIOS ════════════════════════════════════════════════════
 if ($accion === 'convenio_agregar') {
-    $nombre     = str('nombre', 300);
-    $tipo       = str('tipo_convenio', 100);
-    $sector     = str('sector', 20) ?: 'privado';
+    $nombre      = str('nombre', 300);
+    $tipo        = str('tipo_convenio', 100);
+    $_sector_raw = str('sector', 20);
+    $sector      = in_array($_sector_raw, ['privado','publico','ac','otro'], true) ? $_sector_raw : 'privado';
     $carrera_id = postInt('carrera_id');
     $contacto   = str('nombre_contacto', 200);
     $correo     = str('correo_contacto', 254);
@@ -23,10 +24,11 @@ if ($accion === 'convenio_agregar') {
 }
 
 if ($accion === 'convenio_editar') {
-    $id         = postInt('id');
-    $nombre     = str('nombre', 300);
-    $tipo       = str('tipo_convenio', 100);
-    $sector     = str('sector', 20) ?: 'privado';
+    $id          = postInt('id');
+    $nombre      = str('nombre', 300);
+    $tipo        = str('tipo_convenio', 100);
+    $_sector_raw = str('sector', 20);
+    $sector      = in_array($_sector_raw, ['privado','publico','ac','otro'], true) ? $_sector_raw : 'privado';
     $carrera_id = postInt('carrera_id');
     $contacto   = str('nombre_contacto', 200);
     $correo     = str('correo_contacto', 254);

@@ -16,6 +16,9 @@ class RateLimit {
         if (!is_dir($this->dir)) {
             mkdir($this->dir, 0700, true);
         }
+        if (!is_writable($this->dir)) {
+            error_log('[TecSJ RateLimit] Directorio no escribible: ' . $this->dir . '. El rate limiting está desactivado.');
+        }
     }
 
     private function key(string $identifier): string {

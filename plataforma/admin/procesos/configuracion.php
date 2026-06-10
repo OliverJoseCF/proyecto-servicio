@@ -68,8 +68,18 @@ if ($accion === 'cambiar_password') {
 
     if (!preg_match($pattern, $content)) jsonErr('No se encontró GLOBAL_ADMIN_HASH en config.local.php');
 
-    $content = preg_replace($pattern, $replace, $content);
-    file_put_contents($cfgPath, $content);
+    $newContent = preg_replace($pattern, $replace, $content);
+    if ($newContent === null) jsonErr('Error interno al procesar el archivo de configuración');
+
+    // Escritura atómica: evita corrupción ante corte de energía a mitad de escritura
+    $tmp = $cfgPath . '.tmp.' . getmypid();
+    if (file_put_contents($tmp, $newContent, LOCK_EX) === false) {
+        jsonErr('No se pudo escribir el archivo temporal. Verifica permisos en shared/.');
+    }
+    if (!rename($tmp, $cfgPath)) {
+        @unlink($tmp);
+        jsonErr('No se pudo reemplazar config.local.php. Verifica permisos.');
+    }
     jsonOk('Contraseña actualizada. Cierra sesión y prueba el nuevo acceso.');
 }
 

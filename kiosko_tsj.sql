@@ -425,6 +425,21 @@ CREATE TABLE `solicitudes_biblioteca` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- Préstamos de controles y equipos audiovisuales (kiosko de biblioteca)
+CREATE TABLE `solicitud_controles` (
+  `id`             INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `fecha`          DATE         NOT NULL,
+  `nombre_docente` VARCHAR(150) NOT NULL,
+  `aula`           VARCHAR(50),
+  `recibo`         VARCHAR(50),
+  `hora_prestamo`  TIME         NOT NULL,
+  `hora_entrega`   TIME         NOT NULL,
+  `estado`         ENUM('Pendiente','Aceptado','Rechazado') NOT NULL DEFAULT 'Pendiente',
+  `created_at`     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 -- ================================================================
 -- 6. CONVENIOS
 -- ================================================================
@@ -636,6 +651,15 @@ CREATE TABLE `redes_sociales` (
 INSERT INTO `redes_sociales` (`plataforma`, `url`, `icono_svg`, `orden`) VALUES
   ('Facebook', 'https://www.facebook.com/TecSJ/',             'facebook.svg', 1),
   ('YouTube',  'https://www.youtube.com/@TecSuperiorJalisco', 'youtube.svg',  2);
+
+
+-- ================================================================
+-- ÍNDICES ADICIONALES (rendimiento)
+-- ================================================================
+
+CREATE INDEX `idx_prestamos_libro_devuelto` ON `prestamos` (`libro_id`, `devuelto`);
+CREATE INDEX `idx_prestamos_devuelto`       ON `prestamos` (`devuelto`);
+CREATE INDEX `idx_solicitudes_estado`       ON `solicitudes_biblioteca` (`estado`);
 
 
 -- ================================================================

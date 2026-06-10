@@ -46,7 +46,9 @@ if ($accion === 'directorio_toggle') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('UPDATE directorio SET activo = 1 - activo WHERE id=?')->execute([$id]);
-    $activo = (int)$db->query("SELECT activo FROM directorio WHERE id=$id")->fetchColumn();
+    $stmtActivo = $db->prepare('SELECT activo FROM directorio WHERE id=?');
+    $stmtActivo->execute([$id]);
+    $activo = (int)$stmtActivo->fetchColumn();
     jsonOk($activo ? 'Persona visible' : 'Persona oculta', ['activo' => $activo]);
 }
 
@@ -247,7 +249,9 @@ if ($accion === 'carrera_toggle') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('UPDATE carreras SET activo = 1 - activo WHERE id=?')->execute([$id]);
-    $activo = (int)$db->query("SELECT activo FROM carreras WHERE id=$id")->fetchColumn();
+    $stmtActivo = $db->prepare('SELECT activo FROM carreras WHERE id=?');
+    $stmtActivo->execute([$id]);
+    $activo = (int)$stmtActivo->fetchColumn();
     jsonOk($activo ? 'Carrera activada' : 'Carrera desactivada', ['activo' => $activo]);
 }
 

@@ -9,9 +9,9 @@ $adm_title = 'Biblioteca';
 
 try {
     $db = getPDO(DB_NAME);
-    $libros      = $db->query('SELECT * FROM libros ORDER BY codigo')->fetchAll();
-    $prestamos   = $db->query('SELECT p.*,l.nombre libro_nombre FROM prestamos p JOIN libros l ON p.libro_id=l.id WHERE p.devuelto=0 ORDER BY p.fecha_devolucion')->fetchAll();
-    $solicitudes = $db->query('SELECT s.*,l.nombre libro_nombre FROM solicitudes_biblioteca s JOIN libros l ON s.libro_id=l.id WHERE s.estado="pendiente" ORDER BY s.created_at DESC')->fetchAll();
+    $libros      = $db->query('SELECT * FROM libros ORDER BY codigo LIMIT 500')->fetchAll();
+    $prestamos   = $db->query('SELECT p.*,l.nombre libro_nombre FROM prestamos p JOIN libros l ON p.libro_id=l.id WHERE p.devuelto=0 ORDER BY p.fecha_devolucion LIMIT 500')->fetchAll();
+    $solicitudes = $db->query('SELECT s.*,l.nombre libro_nombre FROM solicitudes_biblioteca s JOIN libros l ON s.libro_id=l.id WHERE s.estado="pendiente" ORDER BY s.created_at DESC LIMIT 500')->fetchAll();
     $db_ok = true;
 } catch (\Throwable $e) {
     $libros = $prestamos = $solicitudes = [];

@@ -12,8 +12,6 @@ plataforma/modulos/horarios/horarios/*
 # Vendor (no se usa actualmente; si se re-agrega: composer install)
 plataforma/modulos/biblioteca/composer/
 
-# Rate limit (temp files en /tmp del servidor)
-/tmp/tecsj_rl/
 
 # Logs
 *.log

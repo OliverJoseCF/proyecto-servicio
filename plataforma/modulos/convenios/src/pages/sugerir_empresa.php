@@ -83,7 +83,9 @@ if (defined('VINCULACION_EMAIL') && VINCULACION_EMAIL) {
         'Content-Type: text/plain; charset=UTF-8',
         'Content-Transfer-Encoding: base64',
     ]);
-    @mail(VINCULACION_EMAIL, $subject, base64_encode($body), $headers);
+    if (!@mail(VINCULACION_EMAIL, $subject, base64_encode($body), $headers)) {
+        error_log('[TecSJ Convenios] mail() falló al notificar sugerencia de empresa. Verificar MTA/SMTP del servidor.');
+    }
 }
 
 $rl->record($ip);

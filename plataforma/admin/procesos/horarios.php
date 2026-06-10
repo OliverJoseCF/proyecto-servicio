@@ -69,7 +69,9 @@ if ($accion === 'profesor_toggle') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('UPDATE profesores SET activo = 1 - activo WHERE id_profesor=?')->execute([$id]);
-    $activo = (int)$db->query("SELECT activo FROM profesores WHERE id_profesor=$id")->fetchColumn();
+    $stmtActivo = $db->prepare('SELECT activo FROM profesores WHERE id_profesor=?');
+    $stmtActivo->execute([$id]);
+    $activo = (int)$stmtActivo->fetchColumn();
     jsonOk($activo ? 'Maestro activado' : 'Maestro desactivado', ['activo' => $activo]);
 }
 

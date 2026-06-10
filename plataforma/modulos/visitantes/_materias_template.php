@@ -137,7 +137,7 @@ if ($vista === 'reticula' && !$reticula_url) $vista = 'plan';
       <div style="max-width:960px;margin:0 auto">
         <?php
         $ext = strtolower(pathinfo(parse_url($reticula_url, PHP_URL_PATH), PATHINFO_EXTENSION));
-        $esPdf = $ext === 'pdf' || str_contains($reticula_url, 'drive.google.com');
+        $esPdf = $ext === 'pdf' || strpos($reticula_url, 'drive.google.com') !== false;
         ?>
         <?php if ($esPdf): ?>
           <!-- PDF: embed con fallback a enlace -->

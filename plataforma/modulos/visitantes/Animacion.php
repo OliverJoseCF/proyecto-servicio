@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../shared/header.php';
   <div class="botones">
     <a href="MateriasAnimacion.php" class="button">Materias</a>
     <a href="DocentesAnimacion.php" class="button">Docentes</a>
-    <a href="coordinadorAnimacion.php" class="button">Coordinador/a</a>
+    <a href="CoordinadorAnimacion.php" class="button">Coordinador/a</a>
   </div>
   <a href="index.php" class="top-right" aria-label="Volver al menú principal"><img src="imagenes/casa.png" alt=""></a>
 </main>
