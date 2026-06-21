@@ -152,6 +152,10 @@ require_once __DIR__ . '/_layout.php';
     </button>
     <?php endforeach; ?>
   </div>
+  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+    <input type="text" id="doc-buscar" placeholder="Buscar docente por nombre o correo…" oninput="aplicarFiltroDoc()"
+           style="flex:1;min-width:220px;max-width:420px;padding:9px 12px;border:1.5px solid var(--tsj-gray-200);border-radius:8px;font-size:13px;font-family:inherit">
+  </div>
   <div class="adm-table-wrap">
     <table class="adm-table">
       <thead><tr><th>Nombre</th><th>Foto</th><th>Correo</th><th>Carrera</th><th>Acciones</th></tr></thead>
@@ -160,7 +164,8 @@ require_once __DIR__ . '/_layout.php';
         <tr><td colspan="5" class="adm-table-empty">Sin docentes registrados.</td></tr>
         <?php endif; ?>
         <?php foreach ($docentes as $d): ?>
-        <tr id="doc-<?= $d['id'] ?>" data-carrera="<?= htmlspecialchars($d['carrera_clave'] ?? '') ?>">
+        <tr id="doc-<?= $d['id'] ?>" data-carrera="<?= htmlspecialchars($d['carrera_clave'] ?? '') ?>"
+            data-search="<?= htmlspecialchars(mb_strtolower($d['nombre'] . ' ' . ($d['correo'] ?? ''))) ?>">
           <td style="font-weight:600"><?= htmlspecialchars($d['nombre']) ?></td>
           <td class="col-photo">
             <img src="<?= $d['foto'] ? $base_img.htmlspecialchars($d['foto']) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='38'%3E%3Crect width='38' height='38' fill='%23e5e7eb'/%3E%3C/svg%3E" ?>"
@@ -239,13 +244,25 @@ require_once __DIR__ . '/_layout.php';
       </tbody>
     </table>
   </div>
+  <div style="margin-top:14px">
+    <button type="button" class="adm-btn adm-btn--primary adm-btn--sm" onclick="abrirAgregarCoord()">
+      <span class="material-symbols-rounded">person_add</span> Agregar coordinador
+    </button>
+  </div>
   <div class="adm-form-card" style="margin-top:20px; display:none" id="form-coord-wrap">
-    <div class="adm-form-title"><span class="material-symbols-rounded">manage_accounts</span> Editar coordinador</div>
+    <div class="adm-form-title"><span class="material-symbols-rounded">manage_accounts</span> <span id="form-coord-titulo">Editar coordinador</span></div>
     <form data-proc="visitantes" data-reload id="form-coord">
       <input type="hidden" name="_csrf" value="<?= $csrf ?>">
-      <input type="hidden" name="accion" value="coord_editar">
+      <input type="hidden" name="accion" value="coord_editar" id="coord-accion">
       <input type="hidden" name="id" id="coord-id">
-      <div class="adm-form-grid cols-2">
+      <div class="adm-form-grid cols-3">
+        <div class="adm-field" id="coord-carrera-field" style="display:none"><label>Carrera <span style="color:var(--tsj-pink)">*</span></label>
+          <select name="carrera_id" id="coord-carrera">
+            <?php foreach ($carreras as $ca): ?>
+            <option value="<?= $ca['id'] ?>"><?= htmlspecialchars($ca['nombre']) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
         <div class="adm-field"><label>Nombre</label><input type="text" name="nombre" id="coord-nombre" required></div>
         <div class="adm-field"><label>Correo</label><input type="email" name="correo" id="coord-correo"></div>
       </div>
@@ -641,12 +658,20 @@ function toggleActivo(modulo, accion, id, btn) {
 }
 
 // ── Filtros de carrera ──────────────────────────────────────────
+var docClaveActiva = '';
 function filtrarDocentes(clave){
+  docClaveActiva = clave;
   document.querySelectorAll('#doc-pills .adm-career-pill').forEach(b=>{
     b.classList.toggle('active', b.textContent.trim()===clave);
   });
+  aplicarFiltroDoc();
+}
+function aplicarFiltroDoc(){
+  const q = document.getElementById('doc-buscar').value.trim().toLowerCase();
   document.querySelectorAll('#doc-tbody tr[data-carrera]').forEach(tr=>{
-    tr.style.display = (tr.dataset.carrera===clave || clave==='') ? '' : 'none';
+    const okC = !docClaveActiva || tr.dataset.carrera===docClaveActiva;
+    const okQ = !q || (tr.dataset.search||'').includes(q);
+    tr.style.display = (okC && okQ) ? '' : 'none';
   });
 }
 function filtrarMaterias(clave){
@@ -717,9 +742,22 @@ function resetFormDoc(){
 
 // ── Coordinadores ───────────────────────────────────────────────
 function abrirEditarCoord(c){
+  document.getElementById('coord-accion').value = 'coord_editar';
   document.getElementById('coord-id').value    = c.id;
   document.getElementById('coord-nombre').value= c.nombre||'';
   document.getElementById('coord-correo').value= c.correo||'';
+  document.getElementById('coord-carrera-field').style.display='none';
+  document.getElementById('form-coord-titulo').textContent='Editar coordinador';
+  document.getElementById('form-coord-wrap').style.display='';
+  document.getElementById('form-coord-wrap').scrollIntoView({behavior:'smooth'});
+}
+function abrirAgregarCoord(){
+  document.getElementById('coord-accion').value = 'coord_agregar';
+  document.getElementById('coord-id').value    = '';
+  document.getElementById('coord-nombre').value= '';
+  document.getElementById('coord-correo').value= '';
+  document.getElementById('coord-carrera-field').style.display='';
+  document.getElementById('form-coord-titulo').textContent='Agregar coordinador';
   document.getElementById('form-coord-wrap').style.display='';
   document.getElementById('form-coord-wrap').scrollIntoView({behavior:'smooth'});
 }

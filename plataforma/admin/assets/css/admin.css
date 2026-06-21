@@ -454,10 +454,10 @@
 .adm-table tbody tr:hover { background: var(--tsj-blue-50); }
 .adm-table tbody tr:hover td { background: transparent; }
 .adm-table .actions {
-  display: flex;
-  gap: 6px;
-  align-items: center;
+  white-space: nowrap;
 }
+.adm-table .actions .adm-btn { vertical-align: middle; }
+.adm-table .actions .adm-btn + .adm-btn { margin-left: 6px; }
 .adm-table .col-photo img {
   width: 38px; height: 38px;
   border-radius: 50%; object-fit: cover;

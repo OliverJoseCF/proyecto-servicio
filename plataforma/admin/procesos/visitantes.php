@@ -84,6 +84,19 @@ if ($accion === 'docente_eliminar') {
 }
 
 // ══ COORDINADORES ════════════════════════════════════════════════
+if ($accion === 'coord_agregar') {
+    $carrera_id = postInt('carrera_id');
+    $nombre     = str('nombre', 150);
+    $correo     = str('correo', 254);
+    if (!$carrera_id || !$nombre) jsonErr('Carrera y nombre son requeridos');
+    $stmt = $db->prepare('SELECT COUNT(*) FROM coordinadores WHERE carrera_id=?');
+    $stmt->execute([$carrera_id]);
+    if ((int)$stmt->fetchColumn() > 0) jsonErr('Esa carrera ya tiene coordinador. Edita el existente o elimínalo primero.');
+    $db->prepare('INSERT INTO coordinadores (carrera_id,nombre,correo) VALUES (?,?,?)')
+       ->execute([$carrera_id, $nombre, $correo]);
+    jsonOk('Coordinador agregado', ['id' => $db->lastInsertId()]);
+}
+
 if ($accion === 'coord_editar') {
     $id         = postInt('id');
     $nombre     = str('nombre', 150);

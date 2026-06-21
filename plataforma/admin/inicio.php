@@ -120,16 +120,33 @@ require_once __DIR__ . '/_layout.php';
 <div class="adm-tab-panel" data-tab-group="ini" data-tab="avisos">
   <div class="adm-table-wrap">
     <table class="adm-table">
-      <thead><tr><th>Fecha</th><th>Título</th><th>Descripción</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Fecha</th><th>Título</th><th>Descripción</th><th>Vigencia</th><th>Estado</th><th>Acciones</th></tr></thead>
       <tbody>
         <?php if (empty($avisos)): ?>
-        <tr><td colspan="5" class="adm-table-empty">Sin avisos registrados.</td></tr>
+        <tr><td colspan="6" class="adm-table-empty">Sin avisos registrados.</td></tr>
         <?php endif; ?>
-        <?php foreach ($avisos as $av): ?>
+        <?php foreach ($avisos as $av):
+          $avDesde   = $av['publicar_desde'] ?? null;
+          $avHasta   = $av['publicar_hasta'] ?? null;
+          $hoyStr    = date('Y-m-d');
+          $caducado  = $avHasta && $avHasta < $hoyStr;
+          $programado= $avDesde && $avDesde > $hoyStr;
+        ?>
         <tr id="av-<?= $av['id'] ?>" <?= !$av['activo'] ? 'style="opacity:.5"' : '' ?>>
           <td><span class="adm-status adm-status--info"><?= htmlspecialchars($av['fecha']) ?></span></td>
           <td style="font-weight:600"><?= htmlspecialchars($av['titulo']) ?></td>
           <td style="font-size:12.5px;color:var(--tsj-gray-600)"><?= htmlspecialchars(substr($av['descripcion'] ?? '', 0, 80)) ?><?= strlen($av['descripcion'] ?? '') > 80 ? '…' : '' ?></td>
+          <td style="font-size:12px">
+            <?php if ($caducado): ?>
+              <span class="adm-status adm-status--danger">Caducó <?= htmlspecialchars($avHasta) ?></span>
+            <?php elseif ($programado): ?>
+              <span class="adm-status adm-status--warn">Desde <?= htmlspecialchars($avDesde) ?></span>
+            <?php elseif ($avHasta): ?>
+              <span class="adm-status adm-status--ok">Hasta <?= htmlspecialchars($avHasta) ?></span>
+            <?php else: ?>
+              <span style="color:var(--tsj-gray-400)">Permanente</span>
+            <?php endif; ?>
+          </td>
           <td>
             <?php if ($av['activo']): ?>
               <span class="adm-status adm-status--ok">Visible</span>
@@ -163,6 +180,8 @@ require_once __DIR__ . '/_layout.php';
       <div class="adm-form-grid cols-2">
         <div class="adm-field"><label>Título <span style="color:var(--tsj-pink)">*</span></label><input type="text" name="titulo" id="av-titulo" required></div>
         <div class="adm-field"><label>Fecha</label><input type="date" name="fecha" id="av-fecha" value="<?= date('Y-m-d') ?>"></div>
+        <div class="adm-field"><label>Publicar desde <small style="color:var(--tsj-gray-400)">(vacío = de inmediato)</small></label><input type="date" name="publicar_desde" id="av-desde"></div>
+        <div class="adm-field"><label>Publicar hasta <small style="color:var(--tsj-gray-400)">(vacío = sin caducidad)</small></label><input type="date" name="publicar_hasta" id="av-hasta"></div>
         <div class="adm-field" style="grid-column:1/-1"><label>Descripción</label><textarea name="descripcion" id="av-desc" rows="3"></textarea></div>
       </div>
       <div class="adm-form-actions">
@@ -255,6 +274,8 @@ function abrirEditarAv(a){
   document.getElementById('av-id').value     = a.id;
   document.getElementById('av-titulo').value = a.titulo||'';
   document.getElementById('av-fecha').value  = a.fecha||'';
+  document.getElementById('av-desde').value  = a.publicar_desde||'';
+  document.getElementById('av-hasta').value  = a.publicar_hasta||'';
   document.getElementById('av-desc').value   = a.descripcion||'';
   document.getElementById('form-av-titulo').textContent = 'Editar aviso';
   document.getElementById('form-av').scrollIntoView({behavior:'smooth'});

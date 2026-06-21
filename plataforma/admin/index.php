@@ -18,10 +18,18 @@ try {
         'prestamos'  => $db->query('SELECT COUNT(*) FROM prestamos WHERE devuelto=0')->fetchColumn(),
         'solicitudes'=> $db->query('SELECT COUNT(*) FROM solicitudes_biblioteca WHERE estado="pendiente"')->fetchColumn(),
         'sugerencias'=> $db->query('SELECT COUNT(*) FROM sugerencias_empresa WHERE estado="pendiente"')->fetchColumn(),
+        'atrasados'  => $db->query('SELECT COUNT(*) FROM prestamos WHERE devuelto=0 AND fecha_devolucion < CURDATE()')->fetchColumn(),
+        'por_vencer' => $db->query('SELECT COUNT(*) FROM convenios WHERE activo=1 AND vencimiento IS NOT NULL AND vencimiento <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)')->fetchColumn(),
     ];
+    // Defensivo: la tabla puede no existir aún en BDs creadas con esquemas previos
+    try {
+        $stats['controles'] = $db->query('SELECT COUNT(*) FROM solicitud_controles WHERE estado="Pendiente"')->fetchColumn();
+    } catch (\PDOException $eCtrl) {
+        $stats['controles'] = 0;
+    }
     $db_ok = true;
 } catch (\Throwable $e) {
-    $stats = array_fill_keys(['libros','convenios','docentes','horarios','prestamos','solicitudes','sugerencias'], '—');
+    $stats = array_fill_keys(['libros','convenios','docentes','horarios','prestamos','solicitudes','sugerencias','controles','atrasados','por_vencer'], '—');
     $db_ok = false;
     $db_err = $e->getMessage();
 }
@@ -66,12 +74,30 @@ require_once __DIR__ . '/_layout.php';
   </div>
 </div>
 
-<?php if ($db_ok && ($stats['solicitudes'] > 0 || $stats['sugerencias'] > 0)): ?>
+<?php if ($db_ok && ($stats['solicitudes'] > 0 || $stats['sugerencias'] > 0 || $stats['controles'] > 0 || $stats['atrasados'] > 0 || $stats['por_vencer'] > 0)): ?>
 <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
   <?php if ($stats['solicitudes'] > 0): ?>
   <a href="biblioteca.php#solicitudes" class="adm-alert-badge" style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:#fef3c7;border:1.5px solid #fcd34d;border-radius:8px;color:#92400e;font-size:13px;font-weight:600;text-decoration:none">
     <span class="material-symbols-rounded" style="font-size:18px">notifications</span>
     <?= $stats['solicitudes'] ?> solicitud<?= $stats['solicitudes'] > 1 ? 'es' : '' ?> pendiente<?= $stats['solicitudes'] > 1 ? 's' : '' ?> en biblioteca
+  </a>
+  <?php endif; ?>
+  <?php if ($stats['controles'] > 0): ?>
+  <a href="biblioteca.php#controles" style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:#f5f3ff;border:1.5px solid #c4b5fd;border-radius:8px;color:#5b21b6;font-size:13px;font-weight:600;text-decoration:none">
+    <span class="material-symbols-rounded" style="font-size:18px">videocam</span>
+    <?= $stats['controles'] ?> solicitud<?= $stats['controles'] > 1 ? 'es' : '' ?> de controles pendiente<?= $stats['controles'] > 1 ? 's' : '' ?>
+  </a>
+  <?php endif; ?>
+  <?php if ($stats['atrasados'] > 0): ?>
+  <a href="biblioteca.php#prestamos" style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:#fef2f2;border:1.5px solid #fca5a5;border-radius:8px;color:#991b1b;font-size:13px;font-weight:600;text-decoration:none">
+    <span class="material-symbols-rounded" style="font-size:18px">assignment_late</span>
+    <?= $stats['atrasados'] ?> préstamo<?= $stats['atrasados'] > 1 ? 's' : '' ?> atrasado<?= $stats['atrasados'] > 1 ? 's' : '' ?>
+  </a>
+  <?php endif; ?>
+  <?php if ($stats['por_vencer'] > 0): ?>
+  <a href="convenios.php#vencimientos" style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:#fff7ed;border:1.5px solid #fdba74;border-radius:8px;color:#9a3412;font-size:13px;font-weight:600;text-decoration:none">
+    <span class="material-symbols-rounded" style="font-size:18px">event_busy</span>
+    <?= $stats['por_vencer'] ?> convenio<?= $stats['por_vencer'] > 1 ? 's' : '' ?> vencido<?= $stats['por_vencer'] > 1 ? 's' : '' ?> o por vencer en 30 días
   </a>
   <?php endif; ?>
   <?php if ($stats['sugerencias'] > 0): ?>
@@ -145,6 +171,17 @@ require_once __DIR__ . '/_layout.php';
     <p class="adm-module-desc">Requisitos, documentos descargables, timeline y FAQ.</p>
     <div class="adm-module-items">
       <span class="adm-module-tag">Requisitos</span><span class="adm-module-tag">Documentos</span><span class="adm-module-tag">Timeline</span><span class="adm-module-tag">FAQ</span>
+    </div>
+  </a>
+
+  <a href="reportes.php" class="adm-module-card">
+    <div class="adm-module-card-head">
+      <div class="adm-module-icon" style="background:#ecfeff;color:#0e7490"><span class="material-symbols-rounded">monitoring</span></div>
+      <p class="adm-module-name">Reportes</p>
+    </div>
+    <p class="adm-module-desc">Libros más prestados, atrasos, actividad por mes y bitácora del panel.</p>
+    <div class="adm-module-items">
+      <span class="adm-module-tag">Top libros</span><span class="adm-module-tag">Atrasados</span><span class="adm-module-tag">CSV</span><span class="adm-module-tag">Bitácora</span>
     </div>
   </a>
 

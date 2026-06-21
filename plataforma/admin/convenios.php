@@ -48,6 +48,17 @@ require_once __DIR__ . '/_layout.php';
     <?php endforeach; ?>
   </div>
 
+  <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+    <input type="text" id="conv-buscar" placeholder="Buscar por empresa o contacto…" oninput="aplicarFiltroConv()"
+           style="flex:1;min-width:220px;max-width:420px;padding:9px 12px;border:1.5px solid var(--tsj-gray-200);border-radius:8px;font-size:13px;font-family:inherit">
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--tsj-gray-600);cursor:pointer">
+      <input type="checkbox" id="conv-vencidos" onchange="aplicarFiltroConv()"> Solo vencidos / por vencer
+    </label>
+    <a href="procesos/export.php?tipo=convenios" class="adm-btn adm-btn--ghost adm-btn--sm" style="margin-left:auto">
+      <span class="material-symbols-rounded">download</span> Exportar CSV
+    </a>
+  </div>
+
   <div class="adm-table-wrap">
     <table class="adm-table">
       <thead><tr><th>Empresa</th><th>Tipo</th><th>Carrera</th><th>Contacto</th><th>Correo</th><th>Vencimiento</th><th>Estado</th><th>Acciones</th></tr></thead>
@@ -61,6 +72,8 @@ require_once __DIR__ . '/_layout.php';
           $status  = !$vence ? 'info' : ($hoy > $vence ? 'danger' : ($vence->diff($hoy)->days <= 30 ? 'warn' : 'ok'));
         ?>
         <tr id="cv-<?= $cv['id'] ?>" data-carrera="<?= htmlspecialchars($cv['carrera_clave'] ?? '') ?>"
+            data-search="<?= htmlspecialchars(mb_strtolower($cv['nombre'] . ' ' . ($cv['nombre_contacto'] ?? '') . ' ' . ($cv['correo_contacto'] ?? ''))) ?>"
+            data-vence="<?= in_array($status, ['danger', 'warn'], true) ? '1' : '0' ?>"
             <?= !$cv['activo'] ? 'style="opacity:.5"' : '' ?>>
           <td style="font-weight:600"><?= htmlspecialchars($cv['nombre']) ?></td>
           <td><span class="adm-status adm-status--info"><?= htmlspecialchars($cv['tipo_convenio']) ?></span></td>
@@ -195,12 +208,22 @@ function toggleActivo(modulo, accion, id, btn) {
     });
 }
 
+var convClaveActiva = '';
 function filtrarConvenios(clave){
+  convClaveActiva = clave;
   document.querySelectorAll('#conv-pills .adm-career-pill').forEach(b=>{
     b.classList.toggle('active', b.textContent.trim()===(clave||'Todos'));
   });
+  aplicarFiltroConv();
+}
+function aplicarFiltroConv(){
+  const q    = document.getElementById('conv-buscar').value.trim().toLowerCase();
+  const solo = document.getElementById('conv-vencidos').checked;
   document.querySelectorAll('#conv-tbody tr[data-carrera]').forEach(tr=>{
-    tr.style.display = (!clave || tr.dataset.carrera===clave) ? '' : 'none';
+    const okC = !convClaveActiva || tr.dataset.carrera===convClaveActiva;
+    const okQ = !q || (tr.dataset.search||'').includes(q);
+    const okV = !solo || tr.dataset.vence==='1';
+    tr.style.display = (okC && okQ && okV) ? '' : 'none';
   });
 }
 
@@ -237,6 +260,7 @@ function procesarSug(id, tipo, rowId, csrf){
 }
 
 if(location.hash==='#sugerencias') showTab('conv','sugerencias');
+if(location.hash==='#vencimientos'){ document.getElementById('conv-vencidos').checked = true; aplicarFiltroConv(); }
 </script>
 
 <?php require_once __DIR__ . '/_layout_end.php'; ?>

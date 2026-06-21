@@ -113,15 +113,22 @@ INSERT INTO `carrusel_fotos` (`url`, `titulo`, `subtitulo`, `orden`) VALUES
 
 
 CREATE TABLE `avisos` (
-  `id`          INT UNSIGNED  NOT NULL AUTO_INCREMENT,
-  `titulo`      VARCHAR(200)  NOT NULL,
-  `descripcion` TEXT,
-  `fecha`       DATE          NOT NULL,
-  `activo`      TINYINT(1)    NOT NULL DEFAULT 1,
-  `orden`       SMALLINT      NOT NULL DEFAULT 0,
-  `created_at`  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `id`             INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+  `titulo`         VARCHAR(200)  NOT NULL,
+  `descripcion`    TEXT,
+  `fecha`          DATE          NOT NULL,
+  `publicar_desde` DATE          NULL COMMENT 'NULL = visible desde siempre',
+  `publicar_hasta` DATE          NULL COMMENT 'NULL = sin fecha de caducidad',
+  `activo`         TINYINT(1)    NOT NULL DEFAULT 1,
+  `orden`          SMALLINT      NOT NULL DEFAULT 0,
+  `created_at`     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Migración para BDs existentes (ejecutar una vez si la tabla ya existe):
+-- ALTER TABLE `avisos`
+--   ADD COLUMN `publicar_desde` DATE NULL COMMENT 'NULL = visible desde siempre' AFTER `fecha`,
+--   ADD COLUMN `publicar_hasta` DATE NULL COMMENT 'NULL = sin fecha de caducidad' AFTER `publicar_desde`;
 
 INSERT INTO `avisos` (`titulo`, `descripcion`, `fecha`, `orden`) VALUES
   ('Inicio de semestre agosto-diciembre 2025', 'El semestre inicia el 11 de agosto. Consulta tu horario en el módulo de Horarios.', '2025-07-15', 1),
@@ -635,22 +642,22 @@ INSERT INTO `faq` (`tipo`, `pregunta`, `respuesta`, `orden`) VALUES
 
 
 -- ================================================================
--- 9. REDES SOCIALES
+-- 9. BITÁCORA DEL PANEL ADMIN
 -- ================================================================
+-- Nota: la tabla `redes_sociales` que existía aquí fue retirada — el footer
+-- lee las redes desde las claves *_url de `configuracion` (ver
+-- shared/lib/config_data.php). En BDs existentes puede eliminarse con:
+-- DROP TABLE IF EXISTS `redes_sociales`;
 
-CREATE TABLE `redes_sociales` (
+CREATE TABLE `admin_log` (
   `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `plataforma` VARCHAR(50)  NOT NULL,
-  `url`        VARCHAR(500),
-  `icono_svg`  VARCHAR(100) COMMENT 'Nombre del archivo SVG en shared/assets/img/',
-  `activo`     TINYINT(1)   NOT NULL DEFAULT 1,
-  `orden`      SMALLINT     NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`)
+  `modulo`     VARCHAR(50)  NOT NULL COMMENT 'Proceso admin que ejecutó la acción (biblioteca, convenios, …)',
+  `accion`     VARCHAR(50)  NOT NULL,
+  `detalle`    VARCHAR(500),
+  `created_at` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_admin_log_fecha` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-INSERT INTO `redes_sociales` (`plataforma`, `url`, `icono_svg`, `orden`) VALUES
-  ('Facebook', 'https://www.facebook.com/TecSJ/',             'facebook.svg', 1),
-  ('YouTube',  'https://www.youtube.com/@TecSuperiorJalisco', 'youtube.svg',  2);
 
 
 -- ================================================================

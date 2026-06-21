@@ -71,6 +71,16 @@ require_once __DIR__ . '/../../shared/header.php';
       <p id="ni-error" role="alert" aria-live="polite"
          style="display:none;margin-top:12px;color:#991b1b;font-size:0.88rem;"></p>
     </div>
+
+    <div class="reinscripcion-cta" style="margin-top:28px;padding:18px 20px;background:#f5f3ff;border:1.5px solid #ddd6fe;border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div>
+        <strong style="display:block;color:#1a0960;margin-bottom:2px;">¿Ya eres alumno del Campus?</strong>
+        <span style="color:var(--tsj-gray-600, #4b5563);font-size:0.9rem;">Genera tu referencia de reinscripción para el ciclo escolar.</span>
+      </div>
+      <a href="Egresados.php" class="download-button" style="white-space:nowrap;text-decoration:none;">
+        Ir a Reinscripción →
+      </a>
+    </div>
   </div>
 
 </main>

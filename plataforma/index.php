@@ -14,9 +14,19 @@ try {
         'SELECT * FROM carrusel_fotos WHERE activo=1 ORDER BY orden LIMIT 6'
     )->fetchAll();
 
-    $avisos = $db->query(
-        'SELECT * FROM avisos WHERE activo=1 ORDER BY orden, fecha DESC LIMIT 5'
-    )->fetchAll();
+    // Defensivo: las columnas de vigencia pueden no existir aún en BDs previas
+    try {
+        $avisos = $db->query(
+            'SELECT * FROM avisos WHERE activo=1
+               AND (publicar_desde IS NULL OR publicar_desde <= CURDATE())
+               AND (publicar_hasta IS NULL OR publicar_hasta >= CURDATE())
+             ORDER BY orden, fecha DESC LIMIT 5'
+        )->fetchAll();
+    } catch (\PDOException $eCol) {
+        $avisos = $db->query(
+            'SELECT * FROM avisos WHERE activo=1 ORDER BY orden, fecha DESC LIMIT 5'
+        )->fetchAll();
+    }
 
     $faqs_general = $db->query(
         'SELECT * FROM faq WHERE tipo="general" AND activo=1 ORDER BY orden LIMIT 10'
@@ -216,10 +226,16 @@ body { background: #f0f2f7; font-family: var(--tsj-font); }
 }
 .faq-item.open .faq-pregunta svg { transform:rotate(180deg); }
 .faq-respuesta {
-    max-height:0;overflow:hidden;transition:max-height .3s ease;
-    padding:0 20px;font-size:.88rem;color:var(--tsj-gray-600);line-height:1.6;
+    display:grid;grid-template-rows:0fr;
+    transition:grid-template-rows .3s ease;
+    font-size:.88rem;color:var(--tsj-gray-600);line-height:1.6;
 }
-.faq-item.open .faq-respuesta { max-height:300px;padding:0 20px 16px; }
+.faq-respuesta-inner {
+    overflow:hidden;padding:0 20px;
+    transition:padding .3s ease;
+}
+.faq-item.open .faq-respuesta { grid-template-rows:1fr; }
+.faq-item.open .faq-respuesta-inner { padding:0 20px 16px; }
 
 /* ── 2 columnas en escritorio para avisos+faq ────────── */
 .portal-two-col {
@@ -312,13 +328,13 @@ require_once __DIR__ . '/shared/header.php';
 
     <div class="portal-grid">
 
-      <a href="<?= $base ?>/modulos/visitantes/index.php" class="portal-card">
+      <a href="<?= $base ?>/modulos/visitantes/Ubicacion.php" class="portal-card">
         <div class="portal-card-icon" style="background:#ede9ff" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         </div>
         <div class="portal-card-body">
-          <h2>Directorio</h2>
-          <p>Conoce al personal institucional: departamento, correo, extensión y ubicación.</p>
+          <h2>Ubicación del Campus</h2>
+          <p>Cómo llegar al Campus Chapala: dirección, mapa y referencias de acceso.</p>
           <div class="portal-card-arrow" aria-hidden="true">Acceder <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
         </div>
       </a>
@@ -372,8 +388,8 @@ require_once __DIR__ . '/shared/header.php';
           <svg viewBox="0 0 24 24" style="stroke:#16a34a"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/></svg>
         </div>
         <div class="portal-card-body">
-          <h2>Inscripción y Reinscripción</h2>
-          <p>Información sobre el proceso de nuevo ingreso, requisitos y fechas de reinscripción.</p>
+          <h2>Admisiones</h2>
+          <p>Nuevo ingreso y reinscripción: requisitos, examen de admisión y generación de comprobantes.</p>
           <div class="portal-card-arrow" aria-hidden="true">Acceder <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
         </div>
       </a>
@@ -433,7 +449,7 @@ require_once __DIR__ . '/shared/header.php';
                 <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
               </button>
               <div class="faq-respuesta">
-                <?= htmlspecialchars($q['respuesta']) ?>
+                <div class="faq-respuesta-inner"><?= htmlspecialchars($q['respuesta']) ?></div>
               </div>
             </div>
             <?php endforeach; ?>

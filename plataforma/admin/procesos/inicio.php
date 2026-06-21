@@ -9,10 +9,19 @@ if ($accion === 'aviso_agregar') {
     $titulo = str('titulo', 200);
     $desc   = str('descripcion', 2000);
     $fecha  = str('fecha', 10);
+    $desde  = str('publicar_desde', 10) ?: null;
+    $hasta  = str('publicar_hasta', 10) ?: null;
     if (!$titulo) jsonErr('El título es requerido');
     if (!$fecha)  $fecha = date('Y-m-d');
-    $db->prepare('INSERT INTO avisos (titulo,descripcion,fecha) VALUES (?,?,?)')
-       ->execute([$titulo, $desc, $fecha]);
+    if ($desde && $hasta && $desde > $hasta) jsonErr('La fecha "desde" no puede ser posterior a "hasta"');
+    // Defensivo: las columnas de vigencia pueden no existir aún en BDs previas
+    try {
+        $db->prepare('INSERT INTO avisos (titulo,descripcion,fecha,publicar_desde,publicar_hasta) VALUES (?,?,?,?,?)')
+           ->execute([$titulo, $desc, $fecha, $desde, $hasta]);
+    } catch (\PDOException $eCol) {
+        $db->prepare('INSERT INTO avisos (titulo,descripcion,fecha) VALUES (?,?,?)')
+           ->execute([$titulo, $desc, $fecha]);
+    }
     jsonOk('Aviso agregado', ['id' => $db->lastInsertId()]);
 }
 
@@ -21,9 +30,17 @@ if ($accion === 'aviso_editar') {
     $titulo = str('titulo', 200);
     $desc   = str('descripcion', 2000);
     $fecha  = str('fecha', 10);
+    $desde  = str('publicar_desde', 10) ?: null;
+    $hasta  = str('publicar_hasta', 10) ?: null;
     if (!$id || !$titulo) jsonErr('Datos incompletos');
-    $db->prepare('UPDATE avisos SET titulo=?,descripcion=?,fecha=? WHERE id=?')
-       ->execute([$titulo, $desc, $fecha, $id]);
+    if ($desde && $hasta && $desde > $hasta) jsonErr('La fecha "desde" no puede ser posterior a "hasta"');
+    try {
+        $db->prepare('UPDATE avisos SET titulo=?,descripcion=?,fecha=?,publicar_desde=?,publicar_hasta=? WHERE id=?')
+           ->execute([$titulo, $desc, $fecha, $desde, $hasta, $id]);
+    } catch (\PDOException $eCol) {
+        $db->prepare('UPDATE avisos SET titulo=?,descripcion=?,fecha=? WHERE id=?')
+           ->execute([$titulo, $desc, $fecha, $id]);
+    }
     jsonOk('Aviso actualizado');
 }
 

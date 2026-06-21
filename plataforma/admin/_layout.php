@@ -25,6 +25,7 @@ $nav = [
     'convenios'     => ['label' => 'Convenios',                'icon' => 'handshake',        'href' => $base . '/admin/convenios.php'],
     'horarios'      => ['label' => 'Buscar Maestro',           'icon' => 'calendar_month',   'href' => $base . '/admin/horarios.php'],
     'requisitos'    => ['label' => 'Serv. Social / Residencia','icon' => 'checklist',        'href' => $base . '/admin/requisitos.php'],
+    'reportes'      => ['label' => 'Reportes',                 'icon' => 'monitoring',       'href' => $base . '/admin/reportes.php'],
     'configuracion' => ['label' => 'Configuración',            'icon' => 'settings',         'href' => $base . '/admin/configuracion.php'],
 ];
 ?>

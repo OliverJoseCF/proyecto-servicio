@@ -44,7 +44,24 @@ function db(): PDO {
     return $pdo;
 }
 
+/**
+ * Registra la acción exitosa en la bitácora admin_log.
+ * Defensivo: nunca interrumpe la respuesta si la tabla no existe o la BD falla.
+ */
+function adminLog(string $detalle): void {
+    $accion = mb_substr(trim($_POST['accion'] ?? ''), 0, 50);
+    if ($accion === '') return;
+    $modulo = basename($_SERVER['SCRIPT_NAME'] ?? '', '.php');
+    try {
+        db()->prepare('INSERT INTO admin_log (modulo, accion, detalle) VALUES (?,?,?)')
+            ->execute([$modulo, $accion, mb_substr($detalle, 0, 500)]);
+    } catch (\Throwable $e) {
+        // Sin bitácora disponible — la operación principal no se ve afectada
+    }
+}
+
 function jsonOk(string $msg = 'OK', array $extra = []): never {
+    adminLog($msg);
     echo json_encode(array_merge(['ok' => true, 'msg' => $msg], $extra));
     exit;
 }

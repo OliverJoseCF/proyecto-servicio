@@ -1,7 +1,7 @@
 <?php
 /**
  * Acceso a la configuración editable del portal (tabla `configuracion`) y a las
- * redes sociales activas (tabla `redes_sociales` + claves *_url de configuracion).
+ * redes sociales activas (claves *_url de `configuracion`).
  *
  * Lo usa el footer/header compartido para reflejar lo que el admin guarda en
  * Admin → Configuración. Todas las funciones degradan a un valor por defecto si
