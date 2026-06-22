@@ -20,6 +20,16 @@ $f_horario   = tsjConfig('horario_atencion', 'Lun – Vie: 8:00 – 20:00 h');
 $f_sitio     = tsjConfig('sitio_oficial_url','https://www.tecmm.edu.mx');
 $f_redes     = tsjRedesSociales();
 
+// Correos departamentales (solo mostrar los que tengan valor en BD)
+$f_correos_dep = array_filter([
+    'Biblioteca'      => tsjConfig('correo_biblioteca',  ''),
+    'Vinculación'     => tsjConfig('correo_vinculacion', ''),
+    'Control Escolar' => tsjConfig('correo_escolares',   ''),
+    'Dirección'       => tsjConfig('correo_direccion',   ''),
+    'Facturación'     => tsjConfig('correo_facturacion', ''),
+    'Servicios'       => tsjConfig('correo_servicios',   ''),
+]);
+
 // Mapa módulo → página de admin
 $_tsj_admin_links = [
     'visitantes'  => $base . '/admin/visitantes.php',
@@ -103,18 +113,32 @@ $nav_items = $nav_items ?? [
           <span><?= htmlspecialchars($f_horario, ENT_QUOTES, 'UTF-8') ?></span>
         </div>
 
+        <?php if (!empty($f_correos_dep)): ?>
+        <p class="tsj-footer-social-title" style="margin-top:14px">Contacto por área</p>
+        <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px">
+          <?php foreach ($f_correos_dep as $area => $email): ?>
+          <li style="font-size:12px;color:var(--tsj-footer-muted,#94a3b8)">
+            <span style="font-weight:600;color:var(--tsj-footer-text,#cbd5e1)"><?= htmlspecialchars($area, ENT_QUOTES, 'UTF-8') ?>:</span>
+            <a href="mailto:<?= htmlspecialchars($email, ENT_QUOTES, 'UTF-8') ?>"
+               style="color:inherit;text-decoration:none;word-break:break-all"
+               onmouseover="this.style.textDecoration='underline'"
+               onmouseout="this.style.textDecoration='none'">
+              <?= htmlspecialchars($email, ENT_QUOTES, 'UTF-8') ?>
+            </a>
+          </li>
+          <?php endforeach; ?>
+        </ul>
+        <?php endif; ?>
+
         <?php if (!empty($f_redes)): ?>
-        <p class="tsj-footer-social-title">Redes sociales</p>
+        <p class="tsj-footer-social-title" style="margin-top:14px">Redes sociales</p>
         <div class="tsj-footer-social">
           <?php foreach ($f_redes as $red): ?>
-          <a href="<?= htmlspecialchars($red['url'], ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer"
-             aria-label="<?= htmlspecialchars($red['label'], ENT_QUOTES, 'UTF-8') ?> del <?= htmlspecialchars($f_institu, ENT_QUOTES, 'UTF-8') ?>">
-            <?php if ($red['tiene_svg']): ?>
-              <img src="<?= $base ?>/shared/assets/img/<?= htmlspecialchars($red['icono'], ENT_QUOTES, 'UTF-8') ?>"
-                   alt="<?= htmlspecialchars($red['label'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy" />
-            <?php else: ?>
-              <span class="material-symbols-rounded" aria-hidden="true">public</span>
-            <?php endif; ?>
+          <a href="<?= htmlspecialchars($red['url'], ENT_QUOTES, 'UTF-8') ?>"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="<?= htmlspecialchars($red['label'], ENT_QUOTES, 'UTF-8') ?> — <?= htmlspecialchars($f_institu, ENT_QUOTES, 'UTF-8') ?>"
+             title="<?= htmlspecialchars($red['label'], ENT_QUOTES, 'UTF-8') ?>">
+            <?= $red['svg'] ?>
           </a>
           <?php endforeach; ?>
         </div>

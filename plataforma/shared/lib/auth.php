@@ -55,13 +55,21 @@ function csrfField(): string {
 
 /**
  * Login global (toda la plataforma) con rol admin.
+ *
+ * @param string $role        Rol (siempre 'admin' por ahora).
+ * @param int    $adminId     ID en la tabla `admins`. 0 = cuenta maestra (config.local.php).
+ * @param string $adminNombre Nombre para mostrar y registrar en la bitácora.
+ * @param string $adminEmail  Correo de la cuenta autenticada.
  */
-function globalLogin(string $role = 'admin'): void {
+function globalLogin(string $role = 'admin', int $adminId = 0, string $adminNombre = 'Administrador', string $adminEmail = ''): void {
     session_regenerate_id(true);
     $_SESSION['_csrf']          = bin2hex(random_bytes(32));
     $_SESSION['_auth']          = true;
     $_SESSION['_module']        = 'global';
     $_SESSION['_role']          = $role;
+    $_SESSION['_admin_id']      = $adminId;
+    $_SESSION['_admin_nombre']  = $adminNombre;
+    $_SESSION['_admin_email']   = $adminEmail;
     $_SESSION['_last_activity'] = time();
 }
 
@@ -72,6 +80,22 @@ function isGlobalAdmin(): bool {
     return !empty($_SESSION['_auth'])
         && ($_SESSION['_module'] ?? '') === 'global'
         && ($_SESSION['_role']   ?? '') === 'admin';
+}
+
+/** ID del admin con sesión activa (0 = cuenta maestra de config.local.php). */
+function adminActualId(): int {
+    return (int)($_SESSION['_admin_id'] ?? 0);
+}
+
+/** Nombre del admin con sesión activa. */
+function adminActualNombre(): string {
+    $n = $_SESSION['_admin_nombre'] ?? '';
+    return $n !== '' ? $n : 'Administrador';
+}
+
+/** Correo del admin con sesión activa. */
+function adminActualEmail(): string {
+    return $_SESSION['_admin_email'] ?? '';
 }
 
 /**

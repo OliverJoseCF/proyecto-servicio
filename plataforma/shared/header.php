@@ -20,6 +20,10 @@ if (!defined('PLATAFORMA_URL')) {
 if (!function_exists('isGlobalAdmin')) {
     require_once __DIR__ . '/lib/auth.php';
 }
+if (!function_exists('tsjConfig')) {
+    require_once __DIR__ . '/lib/config_data.php';
+}
+$_tsj_campus = tsjConfig('campus', 'Campus Chapala');
 $_tsj_is_admin = isGlobalAdmin();
 
 if (empty($tsj_no_security_headers)) {
@@ -28,7 +32,7 @@ if (empty($tsj_no_security_headers)) {
 
 $tsj_module      = $tsj_module      ?? '';
 $tsj_title       = $tsj_title       ?? 'Tecnológico Superior de Jalisco';
-$tsj_description = $tsj_description ?? 'Portal de servicios estudiantiles del Tecnológico Superior de Jalisco — Chapala.';
+$tsj_description = $tsj_description ?? tsjConfig('descripcion_portal', 'Portal de servicios estudiantiles del Tecnológico Superior de Jalisco — Chapala.');
 $tsj_extra_css   = $tsj_extra_css   ?? [];
 $tsj_head_extra  = $tsj_head_extra  ?? '';
 $tsj_has_hero    = $tsj_has_hero    ?? false;
@@ -53,22 +57,17 @@ $nav_items = [
 
 // Sub-items de Oferta Académica — cargados desde BD dinámicamente
 $oferta_carreras = [];
-$_iconos_carrera = [
-    'ISC'=>'computer','II'=>'precision_manufacturing','IM'=>'settings_suggest',
-    'IADEV'=>'animation','IGE'=>'business_center','LG'=>'restaurant',
-];
 try {
     if (!isset($db)) { $db = getPDO(DB_NAME); }
-    $filas = $db->query('SELECT clave, nombre FROM carreras WHERE activo=1 ORDER BY orden')->fetchAll();
+    $filas = $db->query('SELECT clave, nombre, icono FROM carreras WHERE activo=1 ORDER BY orden')->fetchAll();
     foreach ($filas as $f) {
         $oferta_carreras[] = [
             'label' => $f['nombre'],
             'href'  => $base . '/modulos/visitantes/materias.php?carrera=' . urlencode($f['clave']),
-            'icon'  => $_iconos_carrera[$f['clave']] ?? 'school',
+            'icon'  => $f['icono'] ?: 'school',
         ];
     }
 } catch (\Throwable $e) {
-    // Si BD no disponible, el dropdown queda vacío — no rompe el header
     $oferta_carreras = [];
 }
 ?>
@@ -84,14 +83,22 @@ try {
   <!-- Poppins + Material Symbols: carga directa (compatible con CSP sin unsafe-inline) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <!-- Poppins + Material Symbols: carga directa (compatible con CSP sin unsafe-inline) -->
+  <!-- Poppins: display=swap (la fuente de texto puede usar fallback mientras carga) -->
   <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" />
+  <!-- Material Symbols: display=block evita que se muestre el NOMBRE del ícono como
+       texto crudo (y el consiguiente reacomodo) mientras la fuente de íconos carga -->
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" />
   <style>
     .material-symbols-rounded {
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
       vertical-align: middle;
       line-height: 1;
+      /* Refuerzo: si el glyph aún no resuelve, no romper el layout con el nombre */
+      font-display: block;
+      white-space: nowrap;
+      overflow: hidden;
     }
   </style>
 
@@ -133,7 +140,7 @@ try {
       <img class="tsj-header-logo"
            src="<?= $base ?>/shared/assets/img/logo.svg"
            alt="" aria-hidden="true" />
-      <span class="tsj-brand-sub">Campus Chapala</span>
+      <span class="tsj-brand-sub"><?= htmlspecialchars($_tsj_campus, ENT_QUOTES, 'UTF-8') ?></span>
     </a>
 
     <!-- Navegación escritorio (centrada absolutamente) -->
@@ -213,7 +220,7 @@ try {
     <div class="tsj-menu-logo">
       <img src="<?= $base ?>/shared/assets/img/logo.svg"
            alt="TSJ Chapala" height="36" />
-      <span>TSJ<br>Campus Chapala</span>
+      <span>TSJ<br><?= htmlspecialchars($_tsj_campus, ENT_QUOTES, 'UTF-8') ?></span>
     </div>
 
     <p class="tsj-menu-section">Portal</p>

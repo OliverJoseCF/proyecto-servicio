@@ -25,7 +25,24 @@ try {
     }
     unset($_c);
 
-    $docentes     = $db->query('SELECT d.*,c.clave carrera_clave,c.nombre carrera_nombre FROM docentes d LEFT JOIN carreras c ON d.carrera_id=c.id ORDER BY d.orden,d.nombre LIMIT 500')->fetchAll();
+    // Atributos de egreso por carrera (texto concatenado para el formulario de edición)
+    $atributosPorCarrera = [];
+    try {
+        foreach ($db->query('SELECT carrera_id, texto FROM atributos_egreso WHERE activo=1 ORDER BY orden')->fetchAll() as $a) {
+            $atributosPorCarrera[$a['carrera_id']][] = $a['texto'];
+        }
+    } catch (\Throwable $_eA) { /* tabla nueva — ignorar en BD antigua */ }
+    foreach ($carreras as &$_c) {
+        $_c['atributos_egreso_texto'] = implode("\n", $atributosPorCarrera[$_c['id']] ?? []);
+    }
+    unset($_c);
+
+    $docentes     = $db->query('SELECT d.* FROM docentes d ORDER BY d.orden,d.nombre LIMIT 500')->fetchAll();
+    // Carreras por docente (pivot)
+    $docCarreras = [];
+    foreach ($db->query('SELECT dc.docente_id, c.id, c.clave, c.nombre FROM docente_carrera dc JOIN carreras c ON c.id=dc.carrera_id ORDER BY c.orden')->fetchAll() as $r) {
+        $docCarreras[$r['docente_id']][] = $r;
+    }
     $coordinadores= $db->query('SELECT co.*,c.nombre carrera_nombre FROM coordinadores co JOIN carreras c ON co.carrera_id=c.id ORDER BY c.orden LIMIT 50')->fetchAll();
     $secretarias  = $db->query('SELECT * FROM secretarias ORDER BY orden,nombre LIMIT 50')->fetchAll();
     $ni           = $db->query('SELECT * FROM nuevo_ingreso_config LIMIT 1')->fetch();
@@ -121,18 +138,33 @@ require_once __DIR__ . '/_layout.php';
   <!-- Formulario agregar/editar directorio -->
   <div class="adm-form-card" style="margin-top:20px" id="form-dir-wrap">
     <div class="adm-form-title"><span class="material-symbols-rounded">person_add</span> <span id="form-dir-titulo">Agregar persona al directorio</span></div>
-    <form data-proc="visitantes" data-reload id="form-dir">
+    <form data-proc="visitantes" data-reload id="form-dir" enctype="multipart/form-data">
       <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="directorio_agregar" id="dir-accion">
       <input type="hidden" name="id" id="dir-id">
+      <input type="hidden" name="foto" id="dir-foto-actual">
       <div class="adm-form-grid cols-3">
         <div class="adm-field"><label>Nombre completo <span style="color:var(--tsj-pink)">*</span></label><input type="text" name="nombre" id="dir-nombre" required></div>
         <div class="adm-field"><label>Puesto / Área</label><input type="text" name="puesto" id="dir-puesto"></div>
         <div class="adm-field"><label>Correo electrónico</label><input type="email" name="correo" id="dir-correo"></div>
-        <div class="adm-field"><label>Teléfono</label><input type="tel" name="telefono" id="dir-telefono" placeholder="S/N"></div>
+        <div class="adm-field"><label>Teléfono</label><input type="tel" name="telefono" id="dir-telefono" placeholder="S/N" inputmode="tel" maxlength="25" pattern="[0-9+\-\s()]{7,25}|S/N" title="Solo números, +, -, espacios y paréntesis (o 'S/N' si no aplica)"></div>
         <div class="adm-field"><label>Extensión</label><input type="text" name="extension" id="dir-extension" placeholder="Ej. Ext. 101"></div>
         <div class="adm-field"><label>Ubicación física</label><input type="text" name="ubicacion_fisica" id="dir-ubicacion" placeholder="Ej. Módulo A, Planta Baja"></div>
-        <div class="adm-field"><label>Foto (nombre de archivo)</label><input type="text" name="foto" id="dir-foto" placeholder="ej. miguel.png"></div>
+        <div class="adm-field" style="grid-column:1/-1">
+          <label>Foto de perfil</label>
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <img id="dir-foto-preview"
+                 src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Crect width='72' height='72' fill='%23e5e7eb' rx='36'/%3E%3C/svg%3E"
+                 style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid var(--tsj-gray-200);flex-shrink:0" alt="">
+            <div style="flex:1;min-width:200px">
+              <input type="file" name="foto_archivo" id="dir-foto-file"
+                     accept="image/jpeg,image/png,image/webp"
+                     onchange="previsualizarFoto(this,'dir-foto-preview')"
+                     style="display:block;margin-bottom:6px">
+              <span class="adm-field-help">JPG, PNG o WEBP · máx. 3 MB. Si no cambias la foto, la actual se conserva.</span>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="adm-form-actions">
         <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar</button>
@@ -163,8 +195,13 @@ require_once __DIR__ . '/_layout.php';
         <?php if (empty($docentes)): ?>
         <tr><td colspan="5" class="adm-table-empty">Sin docentes registrados.</td></tr>
         <?php endif; ?>
-        <?php foreach ($docentes as $d): ?>
-        <tr id="doc-<?= $d['id'] ?>" data-carrera="<?= htmlspecialchars($d['carrera_clave'] ?? '') ?>"
+        <?php foreach ($docentes as $d):
+          $dCarreras   = $docCarreras[$d['id']] ?? [];
+          $dClaves     = array_column($dCarreras, 'clave');
+          $dCarreraIds = array_column($dCarreras, 'id');
+          $dPrimClave  = $dClaves[0] ?? '';
+        ?>
+        <tr id="doc-<?= $d['id'] ?>" data-carrera="<?= htmlspecialchars(implode(' ', $dClaves)) ?>"
             data-search="<?= htmlspecialchars(mb_strtolower($d['nombre'] . ' ' . ($d['correo'] ?? ''))) ?>">
           <td style="font-weight:600"><?= htmlspecialchars($d['nombre']) ?></td>
           <td class="col-photo">
@@ -172,10 +209,16 @@ require_once __DIR__ . '/_layout.php';
                  style="width:38px;height:38px;border-radius:50%;object-fit:cover" alt="">
           </td>
           <td><?= $d['correo'] ? '<a href="mailto:'.htmlspecialchars($d['correo']).'" style="color:var(--tsj-blue)">'.htmlspecialchars($d['correo']).'</a>' : '<span style="color:var(--tsj-gray-400)">—</span>' ?></td>
-          <td><span class="adm-status adm-status--info"><?= htmlspecialchars($d['carrera_clave'] ?? '—') ?></span></td>
+          <td>
+            <?php if ($dCarreras): foreach ($dCarreras as $dc): ?>
+              <span class="adm-status adm-status--info" style="margin:1px 2px;display:inline-block"><?= htmlspecialchars($dc['clave']) ?></span>
+            <?php endforeach; else: ?>
+              <span style="color:var(--tsj-gray-400)">—</span>
+            <?php endif; ?>
+          </td>
           <td class="actions">
             <button class="adm-btn adm-btn--ghost adm-btn--sm"
-                    onclick="abrirEditarDoc(<?= htmlspecialchars(json_encode($d)) ?>)">
+                    onclick="abrirEditarDoc(<?= htmlspecialchars(json_encode(['id'=>$d['id'],'nombre'=>$d['nombre'],'correo'=>$d['correo'],'foto'=>$d['foto'],'carrera_ids'=>$dCarreraIds])) ?>)">
               <span class="material-symbols-rounded">edit</span>
             </button>
             <button class="adm-btn adm-btn--danger adm-btn--sm"
@@ -190,22 +233,42 @@ require_once __DIR__ . '/_layout.php';
   </div>
   <div class="adm-form-card" style="margin-top:20px">
     <div class="adm-form-title"><span class="material-symbols-rounded">school</span> <span id="form-doc-titulo">Agregar docente</span></div>
-    <form data-proc="visitantes" data-reload id="form-doc">
+    <form data-proc="visitantes" data-reload id="form-doc" enctype="multipart/form-data">
       <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="docente_agregar" id="doc-accion">
       <input type="hidden" name="id" id="doc-id">
+      <input type="hidden" name="foto" id="doc-foto-actual">
       <div class="adm-form-grid cols-3">
         <div class="adm-field"><label>Nombre completo <span style="color:var(--tsj-pink)">*</span></label><input type="text" name="nombre" id="doc-nombre" required></div>
         <div class="adm-field"><label>Correo electrónico</label><input type="email" name="correo" id="doc-correo"></div>
-        <div class="adm-field"><label>Carrera</label>
-          <select name="carrera_id" id="doc-carrera">
-            <option value="">Sin asignar</option>
+        <div class="adm-field" style="grid-column:1/-1">
+          <label>Carreras en las que imparte clase <span style="font-weight:400;color:var(--tsj-gray-500)">(selecciona una o varias)</span></label>
+          <div id="doc-carreras-checks" style="display:flex;flex-wrap:wrap;gap:10px 20px;margin-top:6px">
             <?php foreach ($carreras as $c): ?>
-            <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['nombre']) ?></option>
+            <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;font-weight:500;color:var(--tsj-blue-dark)">
+              <input type="checkbox" name="carrera_ids[]" value="<?= $c['id'] ?>"
+                     style="width:15px;height:15px;accent-color:var(--tsj-blue);cursor:pointer">
+              <span class="adm-status adm-status--info" style="font-size:11px;pointer-events:none"><?= htmlspecialchars($c['clave']) ?></span>
+              <?= htmlspecialchars($c['nombre']) ?>
+            </label>
             <?php endforeach; ?>
-          </select>
+          </div>
         </div>
-        <div class="adm-field"><label>Foto (nombre de archivo)</label><input type="text" name="foto" id="doc-foto" placeholder="ej. miguel.png"></div>
+        <div class="adm-field" style="grid-column:1/-1">
+          <label>Foto de perfil</label>
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <img id="doc-foto-preview"
+                 src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Crect width='72' height='72' fill='%23e5e7eb' rx='36'/%3E%3C/svg%3E"
+                 style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid var(--tsj-gray-200);flex-shrink:0" alt="">
+            <div style="flex:1;min-width:200px">
+              <input type="file" name="foto_archivo" id="doc-foto-file"
+                     accept="image/jpeg,image/png,image/webp"
+                     onchange="previsualizarFoto(this,'doc-foto-preview')"
+                     style="display:block;margin-bottom:6px">
+              <span class="adm-field-help">JPG, PNG o WEBP · máx. 3 MB. Si no cambias la foto, la actual se conserva.</span>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="adm-form-actions">
         <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar</button>
@@ -409,10 +472,83 @@ require_once __DIR__ . '/_layout.php';
             <label>Descripción breve (aparece en la tarjeta pública)</label>
             <textarea name="descripcion" id="car-descripcion" rows="2" placeholder="Breve descripción de la carrera para la página de Oferta Académica"></textarea>
           </div>
+          <!-- Textos académicos de la carrera -->
           <div class="adm-field" style="grid-column:1/-1">
-            <label>URL de la Retícula (mapa curricular)</label>
-            <input type="url" name="reticula_url" id="car-reticula" placeholder="https://… o ruta relativa al PDF/imagen">
-            <span class="adm-field-help">Puede ser un enlace de Google Drive, un PDF en el servidor o una imagen.</span>
+            <label>Objetivo General</label>
+            <textarea name="objetivo_general" id="car-objetivo" rows="4" placeholder="Describe el objetivo general de la carrera..."></textarea>
+          </div>
+          <div class="adm-field" style="grid-column:1/-1">
+            <label>Perfil Profesional</label>
+            <textarea name="perfil_profesional" id="car-perfil" rows="4" placeholder="Describe el perfil del profesional egresado..."></textarea>
+          </div>
+          <div class="adm-field" style="grid-column:1/-1">
+            <label>Objetivos Educacionales</label>
+            <textarea name="objetivos_educacionales" id="car-objetivos-edu" rows="4" placeholder="Lista los objetivos educacionales..."></textarea>
+          </div>
+          <div class="adm-field" style="grid-column:1/-1">
+            <label>Atributos de Egreso</label>
+            <span class="adm-field-help">Un atributo por línea. Se muestran como lista numerada en la página pública.</span>
+            <textarea name="atributos_egreso" id="car-atributos" rows="5" placeholder="Capacidad de análisis y diseño de sistemas..."></textarea>
+          </div>
+          <div class="adm-field" style="grid-column:1/-1">
+            <label>Ícono de la carrera</label>
+            <input type="hidden" name="icono" id="car-icono" value="school">
+            <div style="display:flex;align-items:center;gap:14px">
+              <div id="car-icono-preview" style="width:44px;height:44px;border-radius:12px;background:#32129a;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <span class="material-symbols-rounded" id="car-icono-preview-symbol" style="font-size:24px;color:#fff">school</span>
+              </div>
+              <div style="flex:1">
+                <div style="font-weight:600;font-size:13px;color:#1a0960" id="car-icono-nombre-label">school</div>
+                <button type="button" onclick="toggleIconoGrid()"
+                        style="margin-top:4px;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--tsj-blue);background:none;border:none;cursor:pointer;padding:0">
+                  <span class="material-symbols-rounded" style="font-size:15px" id="car-icono-toggle-icon">expand_more</span>
+                  <span id="car-icono-toggle-label">Cambiar ícono</span>
+                </button>
+              </div>
+            </div>
+            <div id="car-icono-grid" style="display:none;margin-top:10px;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:8px;max-height:260px;overflow-y:auto;padding:4px 2px">
+              <?php
+              $iconosDisponibles = [
+                'school','computer','precision_manufacturing','settings_suggest','animation',
+                'business_center','restaurant','biotech','architecture','calculate',
+                'science','psychology','palette','brush','music_note',
+                'health_and_safety','local_hospital','engineering','construction','eco',
+                'agriculture','water_drop','electric_bolt','solar_power','factory',
+                'inventory_2','local_shipping','flight','directions_car','account_balance',
+                'gavel','policy','security','manage_accounts','support_agent',
+                'analytics','bar_chart','trending_up','currency_exchange','payments',
+                'code','terminal','cloud','storage','lan',
+                'wifi','smartphone','camera','videocam','headphones',
+                'sports_soccer','fitness_center','hiking','travel_explore','public',
+              ];
+              foreach ($iconosDisponibles as $ic): ?>
+              <button type="button" class="car-icono-btn"
+                      data-icono="<?= $ic ?>"
+                      onclick="seleccionarIcono('<?= $ic ?>',true)"
+                      title="<?= $ic ?>"
+                      style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border:1.5px solid #e8eaf2;border-radius:10px;background:#fff;cursor:pointer;transition:all .15s;font-size:10px;color:#6b7280">
+                <span class="material-symbols-rounded" style="font-size:24px;color:#4a5170"><?= $ic ?></span>
+                <span style="font-size:9.5px;line-height:1.2;text-align:center;word-break:break-all"><?= $ic ?></span>
+              </button>
+              <?php endforeach; ?>
+            </div>
+          </div>
+          <div class="adm-field" style="grid-column:1/-1">
+            <label>Retícula (mapa curricular)</label>
+            <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+              <div style="flex:1;min-width:200px">
+                <input type="file" name="reticula_archivo" id="car-reticula-file"
+                       accept=".pdf,application/pdf">
+                <span class="adm-field-help">PDF — máx. 10 MB. Sube un archivo nuevo para reemplazar el actual.</span>
+              </div>
+              <div id="car-reticula-actual-wrap" style="display:none;flex-shrink:0;align-items:center;gap:8px">
+                <span class="material-symbols-rounded" style="font-size:22px;color:#6b7280">picture_as_pdf</span>
+                <a id="car-reticula-actual-link" href="#" target="_blank" rel="noopener"
+                   style="font-size:12.5px;color:var(--tsj-blue);font-weight:600;text-decoration:none">
+                  Ver retícula actual
+                </a>
+              </div>
+            </div>
           </div>
           <div class="adm-field" style="grid-column:1/-1">
             <label>Imagen de portada <span style="color:var(--tsj-gray-500);font-weight:400;font-size:12px">(aparece en la card de Convenios)</span></label>
@@ -487,7 +623,7 @@ require_once __DIR__ . '/_layout.php';
         <div class="adm-field"><label>Nombre completo <span style="color:var(--tsj-pink)">*</span></label><input type="text" name="nombre" id="sec-nombre" required></div>
         <div class="adm-field"><label>Rol</label><input type="text" name="rol" id="sec-rol"></div>
         <div class="adm-field"><label>Correo</label><input type="email" name="correo" id="sec-correo"></div>
-        <div class="adm-field"><label>Teléfono</label><input type="tel" name="telefono" id="sec-telefono"></div>
+        <div class="adm-field"><label>Teléfono</label><input type="tel" name="telefono" id="sec-telefono" inputmode="tel" maxlength="25" pattern="[0-9+\-\s()]{7,25}" title="Solo números, +, -, espacios y paréntesis (entre 7 y 25 caracteres)"></div>
       </div>
       <div class="adm-form-actions">
         <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar</button>
@@ -558,6 +694,44 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
+// ── Selector de ícono de carrera ────────────────────────────────
+function toggleIconoGrid() {
+  var grid  = document.getElementById('car-icono-grid');
+  var icon  = document.getElementById('car-icono-toggle-icon');
+  var label = document.getElementById('car-icono-toggle-label');
+  var open  = grid.style.display === 'grid';
+  grid.style.display  = open ? 'none' : 'grid';
+  icon.textContent    = open ? 'expand_more' : 'expand_less';
+  label.textContent   = open ? 'Cambiar ícono' : 'Cerrar';
+}
+function seleccionarIcono(icono, cerrarGrid) {
+  document.getElementById('car-icono').value = icono;
+  document.getElementById('car-icono-preview-symbol').textContent = icono;
+  document.getElementById('car-icono-nombre-label').textContent   = icono;
+  var color = document.getElementById('car-color').value || '#32129a';
+  document.getElementById('car-icono-preview').style.background   = color;
+  document.querySelectorAll('.car-icono-btn').forEach(function(btn) {
+    var sel = btn.dataset.icono === icono;
+    btn.style.borderColor  = sel ? color : '#e8eaf2';
+    btn.style.background   = sel ? color + '18' : '#fff';
+    btn.querySelector('.material-symbols-rounded').style.color = sel ? color : '#4a5170';
+  });
+  if (cerrarGrid) {
+    var grid = document.getElementById('car-icono-grid');
+    grid.style.display = 'none';
+    document.getElementById('car-icono-toggle-icon').textContent  = 'expand_more';
+    document.getElementById('car-icono-toggle-label').textContent = 'Cambiar ícono';
+  }
+}
+// Sincronizar color del preview al cambiar el color de la carrera
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('car-color').addEventListener('input', function() {
+    var ic = document.getElementById('car-icono').value;
+    seleccionarIcono(ic || 'school');
+  });
+  seleccionarIcono('school');
+});
+
 // ── Carreras ────────────────────────────────────────────────────
 function abrirEditarCarrera(c) {
   document.getElementById('car-accion').value       = 'carrera_editar';
@@ -568,9 +742,22 @@ function abrirEditarCarrera(c) {
   var color = c.color || '#32129a';
   document.getElementById('car-color').value        = color;
   document.getElementById('car-color-hex').value    = color;
-  document.getElementById('car-descripcion').value  = c.descripcion || '';
-  document.getElementById('car-reticula').value     = c.reticula_url || '';
-  document.getElementById('car-imagen-url').value   = c.imagen_url || '';
+  document.getElementById('car-descripcion').value     = c.descripcion || '';
+  document.getElementById('car-objetivo').value         = c.objetivo_general || '';
+  document.getElementById('car-perfil').value           = c.perfil_profesional || '';
+  document.getElementById('car-objetivos-edu').value    = c.objetivos_educacionales || '';
+  document.getElementById('car-atributos').value        = c.atributos_egreso_texto || '';
+  document.getElementById('car-imagen-url').value       = c.imagen_url || '';
+  seleccionarIcono(c.icono || 'school');
+  // Retícula actual
+  var retWrap = document.getElementById('car-reticula-actual-wrap');
+  var retLink = document.getElementById('car-reticula-actual-link');
+  if (c.reticula_url) {
+    retLink.href = c.reticula_url;
+    retWrap.style.display = 'flex';
+  } else {
+    retWrap.style.display = 'none';
+  }
   // Mostrar imagen actual como preview
   var wrap = document.getElementById('car-imagen-preview-wrap');
   var prev = document.getElementById('car-imagen-preview');
@@ -586,7 +773,12 @@ function resetFormCarrera() {
   document.getElementById('form-carrera').reset();
   document.getElementById('car-color').value        = '#32129a';
   document.getElementById('car-color-hex').value    = '#32129a';
-  document.getElementById('car-reticula').value     = '';
+  document.getElementById('car-objetivo').value     = '';
+  document.getElementById('car-perfil').value       = '';
+  document.getElementById('car-objetivos-edu').value = '';
+  document.getElementById('car-atributos').value    = '';
+  seleccionarIcono('school');
+  document.getElementById('car-reticula-actual-wrap').style.display = 'none';
   document.getElementById('car-imagen-url').value   = '';
   document.getElementById('car-imagen-preview-wrap').style.display = 'none';
   document.getElementById('car-imagen-preview').src = '';
@@ -626,7 +818,12 @@ function resetFormCarrera() {
       .then(function (r) { return r.json(); })
       .then(function (json) {
         showToast(json.msg, json.ok ? 'ok' : 'error');
-        if (json.ok) setTimeout(function () { location.reload(); }, 900);
+        if (json.ok) setTimeout(function () {
+          // Guardar tab activo antes de recargar
+          var activeTab = document.querySelector('.adm-tab[data-tab-group="vis"].active');
+          if (activeTab) try { sessionStorage.setItem('adm_tab_vis', activeTab.dataset.tab); } catch(e) {}
+          location.reload();
+        }, 900);
       })
       .catch(function (err) { showToast('Error: ' + err.message, 'error'); })
       .finally(function () {
@@ -669,7 +866,8 @@ function filtrarDocentes(clave){
 function aplicarFiltroDoc(){
   const q = document.getElementById('doc-buscar').value.trim().toLowerCase();
   document.querySelectorAll('#doc-tbody tr[data-carrera]').forEach(tr=>{
-    const okC = !docClaveActiva || tr.dataset.carrera===docClaveActiva;
+    const claves = (tr.dataset.carrera||'').split(' ');
+    const okC = !docClaveActiva || claves.includes(docClaveActiva);
     const okQ = !q || (tr.dataset.search||'').includes(q);
     tr.style.display = (okC && okQ) ? '' : 'none';
   });
@@ -700,44 +898,72 @@ function addMateria(carreraId){
   div.querySelector('input').focus();
 }
 
+// ── Vista previa de foto ────────────────────────────────────────
+function previsualizarFoto(input, previewId) {
+  if (!input.files || !input.files[0]) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById(previewId).src = e.target.result;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+var _baseImg = (document.querySelector('meta[name="plataforma-url"]')?.content || '/plataforma')
+               + '/modulos/visitantes/imagenes/';
+var _placeholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Crect width='72' height='72' fill='%23e5e7eb' rx='36'/%3E%3C/svg%3E";
+
 // ── Directorio ─────────────────────────────────────────────────
 function abrirEditar(tipo, p){
-  document.getElementById('dir-accion').value = 'directorio_editar';
-  document.getElementById('dir-id').value     = p.id;
-  document.getElementById('dir-nombre').value  = p.nombre||'';
-  document.getElementById('dir-puesto').value  = p.puesto||'';
-  document.getElementById('dir-correo').value  = p.correo||'';
-  document.getElementById('dir-telefono').value  = p.telefono||'';
-  document.getElementById('dir-extension').value = p.extension||'';
-  document.getElementById('dir-ubicacion').value  = p.ubicacion_fisica||'';
-  document.getElementById('dir-foto').value       = p.foto||'';
+  document.getElementById('dir-accion').value        = 'directorio_editar';
+  document.getElementById('dir-id').value            = p.id;
+  document.getElementById('dir-nombre').value        = p.nombre||'';
+  document.getElementById('dir-puesto').value        = p.puesto||'';
+  document.getElementById('dir-correo').value        = p.correo||'';
+  document.getElementById('dir-telefono').value      = p.telefono||'';
+  document.getElementById('dir-extension').value     = p.extension||'';
+  document.getElementById('dir-ubicacion').value     = p.ubicacion_fisica||'';
+  document.getElementById('dir-foto-actual').value   = p.foto||'';
+  var preview = document.getElementById('dir-foto-preview');
+  preview.src = p.foto ? _baseImg + p.foto : _placeholder;
+  preview.onerror = function(){ this.src = _placeholder; };
   document.getElementById('form-dir-titulo').textContent = 'Editar: '+p.nombre;
   document.getElementById('form-dir-wrap').scrollIntoView({behavior:'smooth'});
 }
 function resetFormDir(){
-  document.getElementById('dir-accion').value='directorio_agregar';
-  document.getElementById('dir-id').value='';
+  document.getElementById('dir-accion').value = 'directorio_agregar';
+  document.getElementById('dir-id').value     = '';
+  document.getElementById('dir-foto-actual').value = '';
   document.getElementById('form-dir').reset();
-  document.getElementById('form-dir-titulo').textContent='Agregar persona al directorio';
+  document.getElementById('dir-foto-preview').src = _placeholder;
+  document.getElementById('form-dir-titulo').textContent = 'Agregar persona al directorio';
 }
 
 // ── Docentes ────────────────────────────────────────────────────
 function abrirEditarDoc(d){
-  document.getElementById('doc-accion').value  = 'docente_editar';
-  document.getElementById('doc-id').value      = d.id;
-  document.getElementById('doc-nombre').value  = d.nombre||'';
-  document.getElementById('doc-correo').value  = d.correo||'';
-  document.getElementById('doc-foto').value    = d.foto||'';
-  const sel = document.getElementById('doc-carrera');
-  for(let o of sel.options){ if(o.value==d.carrera_id){ o.selected=true; break; } }
+  document.getElementById('doc-accion').value      = 'docente_editar';
+  document.getElementById('doc-id').value          = d.id;
+  document.getElementById('doc-nombre').value      = d.nombre||'';
+  document.getElementById('doc-correo').value      = d.correo||'';
+  document.getElementById('doc-foto-actual').value = d.foto||'';
+  var preview = document.getElementById('doc-foto-preview');
+  preview.src = d.foto ? _baseImg + d.foto : _placeholder;
+  preview.onerror = function(){ this.src = _placeholder; };
+  // Marcar checkboxes según carreras actuales del docente
+  var ids = d.carrera_ids || [];
+  document.querySelectorAll('#doc-carreras-checks input[type="checkbox"]').forEach(function(cb){
+    cb.checked = ids.map(String).includes(cb.value);
+  });
   document.getElementById('form-doc-titulo').textContent='Editar: '+d.nombre;
   document.getElementById('form-doc').scrollIntoView({behavior:'smooth'});
 }
 function resetFormDoc(){
-  document.getElementById('doc-accion').value='docente_agregar';
-  document.getElementById('doc-id').value='';
+  document.getElementById('doc-accion').value      = 'docente_agregar';
+  document.getElementById('doc-id').value          = '';
+  document.getElementById('doc-foto-actual').value = '';
   document.getElementById('form-doc').reset();
-  document.getElementById('form-doc-titulo').textContent='Agregar docente';
+  document.getElementById('doc-foto-preview').src  = _placeholder;
+  document.querySelectorAll('#doc-carreras-checks input[type="checkbox"]').forEach(function(cb){ cb.checked = false; });
+  document.getElementById('form-doc-titulo').textContent = 'Agregar docente';
 }
 
 // ── Coordinadores ───────────────────────────────────────────────

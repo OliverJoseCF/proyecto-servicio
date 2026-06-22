@@ -16,7 +16,8 @@ if ($accion === 'libro_agregar') {
     try {
         $db->prepare('INSERT INTO libros (codigo,nombre,autor,editorial,categoria,ejemplares) VALUES (?,?,?,?,?,?)')
            ->execute([$codigo,$nombre,$autor,$editorial,$categoria,$ejemplares]);
-        jsonOk('Libro agregado', ['id' => $db->lastInsertId()]);
+        $newId = $db->lastInsertId();
+        jsonOk('Libro agregado', ['id' => $newId], "Libro agregado: [$codigo] $nombre (ID $newId)");
     } catch (\PDOException $e) {
         if ($e->getCode() === '23000') jsonErr('Ya existe un libro con ese código');
         throw $e;
@@ -34,7 +35,7 @@ if ($accion === 'libro_editar') {
     if (!$id || !$codigo || !$nombre) jsonErr('Datos incompletos');
     $db->prepare('UPDATE libros SET codigo=?,nombre=?,autor=?,editorial=?,categoria=?,ejemplares=? WHERE id=?')
        ->execute([$codigo,$nombre,$autor,$editorial,$categoria,$ejemplares,$id]);
-    jsonOk('Libro actualizado');
+    jsonOk('Libro actualizado', [], "Libro actualizado: [$codigo] $nombre (ID $id)");
 }
 
 if ($accion === 'libro_eliminar') {
@@ -43,17 +44,25 @@ if ($accion === 'libro_eliminar') {
     $stmt = $db->prepare('SELECT COUNT(*) FROM prestamos WHERE libro_id=? AND devuelto=0');
     $stmt->execute([$id]);
     if ((int)$stmt->fetchColumn() > 0) jsonErr('No se puede eliminar: el libro tiene préstamos activos. Espera a que sean devueltos.');
+    $sN = $db->prepare('SELECT codigo, nombre FROM libros WHERE id=?');
+    $sN->execute([$id]);
+    $lr = $sN->fetch();
+    $etiqueta = '[' . ($lr['codigo'] ?? '?') . '] ' . ($lr['nombre'] ?? '?');
     // Soft-delete: conserva el historial de préstamos
     $db->prepare('UPDATE libros SET activo=0 WHERE id=?')->execute([$id]);
-    jsonOk('Libro eliminado del catálogo');
+    jsonOk('Libro eliminado del catálogo', [], "Libro eliminado del catálogo: $etiqueta (ID $id)");
 }
 
 // ══ PRÉSTAMOS ════════════════════════════════════════════════════
 if ($accion === 'prestamo_devuelto') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
+    $sN = $db->prepare('SELECT p.estudiante_nombre, l.nombre libro FROM prestamos p JOIN libros l ON p.libro_id=l.id WHERE p.id=?');
+    $sN->execute([$id]);
+    $pr = $sN->fetch();
+    $etiqueta = ($pr['estudiante_nombre'] ?? '?') . ' — ' . ($pr['libro'] ?? '?');
     $db->prepare('UPDATE prestamos SET devuelto=1, fecha_devuelto=NOW() WHERE id=?')->execute([$id]);
-    jsonOk('Préstamo marcado como devuelto');
+    jsonOk('Préstamo marcado como devuelto', [], "Préstamo devuelto: $etiqueta (ID $id)");
 }
 
 if ($accion === 'prestamo_registrar') {
@@ -71,7 +80,8 @@ if ($accion === 'prestamo_registrar') {
     $db->prepare('INSERT INTO prestamos (libro_id,estudiante_nombre,estudiante_control,carrera,tipo,fecha_prestamo,fecha_devolucion)
                   VALUES (?,?,?,?,?,CURDATE(), DATE_ADD(CURDATE(), INTERVAL ' . $dias . ' DAY))')
        ->execute([$libroId, $nombre, $control, $carrera, $tipo]);
-    jsonOk('Préstamo registrado');
+    $newId = $db->lastInsertId();
+    jsonOk('Préstamo registrado', [], "Préstamo registrado: $nombre — [$codigo] ($dias días, ID $newId)");
 }
 
 // ══ CONTROLES / EQUIPOS AUDIOVISUALES ══════════════════════════
@@ -80,7 +90,8 @@ if ($accion === 'control_estado') {
     $estado = str('estado', 20);
     if (!$id || !in_array($estado, ['Pendiente', 'Aceptado', 'Rechazado'], true)) jsonErr('Datos inválidos');
     $db->prepare('UPDATE solicitud_controles SET estado=? WHERE id=?')->execute([$estado, $id]);
-    jsonOk('Solicitud marcada como ' . strtolower($estado));
+    jsonOk('Solicitud marcada como ' . strtolower($estado),
+        [], 'Control audiovisual — solicitud marcada como ' . strtolower($estado) . " (ID $id)");
 }
 
 // ══ SOLICITUDES ════════════════════════════════════════════════
@@ -104,7 +115,8 @@ if ($accion === 'solicitud_aprobar') {
            ->execute([$row['libro_id'],$row['estudiante_nombre'],$row['estudiante_control'],$row['carrera'],$row['tipo']]);
 
         $db->commit();
-        jsonOk('Solicitud aprobada y préstamo creado');
+        $est = $row['estudiante_nombre'] ?? '?';
+        jsonOk('Solicitud aprobada y préstamo creado', [], "Solicitud de biblioteca aprobada: $est (ID $id)");
     } catch (\Throwable $e) {
         $db->rollBack();
         throw $e;
@@ -114,9 +126,12 @@ if ($accion === 'solicitud_aprobar') {
 if ($accion === 'solicitud_rechazar') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
+    $sN = $db->prepare('SELECT estudiante_nombre FROM solicitudes_biblioteca WHERE id=?');
+    $sN->execute([$id]);
+    $est = $sN->fetchColumn() ?: '?';
     $db->prepare('UPDATE solicitudes_biblioteca SET estado="rechazada", updated_at=NOW() WHERE id=?')
        ->execute([$id]);
-    jsonOk('Solicitud rechazada');
+    jsonOk('Solicitud rechazada', [], "Solicitud de biblioteca rechazada: $est (ID $id)");
 }
 
 jsonErr('Acción desconocida');

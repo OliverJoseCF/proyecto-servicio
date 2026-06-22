@@ -31,13 +31,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email    = trim($_POST['email']    ?? '');
         $password = trim($_POST['password'] ?? '');
 
+        $autenticado = false;
+
+        // 1) Cuentas de administrador en la BD (tabla `admins`)
+        try {
+            $db   = getPDO(DB_NAME);
+            $stmt = $db->prepare('SELECT id, nombre, email, password_hash FROM admins WHERE email = ? AND activo = 1');
+            $stmt->execute([$email]);
+            $admin = $stmt->fetch();
+            if ($admin && password_verify($password, $admin['password_hash'])) {
+                $rl->reset($ip);
+                globalLogin('admin', (int)$admin['id'], $admin['nombre'], $admin['email']);
+                try { $db->prepare('UPDATE admins SET ultimo_acceso = NOW() WHERE id = ?')->execute([(int)$admin['id']]); } catch (\Throwable $e) {}
+                $autenticado = true;
+            }
+        } catch (\Throwable $e) {
+            // BD no disponible o tabla `admins` inexistente — se intenta la cuenta maestra.
+        }
+
+        // 2) Cuenta maestra de config.local.php (respaldo / primer arranque / BD caída)
         if (
-            $email    === GLOBAL_ADMIN_EMAIL
+            !$autenticado
+            && $email    === GLOBAL_ADMIN_EMAIL
             && GLOBAL_ADMIN_HASH !== ''
             && password_verify($password, GLOBAL_ADMIN_HASH)
         ) {
             $rl->reset($ip);
-            globalLogin('admin');
+            globalLogin('admin', 0, 'Administrador principal', GLOBAL_ADMIN_EMAIL);
+            $autenticado = true;
+        }
+
+        if ($autenticado) {
             $dest = $redirect ?: PLATAFORMA_URL . '/admin/';
             header('Location: ' . $dest);
             exit;

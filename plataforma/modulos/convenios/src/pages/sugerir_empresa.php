@@ -21,8 +21,10 @@ if ($rl->isBlocked($ip)) {
     exit();
 }
 
-// Validar CSRF
-if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+// Validar CSRF (soporta tanto _csrf como csrf_token para compatibilidad)
+$_csrf_recv = $_POST['_csrf'] ?? $_POST['csrf_token'] ?? '';
+$_csrf_sess = $_SESSION['_csrf'] ?? $_SESSION['csrf_token'] ?? '';
+if (empty($_csrf_recv) || !hash_equals($_csrf_sess, $_csrf_recv)) {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Petición inválida. Recarga la página e intenta de nuevo.']);
     exit();

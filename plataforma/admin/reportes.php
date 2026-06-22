@@ -51,10 +51,15 @@ try {
     )->fetchAll(PDO::FETCH_KEY_PAIR);
 
     // Bitácora — defensivo: la tabla puede no existir aún en BDs previas
+    $bitacoraModulos = [];
+    $bitacoraTotal   = 0;
+    $bitacoraLimite  = 200;
     try {
         $bitacora = $db->query(
-            'SELECT * FROM admin_log ORDER BY id DESC LIMIT 50'
+            'SELECT * FROM admin_log ORDER BY id DESC LIMIT ' . $bitacoraLimite
         )->fetchAll();
+        $bitacoraTotal   = (int)$db->query('SELECT COUNT(*) FROM admin_log')->fetchColumn();
+        $bitacoraModulos = $db->query('SELECT DISTINCT modulo FROM admin_log ORDER BY modulo')->fetchAll(PDO::FETCH_COLUMN);
     } catch (\PDOException $eLog) {
         $bitacora = [];
     }
@@ -232,13 +237,32 @@ require_once __DIR__ . '/_layout.php';
       </p>
     </div>
     <?php else: ?>
+
+    <!-- Filtros de bitácora -->
+    <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+      <input type="text" id="log-buscar" placeholder="Buscar por acción o detalle…" oninput="filtrarBitacora()"
+             style="flex:1;min-width:220px;max-width:420px;padding:9px 12px;border:1.5px solid var(--tsj-gray-200);border-radius:8px;font-size:13px;font-family:inherit">
+      <select id="log-modulo" onchange="filtrarBitacora()"
+              style="padding:9px 12px;border:1.5px solid var(--tsj-gray-200);border-radius:8px;font-size:13px;font-family:inherit;background:#fff">
+        <option value="">Todos los módulos</option>
+        <?php foreach ($bitacoraModulos as $mod): ?>
+        <option value="<?= htmlspecialchars($mod) ?>"><?= htmlspecialchars($mod) ?></option>
+        <?php endforeach; ?>
+      </select>
+      <span id="log-contador" style="font-size:12.5px;color:var(--tsj-gray-500);margin-left:auto"></span>
+    </div>
+
     <div class="adm-table-wrap">
       <table class="adm-table">
-        <thead><tr><th>Fecha y hora</th><th>Módulo</th><th>Acción</th><th>Detalle</th></tr></thead>
-        <tbody>
-          <?php foreach ($bitacora as $b): ?>
-          <tr>
+        <thead><tr><th>Fecha y hora</th><th>Realizó</th><th>Módulo</th><th>Acción</th><th>Detalle</th></tr></thead>
+        <tbody id="log-tbody">
+          <?php foreach ($bitacora as $b):
+            $autor = trim($b['admin_nombre'] ?? '');
+            if ($autor === '') $autor = 'Cuenta maestra'; ?>
+          <tr data-modulo="<?= htmlspecialchars($b['modulo']) ?>"
+              data-search="<?= htmlspecialchars(mb_strtolower($autor . ' ' . ($b['accion'] ?? '') . ' ' . ($b['detalle'] ?? ''))) ?>">
             <td style="white-space:nowrap;font-size:12.5px"><?= htmlspecialchars($b['created_at']) ?></td>
+            <td style="font-size:12.5px;font-weight:600;white-space:nowrap"><?= htmlspecialchars($autor) ?></td>
             <td><span class="adm-status adm-status--info"><?= htmlspecialchars($b['modulo']) ?></span></td>
             <td><code style="font-size:12px;background:var(--tsj-gray-100);padding:2px 6px;border-radius:4px"><?= htmlspecialchars($b['accion']) ?></code></td>
             <td style="font-size:12.5px;color:var(--tsj-gray-600)"><?= htmlspecialchars($b['detalle'] ?? '') ?></td>
@@ -247,6 +271,48 @@ require_once __DIR__ . '/_layout.php';
         </tbody>
       </table>
     </div>
+    <p style="font-size:12px;color:var(--tsj-gray-400);margin:8px 0 0">
+      <?php if ($bitacoraTotal > $bitacoraLimite): ?>
+        Mostrando las <?= $bitacoraLimite ?> acciones más recientes de <?= number_format($bitacoraTotal) ?> registradas.
+        Para el histórico completo usa la exportación.
+      <?php else: ?>
+        <?= number_format($bitacoraTotal) ?> acción<?= $bitacoraTotal == 1 ? '' : 'es' ?> registrada<?= $bitacoraTotal == 1 ? '' : 's' ?> en total.
+      <?php endif; ?>
+    </p>
+
+    <script>
+    function filtrarBitacora(){
+      var q   = document.getElementById('log-buscar').value.trim().toLowerCase();
+      var mod = document.getElementById('log-modulo').value;
+      var visibles = 0, total = 0;
+      document.querySelectorAll('#log-tbody tr[data-modulo]').forEach(function(tr){
+        total++;
+        var okM = !mod || tr.dataset.modulo === mod;
+        var okQ = !q   || (tr.dataset.search || '').indexOf(q) !== -1;
+        var show = okM && okQ;
+        tr.style.display = show ? '' : 'none';
+        if (show) visibles++;
+      });
+      var cont = document.getElementById('log-contador');
+      cont.textContent = (visibles === total)
+        ? (total + ' acciones')
+        : (visibles + ' de ' + total + ' acciones');
+      var tbody = document.getElementById('log-tbody');
+      var empty = document.getElementById('log-empty-row');
+      if (visibles === 0){
+        if (!empty){
+          empty = document.createElement('tr');
+          empty.id = 'log-empty-row';
+          empty.innerHTML = '<td colspan="5" class="adm-table-empty">No hay acciones que coincidan con el filtro.</td>';
+          tbody.appendChild(empty);
+        }
+        empty.style.display = '';
+      } else if (empty){
+        empty.style.display = 'none';
+      }
+    }
+    filtrarBitacora();
+    </script>
     <?php endif; ?>
   </div>
 

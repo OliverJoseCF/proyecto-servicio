@@ -79,11 +79,17 @@ $nav = [
     </nav>
 
     <div class="adm-sidebar-foot">
+      <?php
+        $_adm_nombre = function_exists('adminActualNombre') ? adminActualNombre() : 'Administrador';
+        $_adm_email  = function_exists('adminActualEmail')  ? adminActualEmail()  : '';
+        $_adm_inicial = mb_strtoupper(mb_substr($_adm_nombre, 0, 1));
+        $_adm_esMaestra = (function_exists('adminActualId') && adminActualId() === 0);
+      ?>
       <div class="adm-user-row">
-        <div class="adm-user-avatar">A</div>
+        <div class="adm-user-avatar"><?= htmlspecialchars($_adm_inicial, ENT_QUOTES, 'UTF-8') ?></div>
         <div>
-          <div class="adm-user-name">Administrador</div>
-          <div class="adm-user-role">Admin global</div>
+          <div class="adm-user-name"><?= htmlspecialchars($_adm_nombre, ENT_QUOTES, 'UTF-8') ?></div>
+          <div class="adm-user-role"><?= $_adm_esMaestra ? 'Cuenta maestra' : htmlspecialchars($_adm_email, ENT_QUOTES, 'UTF-8') ?></div>
         </div>
       </div>
       <form method="POST" action="<?= $base ?>/logout.php">

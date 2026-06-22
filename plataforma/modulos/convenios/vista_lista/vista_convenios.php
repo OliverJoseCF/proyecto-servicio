@@ -40,7 +40,7 @@ try {
     $where  = ['cv.activo = 1'];
     $params = [];
 
-    if ($carrera !== '') { $where[] = 'c.clave = ?';        $params[] = $carrera; }
+    if ($carrera !== '') { $where[] = '(c.clave = ? OR cv.carrera_id IS NULL)'; $params[] = $carrera; }
     if ($tipo    !== '') { $where[] = 'cv.tipo_convenio = ?'; $params[] = $tipo; }
     if ($sector  !== '') { $where[] = 'cv.sector = ?';       $params[] = $sector; }
 

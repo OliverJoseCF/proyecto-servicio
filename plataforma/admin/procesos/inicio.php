@@ -22,7 +22,8 @@ if ($accion === 'aviso_agregar') {
         $db->prepare('INSERT INTO avisos (titulo,descripcion,fecha) VALUES (?,?,?)')
            ->execute([$titulo, $desc, $fecha]);
     }
-    jsonOk('Aviso agregado', ['id' => $db->lastInsertId()]);
+    $newId = $db->lastInsertId();
+    jsonOk('Aviso agregado', ['id' => $newId], "Aviso agregado: $titulo (ID $newId)");
 }
 
 if ($accion === 'aviso_editar') {
@@ -41,14 +42,17 @@ if ($accion === 'aviso_editar') {
         $db->prepare('UPDATE avisos SET titulo=?,descripcion=?,fecha=? WHERE id=?')
            ->execute([$titulo, $desc, $fecha, $id]);
     }
-    jsonOk('Aviso actualizado');
+    jsonOk('Aviso actualizado', [], "Aviso actualizado: $titulo (ID $id)");
 }
 
 if ($accion === 'aviso_eliminar') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
+    $sN = $db->prepare('SELECT titulo FROM avisos WHERE id=?');
+    $sN->execute([$id]);
+    $titulo = $sN->fetchColumn() ?: '?';
     $db->prepare('DELETE FROM avisos WHERE id=?')->execute([$id]);
-    jsonOk('Aviso eliminado');
+    jsonOk('Aviso eliminado', [], "Aviso eliminado: $titulo (ID $id)");
 }
 
 if ($accion === 'aviso_toggle') {
@@ -56,10 +60,13 @@ if ($accion === 'aviso_toggle') {
     if (!$id) jsonErr('ID inválido');
     $stmt = $db->prepare('UPDATE avisos SET activo = 1 - activo WHERE id=?');
     $stmt->execute([$id]);
-    $s = $db->prepare('SELECT activo FROM avisos WHERE id=?');
+    $s = $db->prepare('SELECT titulo, activo FROM avisos WHERE id=?');
     $s->execute([$id]);
-    $activo = (int)$s->fetchColumn();
-    jsonOk($activo ? 'Aviso visible' : 'Aviso oculto', ['activo' => $activo]);
+    $row    = $s->fetch();
+    $activo = (int)($row['activo'] ?? 0);
+    $titulo = $row['titulo'] ?? '?';
+    jsonOk($activo ? 'Aviso visible' : 'Aviso oculto', ['activo' => $activo],
+        'Aviso ' . ($activo ? 'visible' : 'oculto') . ": $titulo (ID $id)");
 }
 
 // ══ FAQ GENERAL ══════════════════════════════════════════════════
@@ -82,7 +89,7 @@ if ($accion === 'faq_general_guardar') {
     foreach ($validas as $i => [$preg, $resp]) {
         $stmt->execute([$preg, $resp, $i + 1]);
     }
-    jsonOk('FAQ general guardada');
+    jsonOk('FAQ general guardada', [], 'FAQ general guardada: ' . count($validas) . ' pregunta(s)');
 }
 
 // ══ CARRUSEL ═════════════════════════════════════════════════════
@@ -133,7 +140,9 @@ if ($accion === 'carrusel_agregar') {
     $orden = (int)$db->query('SELECT COALESCE(MAX(orden),0)+1 FROM carrusel_fotos')->fetchColumn();
     $db->prepare('INSERT INTO carrusel_fotos (url,titulo,subtitulo,orden) VALUES (?,?,?,?)')
        ->execute([$url, $titulo, $subtitulo, $orden]);
-    jsonOk('Imagen agregada al carrusel', ['id' => $db->lastInsertId()]);
+    $newId = $db->lastInsertId();
+    jsonOk('Imagen agregada al carrusel', ['id' => $newId],
+        'Carrusel — imagen agregada: ' . ($titulo ?: 'sin título') . " (ID $newId)");
 }
 
 if ($accion === 'carrusel_editar') {
@@ -166,32 +175,37 @@ if ($accion === 'carrusel_editar') {
                ->execute([$titulo, $subtitulo, $id]);
         }
     }
-    jsonOk('Imagen actualizada');
+    jsonOk('Imagen actualizada', [], 'Carrusel — imagen actualizada: ' . ($titulo ?: 'sin título') . " (ID $id)");
 }
 
 if ($accion === 'carrusel_eliminar') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     // Borrar archivo local si existe
-    $row = $db->prepare('SELECT url FROM carrusel_fotos WHERE id=?');
+    $row = $db->prepare('SELECT url, titulo FROM carrusel_fotos WHERE id=?');
     $row->execute([$id]);
-    $url = $row->fetchColumn();
+    $cr  = $row->fetch();
+    $url = $cr['url'] ?? '';
+    $tit = $cr['titulo'] ?? '';
     if ($url && str_contains($url, '/carrusel/')) {
         $rutaLocal = dirname(__DIR__, 2) . '/shared/assets/img/carrusel/' . basename($url);
         if (file_exists($rutaLocal)) @unlink($rutaLocal);
     }
     $db->prepare('DELETE FROM carrusel_fotos WHERE id=?')->execute([$id]);
-    jsonOk('Imagen eliminada del carrusel');
+    jsonOk('Imagen eliminada del carrusel', [], 'Carrusel — imagen eliminada: ' . ($tit ?: 'sin título') . " (ID $id)");
 }
 
 if ($accion === 'carrusel_toggle') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('UPDATE carrusel_fotos SET activo = 1 - activo WHERE id=?')->execute([$id]);
-    $s = $db->prepare('SELECT activo FROM carrusel_fotos WHERE id=?');
+    $s = $db->prepare('SELECT titulo, activo FROM carrusel_fotos WHERE id=?');
     $s->execute([$id]);
-    $activo = (int)$s->fetchColumn();
-    jsonOk($activo ? 'Imagen visible' : 'Imagen oculta', ['activo' => $activo]);
+    $row    = $s->fetch();
+    $activo = (int)($row['activo'] ?? 0);
+    $tit    = $row['titulo'] ?? '';
+    jsonOk($activo ? 'Imagen visible' : 'Imagen oculta', ['activo' => $activo],
+        'Carrusel — imagen ' . ($activo ? 'visible' : 'oculta') . ': ' . ($tit ?: 'sin título') . " (ID $id)");
 }
 
 jsonErr('Acción desconocida');

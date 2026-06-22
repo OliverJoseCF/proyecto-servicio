@@ -13,11 +13,11 @@
 --    • Todas las tablas con su estructura completa
 --    • Datos iniciales de todos los módulos
 --
---  Tablas (21):
+--  Tablas (22):
 --    configuracion
 --    carrusel_fotos, avisos
 --    carreras
---    directorio, docentes, coordinadores, materias,
+--    directorio, docentes, docente_carrera, coordinadores, materias,
 --    secretarias, nuevo_ingreso_config
 --    libros, prestamos, solicitudes_biblioteca
 --    convenios, sugerencias_empresa
@@ -145,20 +145,24 @@ CREATE TABLE `carreras` (
   `clave`        VARCHAR(10)    NOT NULL UNIQUE,
   `nombre`       VARCHAR(150)   NOT NULL,
   `color`        VARCHAR(7)     NOT NULL DEFAULT '#32129a' COMMENT 'Color hex de la carrera (#rrggbb)',
-  `imagen_url`   VARCHAR(1000)  DEFAULT NULL COMMENT 'URL/ruta de la imagen de portada (card de convenios)',
-  `reticula_url` VARCHAR(1000)  DEFAULT NULL COMMENT 'URL del PDF/imagen del mapa curricular',
-  `activo`       TINYINT(1)     NOT NULL DEFAULT 1,
-  `orden`        SMALLINT       NOT NULL DEFAULT 0,
+  `icono`        VARCHAR(50)    NOT NULL DEFAULT 'school'  COMMENT 'Nombre del ícono de Material Symbols',
+  `imagen_url`              VARCHAR(1000)  DEFAULT NULL COMMENT 'URL/ruta de la imagen de portada (card de convenios)',
+  `reticula_url`            VARCHAR(1000)  DEFAULT NULL COMMENT 'URL del PDF/imagen del mapa curricular',
+  `objetivo_general`        TEXT           DEFAULT NULL,
+  `perfil_profesional`      TEXT           DEFAULT NULL,
+  `objetivos_educacionales` TEXT           DEFAULT NULL,
+  `activo`                  TINYINT(1)     NOT NULL DEFAULT 1,
+  `orden`                   SMALLINT       NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `carreras` (`clave`, `nombre`, `color`, `orden`) VALUES
-  ('ISC',   'Ingeniería en Sistemas Computacionales',             '#32129a', 1),
-  ('II',    'Ingeniería Industrial',                              '#b45309', 2),
-  ('IM',    'Ingeniería Mecatrónica',                             '#0369a1', 3),
-  ('IADEV', 'Ingeniería en Animación Digital y Efectos Visuales', '#7c3aed', 4),
-  ('IGE',   'Ingeniería en Gestión Empresarial',                  '#059669', 5),
-  ('LG',    'Gastronomía',                                        '#dc2626', 6);
+INSERT INTO `carreras` (`clave`, `nombre`, `color`, `icono`, `orden`) VALUES
+  ('ISC',   'Ingeniería en Sistemas Computacionales',             '#32129a', 'computer',                1),
+  ('II',    'Ingeniería Industrial',                              '#b45309', 'precision_manufacturing',  2),
+  ('IM',    'Ingeniería Mecatrónica',                             '#0369a1', 'settings_suggest',         3),
+  ('IADEV', 'Ingeniería en Animación Digital y Efectos Visuales', '#7c3aed', 'animation',                4),
+  ('IGE',   'Ingeniería en Gestión Empresarial',                  '#059669', 'business_center',          5),
+  ('LG',    'Gastronomía',                                        '#dc2626', 'restaurant',               6);
 
 
 -- ================================================================
@@ -191,66 +195,66 @@ INSERT INTO `directorio` (`nombre`, `puesto`, `correo`, `foto`, `orden`) VALUES
   ('José Guadalupe Gamas Gamas',         'Sistemas Computacionales', 'jose.gamas@chapala.tecmm.edu.mx',         'gamas.png',  6);
 
 
--- 4.2 Docentes por carrera
+-- 4.2 Docentes (sin carrera fija — la relación vive en docente_carrera)
 CREATE TABLE `docentes` (
-  `id`         INT UNSIGNED  NOT NULL AUTO_INCREMENT,
-  `nombre`     VARCHAR(150)  NOT NULL,
-  `correo`     VARCHAR(254),
-  `carrera_id` INT UNSIGNED,
-  `foto`       VARCHAR(500)  COMMENT 'Nombre de archivo en /modulos/visitantes/imagenes/',
-  `activo`     TINYINT(1)    NOT NULL DEFAULT 1,
-  `orden`      SMALLINT      NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`carrera_id`) REFERENCES `carreras`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  `id`     INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(150)  NOT NULL,
+  `correo` VARCHAR(254),
+  `foto`   VARCHAR(500)  COMMENT 'Nombre de archivo en /modulos/visitantes/imagenes/',
+  `activo` TINYINT(1)    NOT NULL DEFAULT 1,
+  `orden`  SMALLINT      NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ISC (id=1)
-INSERT INTO `docentes` (`nombre`, `correo`, `carrera_id`, `foto`, `orden`) VALUES
-  ('Miguel Ángel Delgado López',        'miguel.delgado@chapala.tecmm.edu.mx',    1, 'miguel.png', 1),
-  ('Alberto Chavolla',                   NULL,                                     1, NULL,         2),
-  ('Francisco Javier González Siordia', 'francisco.gonzales@chapala.tecmm.edu.mx', 1, NULL,         3),
-  ('Julio César Chávez Novoa',           'julio.chavez@chapala.tecmm.edu.mx',      1, 'julio.png',  4),
-  ('Edgar Martínez',                     NULL,                                     1, NULL,         5),
-  ('José Jorge Hernández Ochoa',         'jorge.hernandez@chapala.tecmm.edu.mx',   1, 'jorge.png',  6),
-  ('Carmen Leticia Salcedo Quevedo',     'carmen.salcedo@chapala.tecmm.edu.mx',    1, 'carmen.png', 7),
-  ('José Guadalupe Gamas Gamas',         'jose.gamas@chapala.tecmm.edu.mx',        1, 'gamas.png',  8);
+-- Docentes deduplicados (un registro por persona real)
+INSERT INTO `docentes` (`id`, `nombre`, `correo`, `foto`, `orden`) VALUES
+  ( 1, 'Miguel Ángel Delgado López',        'miguel.delgado@chapala.tecmm.edu.mx',     'miguel.png', 1),
+  ( 2, 'Alberto Chavolla',                   NULL,                                       NULL,         2),
+  ( 3, 'Francisco Javier González Siordia', 'francisco.gonzales@chapala.tecmm.edu.mx',  NULL,         3),
+  ( 4, 'Julio César Chávez Novoa',           'julio.chavez@chapala.tecmm.edu.mx',        'julio.png',  4),
+  ( 5, 'Edgar Martínez',                     NULL,                                       NULL,         5),
+  ( 6, 'José Jorge Hernández Ochoa',         'jorge.hernandez@chapala.tecmm.edu.mx',     'jorge.png',  6),
+  ( 7, 'Carmen Leticia Salcedo Quevedo',     'carmen.salcedo@chapala.tecmm.edu.mx',      'carmen.png', 7),
+  ( 8, 'José Guadalupe Gamas Gamas',         'jose.gamas@chapala.tecmm.edu.mx',          'gamas.png',  8),
+  ( 9, 'Francisco Pocholo',                  NULL,                                       NULL,         9),
+  (10, 'María Gómez',                        NULL,                                       NULL,        10),
+  (11, 'Rodolfo Rojas',                      NULL,                                       NULL,        11),
+  (12, 'José Hernández',                     NULL,                                       NULL,        12),
+  (13, 'Juan Desales',                       NULL,                                       NULL,        13),
+  (14, 'Francisco Luis Juan',                NULL,                                       NULL,        14),
+  (15, 'Carlos Ramírez',                     NULL,                                       NULL,        15),
+  (16, 'Fidel Rodríguez',                    NULL,                                       NULL,        16),
+  (17, 'Alma González',                      NULL,                                       NULL,        17),
+  (18, 'José Aguilera',                      NULL,                                       NULL,        18),
+  (19, 'María Estrada',                      NULL,                                       NULL,        19),
+  (20, 'Lina Corona',                        NULL,                                       NULL,        20),
+  (21, 'Jessica Álvarez',                    NULL,                                       NULL,        21),
+  (22, 'Jaime Sánchez',                      NULL,                                       NULL,        22),
+  (23, 'Yessica Regalado',                   NULL,                                       NULL,        23),
+  (24, 'Mayra Hinojoza',                     NULL,                                       NULL,        24);
 
--- II (id=2)
-INSERT INTO `docentes` (`nombre`, `correo`, `carrera_id`, `foto`, `orden`) VALUES
-  ('Miguel Ángel Delgado', NULL, 2, NULL, 1),
-  ('Alberto Chavolla',      NULL, 2, NULL, 2),
-  ('Francisco Pocholo',     NULL, 2, NULL, 3),
-  ('Julio César Chávez',    NULL, 2, NULL, 4),
-  ('Francisco Javier',      NULL, 2, NULL, 5),
-  ('Edgar Martínez',        NULL, 2, NULL, 6),
-  ('José Jorge Hernández',  NULL, 2, NULL, 7);
+-- 4.3 Relación muchos-a-muchos: docente ↔ carrera
+CREATE TABLE `docente_carrera` (
+  `docente_id` INT UNSIGNED NOT NULL,
+  `carrera_id` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`docente_id`, `carrera_id`),
+  FOREIGN KEY (`docente_id`) REFERENCES `docentes`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`carrera_id`) REFERENCES `carreras`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- IM (id=3)
-INSERT INTO `docentes` (`nombre`, `correo`, `carrera_id`, `foto`, `orden`) VALUES
-  ('Miguel Ángel Delgado', NULL, 3, NULL, 1),
-  ('María Gómez',           NULL, 3, NULL, 2),
-  ('Rodolfo Rojas',         NULL, 3, NULL, 3),
-  ('José Hernández',        NULL, 3, NULL, 4),
-  ('Juan Desales',          NULL, 3, NULL, 5),
-  ('José Gamas',            NULL, 3, NULL, 6);
-
--- IADEV (id=4)
-INSERT INTO `docentes` (`nombre`, `correo`, `carrera_id`, `foto`, `orden`) VALUES
-  ('Miguel Delgado',      NULL, 4, NULL, 1),
-  ('María Gómez',         NULL, 4, NULL, 2),
-  ('Rodolfo Rojas',       NULL, 4, NULL, 3),
-  ('Francisco Luis Juan', NULL, 4, NULL, 4),
-  ('Julio Chávez',        NULL, 4, NULL, 5),
-  ('José Gamas',          NULL, 4, NULL, 6);
-
--- IGE (id=5)
-INSERT INTO `docentes` (`nombre`, `correo`, `carrera_id`, `foto`, `orden`) VALUES
-  ('Carlos Ramírez',  NULL, 5, NULL, 1),
-  ('Fidel Rodríguez', NULL, 5, NULL, 2),
-  ('Alberto Chavoya', NULL, 5, NULL, 3),
-  ('Alma González',   NULL, 5, NULL, 4),
-  ('José Aguilera',   NULL, 5, NULL, 5),
-  ('María Estrada',   NULL, 5, NULL, 6);
+-- Asignaciones por carrera
+-- ISC (carrera id=1): Delgado, Chavolla, FJ González, JC Chávez, E.Martínez, J.Jorge, Carmen, Gamas
+INSERT INTO `docente_carrera` VALUES (1,1),(2,1),(3,1),(4,1),(5,1),(6,1),(7,1),(8,1);
+-- II  (carrera id=2): Delgado, Chavolla, Pocholo, JC Chávez, FJ González, E.Martínez, J.Jorge
+INSERT INTO `docente_carrera` VALUES (1,2),(2,2),(9,2),(4,2),(3,2),(5,2),(6,2);
+-- IM  (carrera id=3): Delgado, M.Gómez, R.Rojas, J.Hernández, Desales, Gamas
+INSERT INTO `docente_carrera` VALUES (1,3),(10,3),(11,3),(12,3),(13,3),(8,3);
+-- IADEV (carrera id=4): Delgado, M.Gómez, R.Rojas, FLJuan, JC Chávez, Gamas
+INSERT INTO `docente_carrera` VALUES (1,4),(10,4),(11,4),(14,4),(4,4),(8,4);
+-- IGE (carrera id=5): C.Ramírez, F.Rodríguez, Chavolla, A.González, J.Aguilera, M.Estrada
+INSERT INTO `docente_carrera` VALUES (15,5),(16,5),(2,5),(17,5),(18,5),(19,5);
+-- LG  (carrera id=6): L.Corona, J.Álvarez, J.Sánchez, C.Ramírez, Y.Regalado, M.Hinojoza
+INSERT INTO `docente_carrera` VALUES (20,6),(21,6),(22,6),(15,6),(23,6),(24,6);
 
 
 -- 4.3 Coordinadores por carrera
@@ -331,6 +335,18 @@ INSERT INTO `materias` (`carrera_id`, `nombre`, `orden`) VALUES
   (6,'Nutrición y Dietética',            5),(6,'Enología y Bebidas',              6),
   (6,'Gestión de Alimentos y Bebidas',   7),(6,'Cocina Molecular',                8),
   (6,'Arte Culinario y Presentación',    9),(6,'Costos y Presupuestos en Cocina', 10);
+
+
+-- 4.4b Atributos de egreso por carrera
+CREATE TABLE `atributos_egreso` (
+  `id`         INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+  `carrera_id` INT UNSIGNED  NOT NULL,
+  `texto`      VARCHAR(500)  NOT NULL,
+  `orden`      SMALLINT      NOT NULL DEFAULT 0,
+  `activo`     TINYINT(1)    NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`carrera_id`) REFERENCES `carreras`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 -- 4.5 Personal administrativo (secretarías)
@@ -650,13 +666,35 @@ INSERT INTO `faq` (`tipo`, `pregunta`, `respuesta`, `orden`) VALUES
 -- DROP TABLE IF EXISTS `redes_sociales`;
 
 CREATE TABLE `admin_log` (
-  `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `modulo`     VARCHAR(50)  NOT NULL COMMENT 'Proceso admin que ejecutó la acción (biblioteca, convenios, …)',
-  `accion`     VARCHAR(50)  NOT NULL,
-  `detalle`    VARCHAR(500),
-  `created_at` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `id`           INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `modulo`       VARCHAR(50)  NOT NULL COMMENT 'Proceso admin que ejecutó la acción (biblioteca, convenios, …)',
+  `accion`       VARCHAR(50)  NOT NULL,
+  `detalle`      VARCHAR(500),
+  `admin_id`     INT UNSIGNED NULL COMMENT 'ID del admin que ejecutó la acción (NULL = cuenta maestra)',
+  `admin_nombre` VARCHAR(150) NULL COMMENT 'Nombre del admin al momento de la acción',
+  `created_at`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_admin_log_fecha` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ================================================================
+-- 10. CUENTAS DE ADMINISTRADOR (multi-usuario)
+-- ================================================================
+-- Cada persona con acceso al panel tiene su propia cuenta. La cuenta
+-- "maestra" definida en shared/config.local.php (GLOBAL_ADMIN_EMAIL/HASH)
+-- siempre funciona como respaldo aunque esta tabla esté vacía o la BD falle.
+
+CREATE TABLE `admins` (
+  `id`            INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `nombre`        VARCHAR(150) NOT NULL,
+  `email`         VARCHAR(254) NOT NULL,
+  `password_hash` VARCHAR(255) NOT NULL,
+  `activo`        TINYINT(1)   NOT NULL DEFAULT 1,
+  `ultimo_acceso` TIMESTAMP    NULL DEFAULT NULL,
+  `created_at`    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_admins_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -675,9 +713,12 @@ CREATE INDEX `idx_solicitudes_estado`       ON `solicitudes_biblioteca` (`estado
 
 CREATE VIEW `v_docentes` AS
   SELECT d.id, d.nombre, d.correo, d.foto, d.activo, d.orden,
-         c.id AS carrera_id, c.clave AS carrera_clave, c.nombre AS carrera_nombre
+         GROUP_CONCAT(c.clave  ORDER BY c.orden SEPARATOR ', ')  AS carreras_claves,
+         GROUP_CONCAT(c.nombre ORDER BY c.orden SEPARATOR ' | ') AS carreras_nombres
   FROM `docentes` d
-  LEFT JOIN `carreras` c ON d.carrera_id = c.id;
+  LEFT JOIN `docente_carrera` dc ON dc.docente_id = d.id
+  LEFT JOIN `carreras` c ON c.id = dc.carrera_id
+  GROUP BY d.id;
 
 CREATE VIEW `v_convenios` AS
   SELECT cv.id, cv.nombre, cv.tipo_convenio, cv.sector,

@@ -92,11 +92,11 @@ $horario    = $cfg['horario_atencion'] ?? 'Lun – Vie: 8:00 – 20:00 h';
           <span class="material-symbols-rounded" style="font-size:18px">open_in_new</span>
           Abrir en Google Maps
         </a>
-        <a href="index.php"
+        <a href="<?= PLATAFORMA_URL ?>/modulos/visitantes/Directorio.php"
            style="display:inline-flex;align-items:center;gap:8px;color:var(--tsj-blue);font-size:13px;font-weight:600;text-decoration:none;padding:10px 20px;border:1.5px solid #e8eaf2;border-radius:9px;background:#fff;font-family:var(--tsj-font,'Poppins',sans-serif);transition:border-color .2s"
            onmouseover="this.style.borderColor='#33179c'"
            onmouseout="this.style.borderColor='#e8eaf2'">
-          ← Volver
+          ← Volver al Directorio
         </a>
       </div>
 

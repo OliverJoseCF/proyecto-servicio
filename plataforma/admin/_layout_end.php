@@ -31,7 +31,27 @@ function showTab(group, tab) {
   var panel = document.querySelector('.adm-tab-panel[data-tab-group="' + group + '"][data-tab="' + tab + '"]');
   if (btn)   btn.classList.add('active');
   if (panel) panel.classList.add('active');
+  // Guardar tab activo para restaurarlo tras un reload
+  try { sessionStorage.setItem('adm_tab_' + group, tab); } catch(e) {}
 }
+
+// Al cargar, restaurar tabs guardados en sessionStorage
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.adm-tab[data-tab-group]').forEach(function(btn) {
+    var group = btn.dataset.tabGroup;
+    var saved = sessionStorage.getItem('adm_tab_' + group);
+    if (saved) {
+      var savedBtn   = document.querySelector('.adm-tab[data-tab-group="' + group + '"][data-tab="' + saved + '"]');
+      var savedPanel = document.querySelector('.adm-tab-panel[data-tab-group="' + group + '"][data-tab="' + saved + '"]');
+      if (savedBtn && savedPanel) {
+        document.querySelectorAll('.adm-tab[data-tab-group="' + group + '"]').forEach(function(el){ el.classList.remove('active'); });
+        document.querySelectorAll('.adm-tab-panel[data-tab-group="' + group + '"]').forEach(function(el){ el.classList.remove('active'); });
+        savedBtn.classList.add('active');
+        savedPanel.classList.add('active');
+      }
+    }
+  });
+});
 
 /* ── Toast ── */
 function showToast(msg, tipo) {
@@ -86,7 +106,12 @@ document.addEventListener('submit', function(e) {
       .then(function(r){ return r.json(); })
       .then(function(json){
         showToast(json.msg, json.ok ? 'ok' : 'error');
-        if (json.ok) setTimeout(function(){ location.reload(); }, 1200);
+        if (json.ok) setTimeout(function(){
+          document.querySelectorAll('.adm-tab.active[data-tab-group]').forEach(function(t) {
+            try { sessionStorage.setItem('adm_tab_' + t.dataset.tabGroup, t.dataset.tab); } catch(e) {}
+          });
+          location.reload();
+        }, 1200);
       })
       .catch(function(err){ showToast('Error: ' + err.message, 'error'); })
       .finally(function(){ if (btn) { btn.disabled = false; btn.textContent = 'Guardar'; } });
@@ -104,11 +129,29 @@ document.addEventListener('submit', function(e) {
     if (json.ok) {
       // Si el form tiene data-reload, recargar la página
       if (form.dataset.reload !== undefined) {
-        setTimeout(function(){ location.reload(); }, 900);
+        setTimeout(function(){
+          // Guardar todos los tabs activos antes de recargar
+          document.querySelectorAll('.adm-tab.active[data-tab-group]').forEach(function(t) {
+            try { sessionStorage.setItem('adm_tab_' + t.dataset.tabGroup, t.dataset.tab); } catch(e) {}
+          });
+          location.reload();
+        }, 900);
       }
     }
     if (btn) btn.disabled = false;
   });
+});
+
+/* ── Filtro en vivo para teléfonos: solo dígitos, +, -, espacios y () ── */
+document.addEventListener('input', function (e) {
+  if (e.target.matches('input[type="tel"]')) {
+    var limpio = e.target.value.replace(/[^0-9+\-\s()]/g, '');
+    if (limpio !== e.target.value) {
+      var pos = e.target.selectionStart - 1;
+      e.target.value = limpio;
+      try { e.target.setSelectionRange(pos, pos); } catch (err) {}
+    }
+  }
 });
 
 /* ── Confirmar eliminación ── */

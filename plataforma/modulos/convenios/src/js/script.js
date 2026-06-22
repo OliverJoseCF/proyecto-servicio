@@ -140,7 +140,8 @@ document.addEventListener('DOMContentLoaded', function () {
         suggestFormError.textContent   = '';
       }
 
-      fetch('src/pages/sugerir_empresa.php', {
+      var _base = (document.querySelector('meta[name="plataforma-url"]')?.content || '/plataforma');
+      fetch(_base + '/modulos/convenios/src/pages/sugerir_empresa.php', {
         method: 'POST',
         body: new FormData(suggestForm)
       })

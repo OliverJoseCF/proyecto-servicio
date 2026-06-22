@@ -2,6 +2,15 @@
 $tsj_module     = 'visitantes';
 $tsj_title      = 'Portal Institucional — TSJ Campus Chapala';
 $tsj_extra_css  = ['style.css'];
+
+require_once __DIR__ . '/../../shared/config.php';
+try {
+    $db = getPDO(DB_NAME);
+    $carrerasMenu = $db->query('SELECT clave, nombre FROM carreras WHERE activo=1 ORDER BY orden')->fetchAll();
+} catch (\Throwable $e) {
+    $carrerasMenu = [];
+}
+
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 
@@ -27,12 +36,11 @@ require_once __DIR__ . '/../../shared/header.php';
     <!-- ── Planes de estudio ─────────────────────────────── -->
     <h2 class="menu-section-label">Planes de Estudio</h2>
     <nav class="menu menu--carreras" aria-label="Planes de estudio por carrera">
-      <a href="MateriasSistemas.php">Ing. en Sistemas Computacionales</a>
-      <a href="MateriasIndustrial.php">Ing. Industrial</a>
-      <a href="MateriasMecatronica.php">Ing. Mecatrónica</a>
-      <a href="MateriasAnimacion.php">Ing. en Animación Digital y Efectos Visuales</a>
-      <a href="MateriasGestion.php">Ing. en Gestión Empresarial</a>
-      <a href="GastronomiaMaterias.php">Gastronomía</a>
+      <?php foreach ($carrerasMenu as $c): ?>
+      <a href="materias.php?carrera=<?= urlencode($c['clave']) ?>">
+        <?= htmlspecialchars($c['nombre']) ?>
+      </a>
+      <?php endforeach; ?>
     </nav>
 
   </div>

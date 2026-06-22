@@ -19,7 +19,16 @@ html {
   font-family: 'Poppins', 'Arial', sans-serif;
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
+  /* Reserva SIEMPRE el espacio de la barra de scroll: evita que el contenido
+     centrado "salte" horizontalmente al pasar de páginas con scroll a páginas
+     sin scroll (lo que se percibía como un reacomodo en cada navegación). */
+  scrollbar-gutter: stable;
 }
+
+/* Transición suave entre páginas (navegación multipágina). Convierte el
+   "flash" de recarga en un crossfade. Progresivo: navegadores sin soporte
+   simplemente navegan como siempre, sin efectos secundarios. */
+@view-transition { navigation: auto; }
 body {
   margin: 0;
   padding: 0;
@@ -762,14 +771,22 @@ body {
   border-color: var(--tsj-pink);
   transform: translateY(-3px);
 }
-.tsj-footer-social img {
+.tsj-footer-social img,
+.tsj-footer-social svg {
   width: 18px;
   height: 18px;
-  filter: brightness(0) invert(1);
-  opacity: .8;
   display: block;
+  opacity: .8;
+  flex-shrink: 0;
 }
-.tsj-footer-social a:hover img { opacity: 1; }
+.tsj-footer-social img {
+  filter: brightness(0) invert(1);
+}
+.tsj-footer-social svg {
+  color: rgba(255,255,255,.85);
+}
+.tsj-footer-social a:hover img,
+.tsj-footer-social a:hover svg { opacity: 1; color: #fff; }
 .tsj-footer-social a:focus-visible {
   outline: 2px solid var(--tsj-pink);
   outline-offset: 2px;

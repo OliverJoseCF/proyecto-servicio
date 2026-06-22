@@ -4,88 +4,6 @@ require_once __DIR__ . '/_helper.php';
 $accion = str('accion', 30);
 $db     = db();
 
-// ══ PROFESORES ══════════════════════════════════════════════════
-if ($accion === 'profesor_agregar') {
-    $nombre   = str('nombre', 100);
-    $apellido = str('apellido', 100);
-    $correo   = str('correo', 254);
-    $foto     = str('foto', 500);
-    if (!$nombre || !$apellido) jsonErr('Nombre y apellido son requeridos');
-
-    $db->prepare('INSERT INTO profesores (nombre,apellido,correo,foto) VALUES (?,?,?,?)')
-       ->execute([$nombre, $apellido, $correo, $foto ?: null]);
-    $nuevoId = $db->lastInsertId();
-
-    // Si se marcó "agregar al directorio", crear registro en directorio también
-    if (!empty($_POST['agregar_directorio'])) {
-        $nombreCompleto = trim($nombre . ' ' . $apellido);
-        $puesto         = str('dir_puesto',    150);
-        $ubicacion      = str('dir_ubicacion', 200);
-        $telefono       = str('dir_telefono',  30) ?: 'S/N';
-        $extension      = str('dir_extension', 20);
-        $db->prepare(
-            'INSERT INTO directorio (nombre, puesto, correo, telefono, extension, ubicacion_fisica, foto)
-             VALUES (?, ?, ?, ?, ?, ?, ?)'
-        )->execute([
-            $nombreCompleto,
-            $puesto   ?: null,
-            $correo   ?: null,
-            $telefono,
-            $extension ?: null,
-            $ubicacion ?: null,
-            $foto      ?: null,
-        ]);
-        jsonOk('Maestro agregado y añadido al Directorio institucional', ['id' => $nuevoId]);
-    }
-
-    jsonOk('Profesor agregado', ['id' => $nuevoId]);
-}
-
-if ($accion === 'profesor_editar') {
-    $id       = postInt('id');
-    $nombre   = str('nombre', 100);
-    $apellido = str('apellido', 100);
-    $correo   = str('correo', 254);
-    $foto     = str('foto', 500);
-    if (!$id || !$nombre || !$apellido) jsonErr('Datos incompletos');
-    $db->prepare('UPDATE profesores SET nombre=?,apellido=?,correo=?,foto=? WHERE id_profesor=?')
-       ->execute([$nombre, $apellido, $correo, $foto ?: null, $id]);
-
-    // Sincronizar en directorio si ya existe un registro con ese mismo nombre+correo
-    if ($correo) {
-        $existe = $db->prepare('SELECT id FROM directorio WHERE correo=? LIMIT 1');
-        $existe->execute([$correo]);
-        $dirId = $existe->fetchColumn();
-        if ($dirId) {
-            $db->prepare('UPDATE directorio SET nombre=?, correo=?, foto=? WHERE id=?')
-               ->execute([trim($nombre . ' ' . $apellido), $correo, $foto ?: null, $dirId]);
-        }
-    }
-
-    jsonOk('Profesor actualizado');
-}
-
-if ($accion === 'profesor_toggle') {
-    $id = postInt('id');
-    if (!$id) jsonErr('ID inválido');
-    $db->prepare('UPDATE profesores SET activo = 1 - activo WHERE id_profesor=?')->execute([$id]);
-    $stmtActivo = $db->prepare('SELECT activo FROM profesores WHERE id_profesor=?');
-    $stmtActivo->execute([$id]);
-    $activo = (int)$stmtActivo->fetchColumn();
-    jsonOk($activo ? 'Maestro activado' : 'Maestro desactivado', ['activo' => $activo]);
-}
-
-if ($accion === 'profesor_eliminar') {
-    $id = postInt('id');
-    if (!$id) jsonErr('ID inválido');
-    $count = $db->prepare('SELECT COUNT(*) FROM horarios WHERE id_profesor=?');
-    $count->execute([$id]);
-    if ((int)$count->fetchColumn() > 0)
-        jsonErr('El maestro tiene horarios registrados. Elimina sus horarios primero.');
-    $db->prepare('DELETE FROM profesores WHERE id_profesor=?')->execute([$id]);
-    jsonOk('Profesor eliminado');
-}
-
 // ══ HORARIOS ════════════════════════════════════════════════════
 if ($accion === 'horario_guardar') {
     $profesor_id = postInt('profesor_id');
@@ -93,6 +11,11 @@ if ($accion === 'horario_guardar') {
     $semestre    = str('semestre', 10);
     $imagen      = null; // se asigna solo si hay upload
     if (!$profesor_id) jsonErr('Selecciona un profesor');
+
+    // Nombre del profesor para la bitácora
+    $pN = $db->prepare('SELECT nombre FROM docentes WHERE id=?');
+    $pN->execute([$profesor_id]);
+    $profNombre = $pN->fetchColumn() ?: ('ID ' . $profesor_id);
 
     $dir    = dirname(__DIR__, 2) . '/modulos/horarios/horarios/';
     $urlBase = PLATAFORMA_URL . '/modulos/horarios/horarios/';
@@ -132,20 +55,24 @@ if ($accion === 'horario_guardar') {
         $imagenFinal = $imagen ?? $row['imagen_horario'];
         $db->prepare('UPDATE horarios SET semestre=?,imagen_horario=?,updated_at=NOW() WHERE id_horario=?')
            ->execute([$semestre, $imagenFinal, $row['id_horario']]);
-        jsonOk('Horario actualizado');
+        jsonOk('Horario actualizado', [], "Horario actualizado: $profNombre (ID {$row['id_horario']})");
     } else {
         $db->prepare('INSERT INTO horarios (id_profesor,id_carrera,semestre,imagen_horario) VALUES (?,?,?,?)')
            ->execute([$profesor_id, $carrera_id ?: null, $semestre, $imagen]);
-        jsonOk('Horario guardado', ['id' => $db->lastInsertId()]);
+        $newId = $db->lastInsertId();
+        jsonOk('Horario guardado', ['id' => $newId], "Horario guardado: $profNombre (ID $newId)");
     }
 }
 
 if ($accion === 'horario_eliminar') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
-    $row = $db->prepare('SELECT imagen_horario FROM horarios WHERE id_horario=?');
+    $row = $db->prepare('SELECT h.imagen_horario, d.nombre profesor
+                         FROM horarios h LEFT JOIN docentes d ON h.id_profesor=d.id
+                         WHERE h.id_horario=?');
     $row->execute([$id]);
     $h = $row->fetch();
+    $profNombre = $h['profesor'] ?? '?';
     $db->prepare('DELETE FROM horarios WHERE id_horario=?')->execute([$id]);
     // Borrar archivo del disco si existe
     if ($h && $h['imagen_horario']) {
@@ -153,7 +80,7 @@ if ($accion === 'horario_eliminar') {
         $file = $dir . basename($h['imagen_horario']);
         if (file_exists($file)) @unlink($file);
     }
-    jsonOk('Horario eliminado');
+    jsonOk('Horario eliminado', [], "Horario eliminado: $profNombre (ID $id)");
 }
 
 jsonErr('Acción desconocida');

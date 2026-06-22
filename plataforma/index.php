@@ -38,6 +38,15 @@ try {
     $db_ok    = false;
 }
 
+// Datos del portal para el hero fallback (config_data cargado vía header)
+if (!function_exists('tsjConfig')) {
+    require_once __DIR__ . '/shared/lib/config_data.php';
+}
+$_hero_institu = tsjConfig('nombre_institucion', 'Tecnológico Superior de Jalisco');
+$_hero_campus  = tsjConfig('campus',             'Campus Chapala');
+$_hero_desc    = tsjConfig('descripcion_portal',
+    'Accede a los módulos y recursos académicos del Campus Chapala desde un solo lugar.');
+
 $tsj_head_extra = '<style>
 body { background: #f0f2f7; font-family: var(--tsj-font); }
 
@@ -312,8 +321,8 @@ require_once __DIR__ . '/shared/header.php';
   <!-- ── Hero (sin carrusel) ──────────────────────────────── -->
   <section class="portal-hero" aria-label="Bienvenida">
     <p class="portal-hero-label" aria-hidden="true">Sistema de Servicios Institucionales</p>
-    <h1>Tecnológico Superior<br><span>de Jalisco</span></h1>
-    <p>Accede a los módulos y recursos académicos del Campus Chapala desde un solo lugar.</p>
+    <h1><?= htmlspecialchars($_hero_institu, ENT_QUOTES, 'UTF-8') ?></h1>
+    <p><?= htmlspecialchars($_hero_desc, ENT_QUOTES, 'UTF-8') ?></p>
     <div class="portal-hero-wave" aria-hidden="true"></div>
   </section>
 <?php endif; ?>

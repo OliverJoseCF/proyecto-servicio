@@ -110,7 +110,7 @@ require_once __DIR__ . '/_layout.php';
 
   <div class="adm-form-card" style="margin-top:20px">
     <div class="adm-form-title"><span class="material-symbols-rounded">handshake</span> <span id="form-conv-titulo">Agregar convenio</span></div>
-    <form data-proc="convenios" data-reload id="form-conv">
+    <form data-proc="convenios" data-reload id="form-conv" enctype="multipart/form-data">
       <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="convenio_agregar" id="conv-accion">
       <input type="hidden" name="id" id="conv-id">
@@ -142,9 +142,18 @@ require_once __DIR__ . '/_layout.php';
         </div>
         <div class="adm-field"><label>Nombre del contacto</label><input type="text" name="nombre_contacto" id="conv-contacto"></div>
         <div class="adm-field"><label>Correo del contacto</label><input type="email" name="correo_contacto" id="conv-correo"></div>
-        <div class="adm-field"><label>Teléfono</label><input type="tel" name="telefono_contacto" id="conv-telefono"></div>
+        <div class="adm-field"><label>Teléfono</label><input type="tel" name="telefono_contacto" id="conv-telefono" inputmode="tel" maxlength="25" pattern="[0-9+\-\s()]{7,25}" title="Solo números, +, -, espacios y paréntesis (entre 7 y 25 caracteres)"></div>
         <div class="adm-field"><label>Fecha de vencimiento</label><input type="date" name="vencimiento" id="conv-vence"></div>
-        <div class="adm-field"><label>Logo (URL)</label><input type="url" name="logo" id="conv-logo"></div>
+        <div class="adm-field">
+          <label>Logo de la empresa</label>
+          <input type="file" name="logo_archivo" id="conv-logo-file" accept="image/png,image/jpeg,image/webp,image/gif"
+                 onchange="previewLogoConv(this)" style="font-size:13px">
+          <input type="hidden" name="logo" id="conv-logo">
+          <div id="conv-logo-preview" style="margin-top:6px;display:none">
+            <img id="conv-logo-img" src="" alt="preview" style="max-height:56px;max-width:120px;border-radius:6px;border:1px solid var(--tsj-gray-200);object-fit:contain;padding:4px">
+            <button type="button" onclick="quitarLogoConv()" style="margin-left:8px;font-size:12px;color:var(--tsj-pink);background:none;border:none;cursor:pointer">Quitar</button>
+          </div>
+        </div>
       </div>
       <div class="adm-form-actions">
         <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar convenio</button>
@@ -219,12 +228,42 @@ function filtrarConvenios(clave){
 function aplicarFiltroConv(){
   const q    = document.getElementById('conv-buscar').value.trim().toLowerCase();
   const solo = document.getElementById('conv-vencidos').checked;
+  let visibles = 0;
   document.querySelectorAll('#conv-tbody tr[data-carrera]').forEach(tr=>{
-    const okC = !convClaveActiva || tr.dataset.carrera===convClaveActiva;
+    // Sin carrera asignada (todas) → aparece en "Todos" y en cualquier carrera específica
+    const okC = !convClaveActiva || tr.dataset.carrera===convClaveActiva || tr.dataset.carrera==='';
     const okQ = !q || (tr.dataset.search||'').includes(q);
     const okV = !solo || tr.dataset.vence==='1';
-    tr.style.display = (okC && okQ && okV) ? '' : 'none';
+    const show = okC && okQ && okV;
+    tr.style.display = show ? '' : 'none';
+    if(show) visibles++;
   });
+  let emptyRow = document.getElementById('conv-empty-row');
+  if(visibles === 0){
+    if(!emptyRow){
+      emptyRow = document.createElement('tr');
+      emptyRow.id = 'conv-empty-row';
+      emptyRow.innerHTML = '<td colspan="8" class="adm-table-empty">No hay convenios registrados para esta selección.</td>';
+      document.getElementById('conv-tbody').appendChild(emptyRow);
+    }
+    emptyRow.style.display = '';
+  } else if(emptyRow){
+    emptyRow.style.display = 'none';
+  }
+}
+
+function previewLogoConv(input){
+  if(!input.files || !input.files[0]) return;
+  const url = URL.createObjectURL(input.files[0]);
+  document.getElementById('conv-logo-img').src = url;
+  document.getElementById('conv-logo-preview').style.display = '';
+  document.getElementById('conv-logo').value = '';
+}
+function quitarLogoConv(){
+  document.getElementById('conv-logo-file').value = '';
+  document.getElementById('conv-logo-img').src = '';
+  document.getElementById('conv-logo-preview').style.display = 'none';
+  document.getElementById('conv-logo').value = '';
 }
 
 function abrirEditarConv(cv){
@@ -236,6 +275,14 @@ function abrirEditarConv(cv){
   document.getElementById('conv-telefono').value= cv.telefono_contacto||'';
   document.getElementById('conv-vence').value   = cv.vencimiento||'';
   document.getElementById('conv-logo').value    = cv.logo||'';
+  document.getElementById('conv-logo-file').value = '';
+  if(cv.logo){
+    document.getElementById('conv-logo-img').src = cv.logo;
+    document.getElementById('conv-logo-preview').style.display = '';
+  } else {
+    document.getElementById('conv-logo-img').src = '';
+    document.getElementById('conv-logo-preview').style.display = 'none';
+  }
   const tipo = document.getElementById('conv-tipo');
   for(let o of tipo.options){ if(o.value===cv.tipo_convenio){ o.selected=true; break; } }
   const sec = document.getElementById('conv-sector');
@@ -250,13 +297,35 @@ function resetFormConv(){
   document.getElementById('conv-id').value='';
   document.getElementById('form-conv').reset();
   document.getElementById('form-conv-titulo').textContent='Agregar convenio';
+  quitarLogoConv();
 }
 
 function procesarSug(id, tipo, rowId, csrf){
   const accion = tipo==='aceptar'?'sugerencia_aceptar':'sugerencia_rechazar';
   if(!confirm(tipo==='aceptar'?'¿Aceptar esta sugerencia?':'¿Rechazar esta sugerencia?')) return;
   adminFetch('convenios',{_csrf: csrf, accion, id})
-    .then(r=>{ if(r.ok) document.getElementById(rowId)?.remove(); });
+    .then(r=>{
+      if(!r.ok) return;
+      document.getElementById(rowId)?.remove();
+      if(tipo==='aceptar'){
+        // Cambiar al tab de convenios
+        showTab('conv','convenios');
+        // Pre-llenar el formulario con los datos de la sugerencia
+        resetFormConv();
+        document.getElementById('conv-nombre').value   = r.nombre   || '';
+        document.getElementById('conv-correo').value   = r.correo   || '';
+        document.getElementById('conv-contacto').value = r.contacto || '';
+        // Scroll al formulario
+        document.getElementById('form-conv').scrollIntoView({behavior:'smooth', block:'start'});
+        // Resaltar el formulario brevemente para que el admin lo note
+        const card = document.getElementById('form-conv').closest('.adm-form-card');
+        if(card){
+          card.style.transition = 'box-shadow .3s';
+          card.style.boxShadow  = '0 0 0 3px var(--tsj-blue)';
+          setTimeout(()=>{ card.style.boxShadow = ''; }, 2000);
+        }
+      }
+    });
 }
 
 if(location.hash==='#sugerencias') showTab('conv','sugerencias');

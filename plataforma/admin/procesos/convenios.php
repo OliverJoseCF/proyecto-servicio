@@ -4,6 +4,29 @@ require_once __DIR__ . '/_helper.php';
 $accion = str('accion', 30);
 $db     = db();
 
+function subirLogoConvenio(): ?string {
+    if (!isset($_FILES['logo_archivo']) || $_FILES['logo_archivo']['error'] === UPLOAD_ERR_NO_FILE) {
+        return null;
+    }
+    if ($_FILES['logo_archivo']['error'] !== UPLOAD_ERR_OK) {
+        jsonErr('Error al recibir la imagen (código ' . (int)$_FILES['logo_archivo']['error'] . ')');
+    }
+    $ext   = strtolower(pathinfo($_FILES['logo_archivo']['name'], PATHINFO_EXTENSION));
+    $allow = ['jpg','jpeg','png','webp','gif'];
+    if (!in_array($ext, $allow, true)) jsonErr('Formato no permitido. Usa JPG, PNG o WEBP.');
+    if ($_FILES['logo_archivo']['size'] > 2 * 1024 * 1024) jsonErr('La imagen supera 2 MB.');
+    if (!getimagesize($_FILES['logo_archivo']['tmp_name'])) jsonErr('El archivo no es una imagen válida.');
+
+    $dir = dirname(__DIR__, 2) . '/modulos/convenios/assets/images/logo/imagenes/';
+    if (!is_dir($dir)) mkdir($dir, 0755, true);
+
+    $fname = 'logo_' . bin2hex(random_bytes(6)) . '.' . $ext;
+    move_uploaded_file($_FILES['logo_archivo']['tmp_name'], $dir . $fname);
+
+    $base = defined('PLATAFORMA_URL') ? PLATAFORMA_URL : '/plataforma';
+    return $base . '/modulos/convenios/assets/images/logo/imagenes/' . $fname;
+}
+
 // ══ CONVENIOS ════════════════════════════════════════════════════
 if ($accion === 'convenio_agregar') {
     $nombre      = str('nombre', 300);
@@ -13,14 +36,15 @@ if ($accion === 'convenio_agregar') {
     $carrera_id = postInt('carrera_id');
     $contacto   = str('nombre_contacto', 200);
     $correo     = str('correo_contacto', 254);
-    $telefono   = str('telefono_contacto', 30);
-    $logo       = str('logo', 500);
+    $telefono   = telefono('telefono_contacto');
     $vence      = str('vencimiento', 10) ?: null;
     if (!$nombre) jsonErr('El nombre de la empresa es requerido');
+    $logo = subirLogoConvenio() ?? (str('logo', 500) ?: null);
     $db->prepare('INSERT INTO convenios (nombre,tipo_convenio,sector,carrera_id,nombre_contacto,correo_contacto,telefono_contacto,logo,vencimiento)
                   VALUES (?,?,?,?,?,?,?,?,?)')
-       ->execute([$nombre,$tipo,$sector,$carrera_id ?: null,$contacto,$correo,$telefono,$logo ?: null,$vence]);
-    jsonOk('Convenio agregado', ['id' => $db->lastInsertId()]);
+       ->execute([$nombre,$tipo,$sector,$carrera_id ?: null,$contacto,$correo,$telefono,$logo,$vence]);
+    $newId = $db->lastInsertId();
+    jsonOk('Convenio agregado', ['id' => $newId], "Convenio agregado: $nombre (ID $newId)");
 }
 
 if ($accion === 'convenio_editar') {
@@ -32,48 +56,71 @@ if ($accion === 'convenio_editar') {
     $carrera_id = postInt('carrera_id');
     $contacto   = str('nombre_contacto', 200);
     $correo     = str('correo_contacto', 254);
-    $telefono   = str('telefono_contacto', 30);
-    $logo       = str('logo', 500);
+    $telefono   = telefono('telefono_contacto');
     $vence      = str('vencimiento', 10) ?: null;
     if (!$id || !$nombre) jsonErr('Datos incompletos');
+    $logoNuevo = subirLogoConvenio();
+    if ($logoNuevo === null) {
+        $logoNuevo = str('logo', 500) ?: null;
+        if ($logoNuevo === null) {
+            $stmtL = $db->prepare('SELECT logo FROM convenios WHERE id=?');
+            $stmtL->execute([$id]);
+            $logoNuevo = $stmtL->fetchColumn() ?: null;
+        }
+    }
     $db->prepare('UPDATE convenios SET nombre=?,tipo_convenio=?,sector=?,carrera_id=?,nombre_contacto=?,correo_contacto=?,telefono_contacto=?,logo=?,vencimiento=? WHERE id=?')
-       ->execute([$nombre,$tipo,$sector,$carrera_id ?: null,$contacto,$correo,$telefono,$logo ?: null,$vence,$id]);
-    jsonOk('Convenio actualizado');
+       ->execute([$nombre,$tipo,$sector,$carrera_id ?: null,$contacto,$correo,$telefono,$logoNuevo,$vence,$id]);
+    jsonOk('Convenio actualizado', [], "Convenio actualizado: $nombre (ID $id)");
 }
 
 if ($accion === 'convenio_eliminar') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
-    // Soft-delete para conservar referencias históricas
-    $db->prepare('UPDATE convenios SET activo=0 WHERE id=?')->execute([$id]);
-    jsonOk('Convenio eliminado');
+    $sN = $db->prepare('SELECT nombre FROM convenios WHERE id=?');
+    $sN->execute([$id]);
+    $nombre = $sN->fetchColumn() ?: '?';
+    $db->prepare('DELETE FROM convenios WHERE id=?')->execute([$id]);
+    jsonOk('Convenio eliminado', [], "Convenio eliminado: $nombre (ID $id)");
 }
 
 if ($accion === 'convenio_toggle') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
     $db->prepare('UPDATE convenios SET activo = 1 - activo WHERE id=?')->execute([$id]);
-    $s = $db->prepare('SELECT activo FROM convenios WHERE id=?');
+    $s = $db->prepare('SELECT nombre, activo FROM convenios WHERE id=?');
     $s->execute([$id]);
-    $activo = (int)$s->fetchColumn();
-    jsonOk($activo ? 'Convenio activado' : 'Convenio desactivado', ['activo' => $activo]);
+    $row    = $s->fetch();
+    $activo = (int)($row['activo'] ?? 0);
+    $nombre = $row['nombre'] ?? '?';
+    jsonOk($activo ? 'Convenio activado' : 'Convenio desactivado', ['activo' => $activo],
+        ($activo ? 'Convenio activado' : 'Convenio desactivado') . ": $nombre (ID $id)");
 }
 
 // ══ SUGERENCIAS ══════════════════════════════════════════════════
 if ($accion === 'sugerencia_aceptar') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
-    $db->prepare('UPDATE sugerencias_empresa SET estado="aceptada", updated_at=NOW() WHERE id=?')
-       ->execute([$id]);
-    jsonOk('Sugerencia aceptada');
+    $s = $db->prepare('SELECT nombre_empresa, correo_empresa, nombre_contacto FROM sugerencias_empresa WHERE id=?');
+    $s->execute([$id]);
+    $sug = $s->fetch();
+    $db->prepare('UPDATE sugerencias_empresa SET estado="aceptada", updated_at=NOW() WHERE id=?')->execute([$id]);
+    $empNom = $sug['nombre_empresa'] ?? '?';
+    jsonOk('Sugerencia aceptada', [
+        'nombre'   => $sug['nombre_empresa']  ?? '',
+        'correo'   => $sug['correo_empresa']  ?? '',
+        'contacto' => $sug['nombre_contacto'] ?? '',
+    ], "Sugerencia aceptada: $empNom (ID $id)");
 }
 
 if ($accion === 'sugerencia_rechazar') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
+    $sN = $db->prepare('SELECT nombre_empresa FROM sugerencias_empresa WHERE id=?');
+    $sN->execute([$id]);
+    $empNom = $sN->fetchColumn() ?: '?';
     $db->prepare('UPDATE sugerencias_empresa SET estado="rechazada", updated_at=NOW() WHERE id=?')
        ->execute([$id]);
-    jsonOk('Sugerencia rechazada');
+    jsonOk('Sugerencia rechazada', [], "Sugerencia rechazada: $empNom (ID $id)");
 }
 
 jsonErr('Acción desconocida');

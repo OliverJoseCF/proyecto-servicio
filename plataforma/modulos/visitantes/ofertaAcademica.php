@@ -6,18 +6,7 @@ require_once __DIR__ . '/../../shared/config.php';
 
 $base = defined('PLATAFORMA_URL') ? PLATAFORMA_URL : '/plataforma';
 
-// Íconos por clave conocida (estético, no crítico)
-$iconos = [
-    'ISC'   => 'computer',
-    'II'    => 'precision_manufacturing',
-    'IM'    => 'settings_suggest',
-    'IADEV' => 'animation',
-    'IGE'   => 'business_center',
-    'LG'    => 'restaurant',
-];
-$iconoDefault = 'school';
-
-// Cargar carreras activas + color + descripción desde BD
+// Cargar carreras activas desde BD
 $carreras = [];
 try {
     $db = getPDO(DB_NAME);
@@ -26,15 +15,14 @@ try {
     $rows = $db->query("SELECT clave, valor FROM configuracion WHERE clave LIKE 'desc_%'")->fetchAll();
     foreach ($rows as $r) $descsBD[$r['clave']] = $r['valor'];
 
-    // Incluir color de la BD
-    $filas = $db->query('SELECT id, clave, nombre, color FROM carreras WHERE activo=1 ORDER BY orden')->fetchAll();
+    $filas = $db->query('SELECT clave, nombre, color, icono FROM carreras WHERE activo=1 ORDER BY orden')->fetchAll();
 
     foreach ($filas as $fila) {
         $clave = $fila['clave'];
         $carreras[$clave] = [
             'nombre' => $fila['nombre'],
             'color'  => $fila['color'] ?: '#32129a',
-            'icono'  => $iconos[$clave] ?? $iconoDefault,
+            'icono'  => $fila['icono'] ?: 'school',
             'desc'   => $descsBD['desc_' . $clave] ?? '',
             'href'   => 'materias.php?carrera=' . urlencode($clave),
         ];
@@ -144,20 +132,23 @@ require_once __DIR__ . '/../../shared/header.php';
   </div>
 
   <div class="oa-grid">
-    <?php foreach ($carreras as $clave => $c): ?>
-    <a href="<?= htmlspecialchars($base . '/modulos/visitantes/' . $c['href']) ?>" class="oa-card">
-      <div class="oa-card-top" style="background:<?= $c['color'] ?>"></div>
+    <?php foreach ($carreras as $clave => $c):
+      $urlMaterias = htmlspecialchars($base . '/modulos/visitantes/' . $c['href']);
+      $color       = $c['color'];
+    ?>
+    <a href="<?= $urlMaterias ?>" class="oa-card">
+      <div class="oa-card-top" style="background:<?= $color ?>"></div>
       <div class="oa-card-body">
-        <div class="oa-card-icon" style="background:<?= $c['color'] ?>">
+        <div class="oa-card-icon" style="background:<?= $color ?>">
           <span class="material-symbols-rounded" aria-hidden="true"><?= $c['icono'] ?></span>
         </div>
         <div class="oa-card-clave"><?= htmlspecialchars($clave) ?></div>
         <div class="oa-card-nombre"><?= htmlspecialchars($c['nombre']) ?></div>
         <div class="oa-card-desc"><?= htmlspecialchars($c['desc']) ?></div>
-        <div class="oa-card-link" style="color:<?= $c['color'] ?>">
+        <span class="oa-card-link" style="color:<?= $color ?>">
           Ver plan de estudios
           <span class="material-symbols-rounded" style="font-size:16px">arrow_forward</span>
-        </div>
+        </span>
       </div>
     </a>
     <?php endforeach; ?>

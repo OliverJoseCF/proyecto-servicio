@@ -21,34 +21,35 @@ $items_por_pagina = 30;
 $pagina_actual    = max(1, (int)($_GET['pagina'] ?? 1));
 $offset           = ($pagina_actual - 1) * $items_por_pagina;
 
-// Mostrar todos los profesores activos — si tienen horario se muestra, si no "Sin horario"
+// Mostrar todos los docentes activos — si tienen horario se muestra, si no "Sin horario"
 $where  = 'p.activo = 1';
 $params = [];
 
 if ($busqueda !== '') {
-    $where .= ' AND (p.nombre LIKE :busqueda1 OR p.apellido LIKE :busqueda2)';
-    $params[':busqueda1'] = "%$busqueda%";
-    $params[':busqueda2'] = "%$busqueda%";
+    $where .= ' AND p.nombre LIKE :busqueda';
+    $params[':busqueda'] = "%$busqueda%";
 }
 if ($id_carrera > 0) {
-    $where .= ' AND h.id_carrera = :id_carrera';
+    $where .= ' AND EXISTS (SELECT 1 FROM docente_carrera dc2 WHERE dc2.docente_id=p.id AND dc2.carrera_id=:id_carrera)';
     $params[':id_carrera'] = $id_carrera;
 }
 
 $sql_base = "
     SELECT h.id_horario,
            p.nombre          AS nombre_profesor,
-           p.apellido        AS apellido_profesor,
+           ''                AS apellido_profesor,
            p.foto            AS foto_profesor,
            c.nombre          AS nombre_carrera,
            c.color           AS color_carrera,
            h.semestre,
            h.imagen_horario
-    FROM   profesores p
-    LEFT JOIN horarios  h ON h.id_profesor = p.id_profesor AND h.activo = 1
-    LEFT JOIN carreras  c ON h.id_carrera  = c.id
+    FROM   docentes p
+    LEFT JOIN horarios       h  ON h.id_profesor = p.id AND h.activo = 1
+    LEFT JOIN docente_carrera dc ON dc.docente_id = p.id
+    LEFT JOIN carreras        c  ON c.id = dc.carrera_id
     WHERE  $where
-    ORDER BY p.apellido, p.nombre
+    GROUP BY p.id, h.id_horario
+    ORDER BY p.nombre
 ";
 
 $stmt_count = $pdo->prepare("SELECT COUNT(*) FROM ($sql_base) AS t");

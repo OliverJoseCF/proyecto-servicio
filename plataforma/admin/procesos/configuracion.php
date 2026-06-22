@@ -4,7 +4,7 @@ require_once __DIR__ . '/_helper.php';
 $accion = str('accion', 30);
 
 if ($accion === 'guardar_config') {
-    $campos = ['nombre_institucion','campus','descripcion_portal','plataforma_url','eslogan',
+    $campos = ['nombre_institucion','campus','descripcion_portal','eslogan','sitio_oficial_url',
                 'direccion','correo_general','telefono','horario_atencion',
                 'maps_embed_url','maps_link_url'];
     $db = db();
@@ -19,11 +19,15 @@ if ($accion === 'guardar_config') {
         // maps_embed_url puede ser muy larga
         $max = in_array($c, ['maps_embed_url','maps_link_url','descripcion_portal']) ? 5000 : 500;
         $v   = str($c, $max);
+        if ($c === 'telefono' && $v !== '' && !preg_match('/^[0-9+\-\s()]{7,25}$/', $v)) {
+            jsonErr('El teléfono solo puede contener números, +, -, espacios y paréntesis (7 a 25 caracteres)');
+        }
         $stmt->execute([':k' => $c, ':v' => $v]);
         $guardados++;
     }
     if ($guardados === 0) jsonErr('No se recibió ningún campo válido');
-    jsonOk('Configuración guardada');
+    $camposGuardados = array_filter($campos, fn($c) => array_key_exists($c, $_POST));
+    jsonOk('Configuración guardada', [], 'Configuración guardada: ' . implode(', ', $camposGuardados));
 }
 
 if ($accion === 'guardar_correos') {
@@ -36,11 +40,11 @@ if ($accion === 'guardar_correos') {
         $v = str($c, 254);
         $stmt->execute([':k' => $c, ':v' => $v]);
     }
-    jsonOk('Correos guardados');
+    jsonOk('Correos guardados', [], 'Correos institucionales actualizados (' . count($campos) . ' correos)');
 }
 
 if ($accion === 'guardar_redes') {
-    $campos = ['facebook_url','youtube_url','instagram_url','twitter_url','linkedin_url','sitio_oficial_url'];
+    $campos = ['facebook_url','youtube_url','instagram_url','twitter_url','linkedin_url'];
     $db = db();
     $stmt = $db->prepare('INSERT INTO configuracion (clave, valor) VALUES (:k,:v)
                           ON DUPLICATE KEY UPDATE valor = VALUES(valor)');
@@ -48,7 +52,7 @@ if ($accion === 'guardar_redes') {
         $v = str($c, 500);
         $stmt->execute([':k' => $c, ':v' => $v]);
     }
-    jsonOk('Redes sociales guardadas');
+    jsonOk('Redes sociales guardadas', [], 'Redes sociales actualizadas');
 }
 
 if ($accion === 'cambiar_password') {
@@ -80,7 +84,7 @@ if ($accion === 'cambiar_password') {
         @unlink($tmp);
         jsonErr('No se pudo reemplazar config.local.php. Verifica permisos.');
     }
-    jsonOk('Contraseña actualizada. Cierra sesión y prueba el nuevo acceso.');
+    jsonOk('Contraseña actualizada. Cierra sesión y prueba el nuevo acceso.', [], 'Contraseña del admin actualizada');
 }
 
 jsonErr('Acción desconocida');

@@ -10,12 +10,19 @@ $adm_title = 'Buscar Maestro';
 try {
     $db        = getPDO(DB_NAME);
     $carreras  = $db->query('SELECT * FROM carreras ORDER BY orden')->fetchAll();
-    $profesores= $db->query('SELECT * FROM profesores ORDER BY activo DESC, apellido, nombre')->fetchAll();
-    $horarios  = $db->query('SELECT h.*,p.nombre,p.apellido,p.foto,c.clave carrera_clave,c.nombre carrera_nombre
+    $profesores= $db->query(
+        'SELECT d.id, d.nombre, d.correo, d.foto, d.activo,
+                GROUP_CONCAT(c.clave ORDER BY c.orden SEPARATOR "/") AS carrera_clave
+           FROM docentes d
+           LEFT JOIN docente_carrera dc ON dc.docente_id = d.id
+           LEFT JOIN carreras c ON c.id = dc.carrera_id
+          GROUP BY d.id ORDER BY d.activo DESC, d.nombre'
+    )->fetchAll();
+    $horarios  = $db->query('SELECT h.*,d.nombre,\'\' AS apellido,d.foto,c.clave carrera_clave,c.nombre carrera_nombre
                               FROM horarios h
-                              JOIN profesores p ON h.id_profesor=p.id_profesor
+                              JOIN docentes d ON h.id_profesor=d.id
                               LEFT JOIN carreras c ON h.id_carrera=c.id
-                              ORDER BY p.apellido,p.nombre')->fetchAll();
+                              ORDER BY d.nombre')->fetchAll();
     $db_ok = true;
 } catch (\Throwable $e) {
     $carreras = $profesores = $horarios = [];
@@ -47,19 +54,19 @@ require_once __DIR__ . '/_layout.php';
 <div class="adm-tab-panel active" data-tab-group="hor" data-tab="maestros">
   <div class="adm-table-wrap">
     <table class="adm-table">
-      <thead><tr><th>Foto</th><th>Nombre</th><th>Apellido</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Foto</th><th>Nombre</th><th>Carrera</th><th>Correo</th><th>Estado</th></tr></thead>
       <tbody>
         <?php if (empty($profesores)): ?>
-        <tr><td colspan="6" class="adm-table-empty">Sin maestros registrados.</td></tr>
+        <tr><td colspan="5" class="adm-table-empty">Sin docentes registrados. Agrégalos en <a href="visitantes.php" style="color:var(--tsj-blue)">Visitantes → Docentes</a>.</td></tr>
         <?php endif; ?>
         <?php foreach ($profesores as $p): ?>
-        <tr id="prof-<?= $p['id_profesor'] ?>" <?= !$p['activo'] ? 'style="opacity:.5"' : '' ?>>
+        <tr id="prof-<?= $p['id'] ?>" <?= !$p['activo'] ? 'style="opacity:.5"' : '' ?>>
           <td class="col-photo">
             <img src="<?= $p['foto'] ? $base_img.htmlspecialchars($p['foto']) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='38'%3E%3Crect width='38' height='38' fill='%23e5e7eb'/%3E%3C/svg%3E" ?>"
                  style="width:38px;height:38px;border-radius:50%;object-fit:cover" alt="">
           </td>
           <td style="font-weight:600"><?= htmlspecialchars($p['nombre']) ?></td>
-          <td><?= htmlspecialchars($p['apellido']) ?></td>
+          <td><span class="adm-status adm-status--info" style="font-size:11px"><?= htmlspecialchars($p['carrera_clave'] ?? '—') ?></span></td>
           <td><?= $p['correo'] ? '<a href="mailto:'.htmlspecialchars($p['correo']).'" style="color:var(--tsj-blue);font-size:12.5px">'.htmlspecialchars($p['correo']).'</a>' : '—' ?></td>
           <td>
             <?php if ($p['activo']): ?>
@@ -68,79 +75,15 @@ require_once __DIR__ . '/_layout.php';
               <span class="adm-status adm-status--warn">Inactivo</span>
             <?php endif; ?>
           </td>
-          <td class="actions">
-            <button class="adm-btn adm-btn--ghost adm-btn--sm" title="<?= $p['activo'] ? 'Desactivar' : 'Activar' ?>"
-                    onclick="toggleActivo('horarios','profesor_toggle',<?= $p['id_profesor'] ?>,this)">
-              <span class="material-symbols-rounded"><?= $p['activo'] ? 'visibility_off' : 'visibility' ?></span>
-            </button>
-            <button class="adm-btn adm-btn--ghost adm-btn--sm"
-                    onclick="abrirEditarProf(<?= htmlspecialchars(json_encode($p)) ?>)">
-              <span class="material-symbols-rounded">edit</span>
-            </button>
-            <button class="adm-btn adm-btn--danger adm-btn--sm"
-                    onclick="confirmarEliminar('horarios','profesor_eliminar',<?= $p['id_profesor'] ?>,'prof-<?= $p['id_profesor'] ?>')">
-              <span class="material-symbols-rounded">delete</span>
-            </button>
-          </td>
         </tr>
         <?php endforeach; ?>
       </tbody>
     </table>
   </div>
 
-  <div class="adm-form-card" style="margin-top:20px">
-    <div class="adm-form-title"><span class="material-symbols-rounded">school</span> <span id="form-prof-titulo">Agregar maestro</span></div>
-    <form data-proc="horarios" data-reload id="form-prof">
-      <input type="hidden" name="_csrf" value="<?= $csrf ?>">
-      <input type="hidden" name="accion" value="profesor_agregar" id="prof-accion">
-      <input type="hidden" name="id" id="prof-id">
-      <div class="adm-form-grid cols-3">
-        <div class="adm-field"><label>Nombre(s) <span style="color:var(--tsj-pink)">*</span></label><input type="text" name="nombre" id="prof-nombre" required></div>
-        <div class="adm-field"><label>Apellido(s) <span style="color:var(--tsj-pink)">*</span></label><input type="text" name="apellido" id="prof-apellido" required></div>
-        <div class="adm-field"><label>Correo electrónico</label><input type="email" name="correo" id="prof-correo"></div>
-        <div class="adm-field"><label>Foto (nombre de archivo)</label><input type="text" name="foto" id="prof-foto" placeholder="ej. miguel.png"></div>
-      </div>
-
-      <!-- ── Integración con Directorio ── -->
-      <div style="margin:16px 0;padding:14px 16px;background:var(--tsj-blue-50);border-radius:10px;border:1.5px solid #e0dcff">
-        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:600;font-size:13.5px;color:var(--tsj-blue)">
-          <input type="checkbox" name="agregar_directorio" id="prof-dir-check"
-                 onchange="toggleDirFields(this.checked)"
-                 style="width:16px;height:16px;accent-color:var(--tsj-blue);cursor:pointer">
-          <span class="material-symbols-rounded" style="font-size:18px">contacts</span>
-          También agregar al Directorio Institucional
-        </label>
-        <p style="margin:6px 0 0 26px;font-size:12px;color:var(--tsj-gray-600)">
-          El maestro aparecerá automáticamente en el Directorio del portal.
-        </p>
-
-        <div id="prof-dir-fields" style="display:none;margin-top:14px">
-          <div class="adm-form-grid cols-2">
-            <div class="adm-field">
-              <label>Puesto / Área</label>
-              <input type="text" name="dir_puesto" id="prof-dir-puesto" placeholder="Ej. Docente ISC">
-            </div>
-            <div class="adm-field">
-              <label>Ubicación física</label>
-              <input type="text" name="dir_ubicacion" id="prof-dir-ubicacion" placeholder="Ej. Módulo B, Planta Alta">
-            </div>
-            <div class="adm-field">
-              <label>Teléfono</label>
-              <input type="tel" name="dir_telefono" id="prof-dir-telefono" placeholder="S/N">
-            </div>
-            <div class="adm-field">
-              <label>Extensión</label>
-              <input type="text" name="dir_extension" id="prof-dir-extension" placeholder="Ej. 101">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="adm-form-actions">
-        <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar maestro</button>
-        <button type="button" class="adm-btn adm-btn--ghost" onclick="resetFormProf()">Cancelar</button>
-      </div>
-    </form>
+  <div style="margin-top:14px;padding:12px 16px;background:var(--tsj-blue-50);border-radius:10px;border:1.5px solid #e0dcff;font-size:13px;color:var(--tsj-blue-dark)">
+    <span class="material-symbols-rounded" style="font-size:16px;vertical-align:middle">info</span>
+    Para agregar o editar docentes, ve a <a href="visitantes.php" style="color:var(--tsj-blue);font-weight:600">Visitantes → Docentes</a>. Los cambios se reflejan automáticamente aquí y en el portal público.
   </div>
 </div>
 
@@ -190,7 +133,7 @@ require_once __DIR__ . '/_layout.php';
           <select name="profesor_id" required>
             <option value="">— Seleccionar —</option>
             <?php foreach ($profesores as $p): ?>
-            <option value="<?= $p['id_profesor'] ?>"><?= htmlspecialchars($p['apellido'].', '.$p['nombre']) ?></option>
+            <option value="<?= $p['id'] ?>"><?= htmlspecialchars($p['nombre']) ?><?= $p['carrera_clave'] ? ' (' . htmlspecialchars($p['carrera_clave']) . ')' : '' ?></option>
             <?php endforeach; ?>
           </select>
         </div>
@@ -222,52 +165,6 @@ require_once __DIR__ . '/_layout.php';
   </div>
 </div>
 
-<script>
-function toggleActivo(modulo, accion, id, btn) {
-  var csrfEl = document.querySelector('input[name="_csrf"]');
-  var csrf   = csrfEl ? csrfEl.value : '';
-  adminFetch(modulo, { _csrf: csrf, accion: accion, id: id })
-    .then(function (json) {
-      if (json.ok) {
-        var row   = btn.closest('tr');
-        var icon  = btn.querySelector('.material-symbols-rounded');
-        var badge = row.querySelector('.adm-status');
-        var activo = json.activo;
-        row.style.opacity = activo ? '' : '0.5';
-        icon.textContent  = activo ? 'visibility_off' : 'visibility';
-        btn.title         = activo ? 'Desactivar' : 'Activar';
-        if (badge) {
-          badge.textContent = activo ? 'Activo' : 'Inactivo';
-          badge.className   = 'adm-status ' + (activo ? 'adm-status--ok' : 'adm-status--warn');
-        }
-      }
-    });
-}
-
-function toggleDirFields(show) {
-  document.getElementById('prof-dir-fields').style.display = show ? '' : 'none';
-}
-function abrirEditarProf(p){
-  document.getElementById('prof-accion').value   = 'profesor_editar';
-  document.getElementById('prof-id').value       = p.id_profesor;
-  document.getElementById('prof-nombre').value   = p.nombre||'';
-  document.getElementById('prof-apellido').value = p.apellido||'';
-  document.getElementById('prof-correo').value   = p.correo||'';
-  document.getElementById('prof-foto').value     = p.foto||'';
-  // Ocultar sección directorio al editar (ya se gestionó al crear)
-  document.getElementById('prof-dir-check').checked = false;
-  toggleDirFields(false);
-  document.getElementById('form-prof-titulo').textContent='Editar: '+p.nombre+' '+p.apellido;
-  document.getElementById('form-prof').scrollIntoView({behavior:'smooth'});
-}
-function resetFormProf(){
-  document.getElementById('prof-accion').value='profesor_agregar';
-  document.getElementById('prof-id').value='';
-  document.getElementById('form-prof').reset();
-  document.getElementById('prof-dir-check').checked = false;
-  toggleDirFields(false);
-  document.getElementById('form-prof-titulo').textContent='Agregar maestro';
-}
-</script>
+<script></script>
 
 <?php require_once __DIR__ . '/_layout_end.php'; ?>

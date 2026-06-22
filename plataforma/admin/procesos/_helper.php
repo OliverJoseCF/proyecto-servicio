@@ -51,17 +51,34 @@ function db(): PDO {
 function adminLog(string $detalle): void {
     $accion = mb_substr(trim($_POST['accion'] ?? ''), 0, 50);
     if ($accion === '') return;
-    $modulo = basename($_SERVER['SCRIPT_NAME'] ?? '', '.php');
+    $modulo  = basename($_SERVER['SCRIPT_NAME'] ?? '', '.php');
+    $detalle = mb_substr($detalle, 0, 500);
+    $adminId = function_exists('adminActualId')     ? adminActualId()     : 0;
+    $adminNom= function_exists('adminActualNombre') ? adminActualNombre() : 'Administrador';
     try {
-        db()->prepare('INSERT INTO admin_log (modulo, accion, detalle) VALUES (?,?,?)')
-            ->execute([$modulo, $accion, mb_substr($detalle, 0, 500)]);
+        // Esquema nuevo: registra también quién ejecutó la acción
+        db()->prepare('INSERT INTO admin_log (modulo, accion, detalle, admin_id, admin_nombre) VALUES (?,?,?,?,?)')
+            ->execute([$modulo, $accion, $detalle, $adminId ?: null, $adminNom]);
     } catch (\Throwable $e) {
-        // Sin bitácora disponible — la operación principal no se ve afectada
+        // Fallback: BD con esquema viejo (sin columnas de identidad)
+        try {
+            db()->prepare('INSERT INTO admin_log (modulo, accion, detalle) VALUES (?,?,?)')
+                ->execute([$modulo, $accion, $detalle]);
+        } catch (\Throwable $e2) {
+            // Sin bitácora disponible — la operación principal no se ve afectada
+        }
     }
 }
 
-function jsonOk(string $msg = 'OK', array $extra = []): never {
-    adminLog($msg);
+/**
+ * Responde éxito al frontend y registra en bitácora.
+ * @param string      $msg      Mensaje amigable mostrado al admin (toast).
+ * @param array       $extra    Datos extra para el JSON de respuesta.
+ * @param string|null $detalle  Detalle específico para la bitácora (ej. nombre + ID
+ *                              del registro afectado). Si es null, se usa $msg.
+ */
+function jsonOk(string $msg = 'OK', array $extra = [], ?string $detalle = null): never {
+    adminLog($detalle ?? $msg);
     echo json_encode(array_merge(['ok' => true, 'msg' => $msg], $extra));
     exit;
 }
@@ -78,4 +95,21 @@ function str(string $key, int $max = 500): string {
 
 function postInt(string $key, int $default = 0): int {
     return isset($_POST[$key]) ? (int)$_POST[$key] : $default;
+}
+
+/**
+ * Valida un teléfono: solo dígitos, +, -, espacios y paréntesis (7–25 chars).
+ * Cadena vacía se considera válida (campo opcional); usa $obligatorio para exigirlo.
+ * Termina la petición con jsonErr() si es inválido.
+ */
+function telefono(string $key, bool $obligatorio = false): string {
+    $val = str($key, 25);
+    if ($val === '') {
+        if ($obligatorio) jsonErr('El teléfono es requerido');
+        return '';
+    }
+    if (!preg_match('/^[0-9+\-\s()]{7,25}$/', $val)) {
+        jsonErr('El teléfono solo puede contener números, +, -, espacios y paréntesis (7 a 25 caracteres)');
+    }
+    return $val;
 }
