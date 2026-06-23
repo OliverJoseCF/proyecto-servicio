@@ -87,6 +87,10 @@
   color: rgba(255,255,255,.4);
   flex-shrink: 0;
   transition: color .18s;
+  /* Caja fija: evita el salto de layout mientras carga la fuente de íconos */
+  width: 20px;
+  text-align: center;
+  overflow: hidden;
 }
 .adm-nav-link:hover {
   background: rgba(255,255,255,.08);
