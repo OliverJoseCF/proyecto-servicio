@@ -104,7 +104,7 @@ require_once __DIR__ . '/_layout.php';
               <span class="material-symbols-rounded"><?= $cv['activo'] ? 'visibility_off' : 'visibility' ?></span>
             </button>
             <button class="adm-btn adm-btn--ghost adm-btn--sm"
-                    onclick="abrirEditarConv(<?= htmlspecialchars(json_encode($cv)) ?>)">
+                    onclick="abrirEditarConv(<?= htmlspecialchars(json_encode($cv), ENT_QUOTES, 'UTF-8') ?>)">
               <span class="material-symbols-rounded">edit</span>
             </button>
             <button class="adm-btn adm-btn--danger adm-btn--sm"

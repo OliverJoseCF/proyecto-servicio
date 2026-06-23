@@ -79,7 +79,8 @@
   text-decoration: none;
   font-size: 13.5px; font-weight: 500;
   transition: background .18s, color .18s;
-  white-space: nowrap;
+  white-space: normal;
+  line-height: 1.3;
 }
 .adm-nav-link .material-symbols-rounded {
   font-size: 20px;

@@ -80,16 +80,8 @@ try {
   <title><?= htmlspecialchars($tsj_title, ENT_QUOTES, 'UTF-8') ?> — TSJ Chapala</title>
   <link rel="icon" type="image/png" href="<?= $base ?>/shared/assets/img/favicon.png" />
 
-  <!-- Poppins + Material Symbols: carga directa (compatible con CSP sin unsafe-inline) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <!-- Poppins: display=swap (la fuente de texto puede usar fallback mientras carga) -->
-  <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" />
-  <!-- Material Symbols: display=block evita que se muestre el NOMBRE del ícono como
-       texto crudo (y el consiguiente reacomodo) mientras la fuente de íconos carga -->
-  <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" />
+  <!-- Poppins + Material Symbols self-hosted: sin dependencia del CDN de Google (funciona offline) -->
+  <link rel="stylesheet" href="<?= $base ?>/shared/assets/fonts/fonts.css" />
   <style>
     .material-symbols-rounded {
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;

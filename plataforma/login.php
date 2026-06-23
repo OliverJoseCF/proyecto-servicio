@@ -83,9 +83,8 @@ $csrf = csrfToken();
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Acceso Administrador — TSJ Chapala</title>
   <link rel="icon" type="image/png" href="<?= $base ?>/shared/assets/img/favicon.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <!-- Fuentes self-hosted (Poppins + Material Symbols) — sin dependencia del CDN de Google -->
+  <link rel="stylesheet" href="<?= $base ?>/shared/assets/fonts/fonts.css" />
   <?php
     $theme_v = filemtime(__DIR__ . '/shared/assets/css/theme.css');
   ?>

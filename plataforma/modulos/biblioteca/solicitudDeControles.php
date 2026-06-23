@@ -9,7 +9,7 @@ $tsj_title      = 'Biblioteca — Solicitud de Controles';
 $tsj_extra_css  = [
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
-    'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap',
+    // Cormorant Garamond + Outfit ahora self-hosted vía shared/assets/fonts/fonts.css (cargado por el header)
     'assets/css/solicitud-controles.css',
 ];
 /* Reutilizamos el mismo CSS que solicitudDeLibros con leve override */

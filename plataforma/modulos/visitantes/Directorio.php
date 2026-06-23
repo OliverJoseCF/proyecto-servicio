@@ -7,8 +7,8 @@ require_once __DIR__ . '/../../shared/config.php';
 
 try {
     $db         = getPDO(DB_NAME);
-    $personas   = $db->query('SELECT * FROM directorio WHERE activo=1 ORDER BY orden, nombre')->fetchAll();
-    $secretarias = $db->query('SELECT * FROM secretarias WHERE activo=1 ORDER BY orden, nombre')->fetchAll();
+    $personas   = $db->query('SELECT nombre, puesto, ubicacion_fisica, extension, correo, foto FROM directorio WHERE activo=1 ORDER BY orden, nombre')->fetchAll();
+    $secretarias = $db->query('SELECT nombre, rol, telefono, correo FROM secretarias WHERE activo=1 ORDER BY orden, nombre')->fetchAll();
     $db_ok      = true;
 } catch (\Throwable $e) {
     $personas    = [];

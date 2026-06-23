@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../shared/config.php';
 // Cargar configuración dinámica desde BD
 try {
     $db  = getPDO(DB_NAME);
-    $ni  = $db->query('SELECT * FROM nuevo_ingreso_config LIMIT 1')->fetch();
+    $ni  = $db->query('SELECT dia_examen, hora_examen, lugar_examen, requisitos FROM nuevo_ingreso_config LIMIT 1')->fetch();
 } catch (\Throwable $e) {
     $ni = null;
 }

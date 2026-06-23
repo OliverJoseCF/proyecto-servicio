@@ -1,8 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../shared/config.php';
 
-// DB_NAME alias que usa conexion.php de este módulo.
-// shared/config.php ya lo define; solo lo fijamos si por algún motivo no existe,
+// DB_NAME: shared/config.php ya lo define; solo lo fijamos si por algún motivo no existe,
 // para evitar el warning "Constant DB_NAME already defined".
 if (!defined('DB_NAME')) {
     define('DB_NAME', DB_CONVENIOS);

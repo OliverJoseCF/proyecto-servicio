@@ -40,7 +40,7 @@ $horario    = $cfg['horario_atencion'] ?? 'Lun – Vie: 8:00 – 20:00 h';
           <span class="material-symbols-rounded" style="color:var(--tsj-pink);font-size:26px;flex-shrink:0;margin-top:2px">location_on</span>
           <div>
             <p style="margin:0 0 4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--tsj-gray-400)">Dirección</p>
-            <p style="margin:0;font-size:14px;font-weight:600;color:#1a0960;line-height:1.4"><?= htmlspecialchars($direccion) ?></p>
+            <p style="margin:0;font-size:14px;font-weight:600;color:#1a0960;line-height:1.4"><?= htmlspecialchars($direccion, ENT_QUOTES, 'UTF-8') ?></p>
           </div>
         </div>
 
@@ -48,7 +48,7 @@ $horario    = $cfg['horario_atencion'] ?? 'Lun – Vie: 8:00 – 20:00 h';
           <span class="material-symbols-rounded" style="color:var(--tsj-pink);font-size:26px;flex-shrink:0;margin-top:2px">phone</span>
           <div>
             <p style="margin:0 0 4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--tsj-gray-400)">Teléfono</p>
-            <p style="margin:0;font-size:14px;font-weight:600;color:#1a0960"><?= htmlspecialchars($telefono) ?></p>
+            <p style="margin:0;font-size:14px;font-weight:600;color:#1a0960"><?= htmlspecialchars($telefono, ENT_QUOTES, 'UTF-8') ?></p>
           </div>
         </div>
 
@@ -56,7 +56,7 @@ $horario    = $cfg['horario_atencion'] ?? 'Lun – Vie: 8:00 – 20:00 h';
           <span class="material-symbols-rounded" style="color:var(--tsj-pink);font-size:26px;flex-shrink:0;margin-top:2px">schedule</span>
           <div>
             <p style="margin:0 0 4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--tsj-gray-400)">Horario de atención</p>
-            <p style="margin:0;font-size:14px;font-weight:600;color:#1a0960"><?= htmlspecialchars($horario) ?></p>
+            <p style="margin:0;font-size:14px;font-weight:600;color:#1a0960"><?= htmlspecialchars($horario, ENT_QUOTES, 'UTF-8') ?></p>
           </div>
         </div>
 
@@ -66,7 +66,7 @@ $horario    = $cfg['horario_atencion'] ?? 'Lun – Vie: 8:00 – 20:00 h';
       <div style="border-radius:14px;overflow:hidden;border:1.5px solid #e8eaf2;box-shadow:0 4px 20px rgba(51,23,156,.10);margin-bottom:20px">
         <?php if ($maps_embed): ?>
           <iframe
-            src="<?= htmlspecialchars($maps_embed) ?>"
+            src="<?= htmlspecialchars($maps_embed, ENT_QUOTES, 'UTF-8') ?>"
             width="100%" height="420"
             style="border:0;display:block"
             allowfullscreen
@@ -85,7 +85,7 @@ $horario    = $cfg['horario_atencion'] ?? 'Lun – Vie: 8:00 – 20:00 h';
 
       <!-- Botón Google Maps -->
       <div style="display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap">
-        <a href="<?= htmlspecialchars($maps_link) ?>" target="_blank" rel="noopener noreferrer"
+        <a href="<?= htmlspecialchars($maps_link, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer"
            style="display:inline-flex;align-items:center;gap:8px;background:var(--tsj-blue);color:#fff;padding:11px 22px;border-radius:9px;text-decoration:none;font-size:14px;font-weight:700;font-family:var(--tsj-font,'Poppins',sans-serif);transition:background .2s,transform .18s;box-shadow:0 3px 12px rgba(51,23,156,.25)"
            onmouseover="this.style.background='#1a0960';this.style.transform='translateY(-1px)'"
            onmouseout="this.style.background='var(--tsj-blue)';this.style.transform=''">

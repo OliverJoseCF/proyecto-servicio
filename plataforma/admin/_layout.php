@@ -47,10 +47,8 @@ $navSections = [
   <title><?= htmlspecialchars($adm_title, ENT_QUOTES, 'UTF-8') ?> — Admin TSJ</title>
   <meta name="plataforma-url" content="<?= htmlspecialchars($base) ?>" />
   <link rel="icon" type="image/png" href="<?= $base ?>/shared/assets/img/favicon.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" />
+  <!-- Fuentes self-hosted (Poppins + Material Symbols) — sin dependencia del CDN de Google -->
+  <link rel="stylesheet" href="<?= $base ?>/shared/assets/fonts/fonts.css" />
   <style>
     .material-symbols-rounded {
       font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;

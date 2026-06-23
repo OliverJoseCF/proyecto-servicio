@@ -15,11 +15,11 @@ try {
     $requisitos->execute([$tipo]);
     $requisitos  = $requisitos->fetchAll();
 
-    $fases       = $db->prepare('SELECT * FROM timeline_fases WHERE tipo=? AND activo=1 ORDER BY orden');
+    $fases       = $db->prepare('SELECT titulo, descripcion, tiempo_referencia FROM timeline_fases WHERE tipo=? AND activo=1 ORDER BY orden');
     $fases->execute([$tipo]);
     $fases       = $fases->fetchAll();
 
-    $documentos  = $db->prepare('SELECT * FROM documentos_descargables WHERE tipo=? AND activo=1 ORDER BY orden');
+    $documentos  = $db->prepare('SELECT nombre, url FROM documentos_descargables WHERE tipo=? AND activo=1 ORDER BY orden');
     $documentos->execute([$tipo]);
     $documentos  = $documentos->fetchAll();
 
