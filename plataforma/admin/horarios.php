@@ -5,7 +5,7 @@ $loginUrl = (defined('PLATAFORMA_URL') ? PLATAFORMA_URL : '/plataforma') . '/log
 if (!isGlobalAdmin()) { header('Location: ' . $loginUrl); exit; }
 
 $adm_page  = 'horarios';
-$adm_title = 'Buscar Maestro';
+$adm_title = 'Maestros y horarios';
 
 try {
     $db        = getPDO(DB_NAME);
@@ -37,12 +37,21 @@ require_once __DIR__ . '/_layout.php';
 <div class="adm-page-header">
   <div>
     <h1 class="adm-page-title">Gestión de Maestros y Horarios</h1>
-    <p class="adm-page-desc">Agrega, edita o elimina maestros y sus archivos de horario.</p>
+    <p class="adm-page-desc">Consulta la lista de maestros y sube o reemplaza sus archivos de horario.</p>
   </div>
 </div>
 
+<div class="adm-pending" style="margin-bottom:18px">
+  <span class="material-symbols-rounded">info</span>
+  <span>
+    <strong>Maestros</strong> muestra la lista (solo lectura): para agregar o editar un maestro ve a
+    <a href="visitantes.php" style="font-weight:600">Directorio y carreras → Docentes</a>.
+    En <strong>Horarios y archivos</strong> subes el PDF o imagen del horario de cada maestro por carrera y semestre.
+  </span>
+</div>
+
 <div class="adm-tabs">
-  <?php foreach (['maestros'=>'Maestros','horarios_tab'=>'Horarios / Archivos'] as $k=>$l): ?>
+  <?php foreach (['maestros'=>'Maestros (lista)','horarios_tab'=>'Horarios y archivos'] as $k=>$l): ?>
   <button class="adm-tab <?= $k==='maestros'?'active':'' ?>"
           data-tab-group="hor" data-tab="<?= $k ?>" onclick="showTab('hor','<?= $k ?>')">
     <?= $l ?>
@@ -57,7 +66,7 @@ require_once __DIR__ . '/_layout.php';
       <thead><tr><th>Foto</th><th>Nombre</th><th>Carrera</th><th>Correo</th><th>Estado</th></tr></thead>
       <tbody>
         <?php if (empty($profesores)): ?>
-        <tr><td colspan="5" class="adm-table-empty">Sin docentes registrados. Agrégalos en <a href="visitantes.php" style="color:var(--tsj-blue)">Visitantes → Docentes</a>.</td></tr>
+        <tr><td colspan="5" class="adm-table-empty">Sin docentes registrados. Agrégalos en <a href="visitantes.php" style="color:var(--tsj-blue)">Directorio y carreras → Docentes</a>.</td></tr>
         <?php endif; ?>
         <?php foreach ($profesores as $p): ?>
         <tr id="prof-<?= $p['id'] ?>" <?= !$p['activo'] ? 'style="opacity:.5"' : '' ?>>
@@ -83,7 +92,7 @@ require_once __DIR__ . '/_layout.php';
 
   <div style="margin-top:14px;padding:12px 16px;background:var(--tsj-blue-50);border-radius:10px;border:1.5px solid #e0dcff;font-size:13px;color:var(--tsj-blue-dark)">
     <span class="material-symbols-rounded" style="font-size:16px;vertical-align:middle">info</span>
-    Para agregar o editar docentes, ve a <a href="visitantes.php" style="color:var(--tsj-blue);font-weight:600">Visitantes → Docentes</a>. Los cambios se reflejan automáticamente aquí y en el portal público.
+    Para agregar o editar docentes, ve a <a href="visitantes.php" style="color:var(--tsj-blue);font-weight:600">Directorio y carreras → Docentes</a>. Los cambios se reflejan automáticamente aquí y en el portal público.
   </div>
 </div>
 

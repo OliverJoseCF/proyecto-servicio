@@ -39,13 +39,25 @@ require_once __DIR__ . '/_layout.php';
 
 <div class="adm-page-header">
   <div>
-    <h1 class="adm-page-title">Configuración General</h1>
-    <p class="adm-page-desc">Correos del sistema, redes sociales, footer y datos de contacto del portal.</p>
+    <h1 class="adm-page-title">Configuración</h1>
+    <p class="adm-page-desc">Datos del portal, correos de contacto, redes sociales, cuentas de administrador y seguridad.</p>
   </div>
 </div>
 
+<div class="adm-pending" style="margin-bottom:18px">
+  <span class="material-symbols-rounded">info</span>
+  <span>
+    Usa las pestañas para encontrar lo que buscas:
+    <strong>Datos del portal</strong> (nombre, dirección, footer, mapa) ·
+    <strong>Correos de contacto</strong> (los que aparecen en el footer) ·
+    <strong>Redes sociales</strong> ·
+    <strong>Administradores</strong> (quién puede entrar al panel) ·
+    <strong>Seguridad y acceso</strong> (contraseña de la cuenta maestra).
+  </span>
+</div>
+
 <div class="adm-tabs">
-  <?php foreach (['portal'=>'Información del portal','correos'=>'Correos del sistema','redes'=>'Redes sociales','administradores'=>'Administradores','seguridad'=>'Seguridad y acceso'] as $k=>$l): ?>
+  <?php foreach (['portal'=>'Datos del portal','correos'=>'Correos de contacto','redes'=>'Redes sociales','administradores'=>'Administradores','seguridad'=>'Seguridad y acceso'] as $k=>$l): ?>
     <button class="adm-tab <?= $k==='portal'?'active':'' ?>"
             data-tab-group="cfg" data-tab="<?= $k ?>" onclick="showTab('cfg','<?= $k ?>')">
       <?= $l ?>
@@ -156,7 +168,7 @@ require_once __DIR__ . '/_layout.php';
       <p style="font-size:12px;color:var(--tsj-gray-400);margin:4px 0 16px">
         <span class="material-symbols-rounded" style="font-size:14px;vertical-align:middle">info</span>
         Deja vacío cualquier red que la institución no use — no aparecerá en el footer.
-        El sitio web oficial se configura en la pestaña <strong>Información del portal</strong>.
+        El sitio web oficial se configura en la pestaña <strong>Datos del portal</strong>.
       </p>
       <div class="adm-form-actions">
         <button type="submit" class="adm-btn adm-btn--primary"><span class="material-symbols-rounded">save</span> Guardar redes</button>
@@ -171,8 +183,9 @@ require_once __DIR__ . '/_layout.php';
   <?php if (!$admins_ok): ?>
   <div class="adm-pending" style="background:#fef2f2;border-color:#fca5a5;color:#991b1b;margin-bottom:18px">
     <span class="material-symbols-rounded">warning</span>
-    <span><strong>Falta aplicar la migración.</strong> Ejecuta <code>migracion_admins.sql</code> sobre la base de datos
-    <code>kiosko_tsj</code> (phpMyAdmin → SQL) para habilitar las cuentas de administrador.</span>
+    <span><strong>Falta la tabla de administradores.</strong> Vuelve a importar <code>kiosko_tsj.sql</code>
+    en phpMyAdmin (recrea la base con todas las tablas, incluida <code>admins</code>) para habilitar
+    las cuentas de administrador.</span>
   </div>
   <?php else: ?>
 

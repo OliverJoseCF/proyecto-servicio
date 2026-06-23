@@ -13,18 +13,18 @@
 --    • Todas las tablas con su estructura completa
 --    • Datos iniciales de todos los módulos
 --
---  Tablas (22):
+--  Tablas (25):
 --    configuracion
 --    carrusel_fotos, avisos
 --    carreras
 --    directorio, docentes, docente_carrera, coordinadores, materias,
---    secretarias, nuevo_ingreso_config
---    libros, prestamos, solicitudes_biblioteca
+--    atributos_egreso, secretarias, nuevo_ingreso_config
+--    libros, prestamos, solicitudes_biblioteca, solicitud_controles
 --    convenios, sugerencias_empresa
 --    profesores, horarios
 --    requisitos_items, timeline_fases,
 --    documentos_descargables, faq
---    redes_sociales
+--    admin_log, admins
 --
 --  Vistas (5):
 --    v_docentes, v_convenios, v_horarios, v_materias, v_coordinadores

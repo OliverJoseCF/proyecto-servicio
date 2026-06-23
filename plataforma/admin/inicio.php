@@ -5,7 +5,7 @@ $loginUrl = (defined('PLATAFORMA_URL') ? PLATAFORMA_URL : '/plataforma') . '/log
 if (!isGlobalAdmin()) { header('Location: ' . $loginUrl); exit; }
 
 $adm_page  = 'inicio';
-$adm_title = 'Inicio del Portal';
+$adm_title = 'Página de inicio';
 
 try {
     $db       = getPDO(DB_NAME);
@@ -105,7 +105,7 @@ require_once __DIR__ . '/_layout.php';
           <input type="url" name="url" id="car-url" placeholder="https://ejemplo.com/imagen.jpg">
           <span class="adm-field-help">Usa esto si la imagen ya está en internet. Deja vacío si subiste un archivo arriba.</span>
         </div>
-        <div class="adm-field"><label>Título (opcional)</label><input type="text" name="titulo" id="car-titulo-inp" placeholder="Ej. Semestre 2025-A"></div>
+        <div class="adm-field"><label>Título (opcional)</label><input type="text" name="titulo" id="car-titulo-inp" placeholder="Ej. Bienvenida semestre 2026"></div>
         <div class="adm-field"><label>Subtítulo (opcional)</label><input type="text" name="subtitulo" id="car-subtitulo"></div>
       </div>
       <div class="adm-form-actions">

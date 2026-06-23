@@ -5,7 +5,7 @@ $loginUrl = (defined('PLATAFORMA_URL') ? PLATAFORMA_URL : '/plataforma') . '/log
 if (!isGlobalAdmin()) { header('Location: ' . $loginUrl); exit; }
 
 $adm_page  = 'requisitos';
-$adm_title = 'Serv. Social / Residencia';
+$adm_title = 'Servicio social y residencias';
 
 try {
     $db = getPDO(DB_NAME);
@@ -208,8 +208,8 @@ function renderTipoTab(string $tipo, array $d, string $csrf): void {
 
 <div class="adm-page-header">
   <div>
-    <h1 class="adm-page-title">Gestión de Serv. Social / Residencia</h1>
-    <p class="adm-page-desc">Requisitos, documentos descargables, timeline y FAQ.</p>
+    <h1 class="adm-page-title">Servicio social y residencias</h1>
+    <p class="adm-page-desc">Requisitos, documentos descargables, fases del proceso (timeline) y preguntas frecuentes.</p>
   </div>
 </div>
 

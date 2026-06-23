@@ -368,6 +368,12 @@ $csrf = csrfToken();
         </button>
       </form>
 
+      <p style="margin-top:22px;font-size:12.5px;color:var(--tsj-gray-400);line-height:1.6;text-align:center">
+        <span class="material-symbols-rounded" style="font-size:15px;vertical-align:middle">help</span>
+        ¿Olvidaste tu contraseña? Pídele a otro administrador que te la restablezca
+        desde <strong>Configuración → Administradores</strong>.
+      </p>
+
       <a href="<?= $base ?>/" class="login-back">
         <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
         Volver al portal

@@ -498,6 +498,24 @@
   display: flex; align-items: center; gap: 8px;
 }
 .adm-form-title .material-symbols-rounded { font-size: 20px; }
+
+/* Subsecciones dentro de un formulario largo (agrupan campos por tema) */
+.adm-subform-head {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 12.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .5px;
+  color: var(--tsj-blue); margin: 0 0 4px;
+}
+.adm-subform-head .material-symbols-rounded { font-size: 18px; }
+.adm-subform-head--sep {
+  margin-top: 24px; padding-top: 18px;
+  border-top: 1px dashed var(--tsj-gray-200);
+}
+.adm-subform-desc {
+  font-size: 12px; color: var(--tsj-gray-500);
+  margin: 0 0 14px; line-height: 1.5;
+}
+
 .adm-form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

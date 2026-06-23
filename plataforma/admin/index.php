@@ -5,7 +5,7 @@ $loginUrl = (defined('PLATAFORMA_URL') ? PLATAFORMA_URL : '/plataforma') . '/log
 if (!isGlobalAdmin()) { header('Location: ' . $loginUrl); exit; }
 
 $adm_page  = 'dashboard';
-$adm_title = 'Dashboard';
+$adm_title = 'Resumen';
 
 // Stats desde BD
 try {
@@ -114,13 +114,35 @@ require_once __DIR__ . '/_layout.php';
 
   <a href="visitantes.php" class="adm-module-card">
     <div class="adm-module-card-head">
-      <div class="adm-module-icon" style="background:#ede9ff;color:var(--tsj-blue)"><span class="material-symbols-rounded">badge</span></div>
-      <p class="adm-module-name">Visitantes</p>
+      <div class="adm-module-icon" style="background:#ede9ff;color:var(--tsj-blue)"><span class="material-symbols-rounded">groups</span></div>
+      <p class="adm-module-name">Directorio y carreras</p>
     </div>
-    <p class="adm-module-desc">Directorio, docentes, coordinadores, materias, secretarías y nuevo ingreso.</p>
+    <p class="adm-module-desc">Directorio de personal, docentes, coordinadores, carreras (oferta académica), planes de estudio, secretarías y nuevo ingreso.</p>
     <div class="adm-module-items">
       <span class="adm-module-tag">Directorio</span><span class="adm-module-tag">Docentes</span>
-      <span class="adm-module-tag">Coordinadores</span><span class="adm-module-tag">Materias</span>
+      <span class="adm-module-tag">Carreras</span><span class="adm-module-tag">Materias</span>
+    </div>
+  </a>
+
+  <a href="horarios.php" class="adm-module-card">
+    <div class="adm-module-card-head">
+      <div class="adm-module-icon" style="background:#e0e7ff;color:#4338ca"><span class="material-symbols-rounded">calendar_month</span></div>
+      <p class="adm-module-name">Maestros y horarios</p>
+    </div>
+    <p class="adm-module-desc">Lista de maestros y carga de sus archivos de horario (PDF o imagen) por carrera y semestre.</p>
+    <div class="adm-module-items">
+      <span class="adm-module-tag">Maestros</span><span class="adm-module-tag">Horarios</span><span class="adm-module-tag">Archivos</span>
+    </div>
+  </a>
+
+  <a href="requisitos.php" class="adm-module-card">
+    <div class="adm-module-card-head">
+      <div class="adm-module-icon" style="background:#ffe4e8;color:var(--tsj-pink)"><span class="material-symbols-rounded">checklist</span></div>
+      <p class="adm-module-name">Servicio social y residencias</p>
+    </div>
+    <p class="adm-module-desc">Requisitos, documentos descargables, fases del proceso y preguntas frecuentes.</p>
+    <div class="adm-module-items">
+      <span class="adm-module-tag">Requisitos</span><span class="adm-module-tag">Documentos</span><span class="adm-module-tag">Fases</span><span class="adm-module-tag">FAQ</span>
     </div>
   </a>
 
@@ -132,7 +154,7 @@ require_once __DIR__ . '/_layout.php';
         <span style="margin-left:auto;background:#f59e0b;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px"><?= $stats['solicitudes'] ?></span>
       <?php endif; ?>
     </div>
-    <p class="adm-module-desc">Catálogo de libros, préstamos activos y solicitudes pendientes.</p>
+    <p class="adm-module-desc">Catálogo de libros, préstamos activos, solicitudes de estudiantes y préstamo de controles.</p>
     <div class="adm-module-items">
       <span class="adm-module-tag">Catálogo</span><span class="adm-module-tag">Préstamos</span><span class="adm-module-tag">Solicitudes</span>
     </div>
@@ -146,38 +168,16 @@ require_once __DIR__ . '/_layout.php';
         <span style="margin-left:auto;background:#16a34a;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px"><?= $stats['sugerencias'] ?></span>
       <?php endif; ?>
     </div>
-    <p class="adm-module-desc">Empresas vinculadas por carrera, contactos y sugerencias.</p>
+    <p class="adm-module-desc">Empresas vinculadas por carrera, contactos y sugerencias de alumnos.</p>
     <div class="adm-module-items">
       <span class="adm-module-tag">Empresas</span><span class="adm-module-tag">Por carrera</span><span class="adm-module-tag">Sugerencias</span>
-    </div>
-  </a>
-
-  <a href="horarios.php" class="adm-module-card">
-    <div class="adm-module-card-head">
-      <div class="adm-module-icon" style="background:#e0e7ff;color:#4338ca"><span class="material-symbols-rounded">calendar_month</span></div>
-      <p class="adm-module-name">Buscar Maestro</p>
-    </div>
-    <p class="adm-module-desc">Gestión de maestros, horarios, fotos de perfil y correos.</p>
-    <div class="adm-module-items">
-      <span class="adm-module-tag">Maestros</span><span class="adm-module-tag">Horarios</span><span class="adm-module-tag">Correos</span>
-    </div>
-  </a>
-
-  <a href="requisitos.php" class="adm-module-card">
-    <div class="adm-module-card-head">
-      <div class="adm-module-icon" style="background:#ffe4e8;color:var(--tsj-pink)"><span class="material-symbols-rounded">checklist</span></div>
-      <p class="adm-module-name">Serv. Social / Residencia</p>
-    </div>
-    <p class="adm-module-desc">Requisitos, documentos descargables, timeline y FAQ.</p>
-    <div class="adm-module-items">
-      <span class="adm-module-tag">Requisitos</span><span class="adm-module-tag">Documentos</span><span class="adm-module-tag">Timeline</span><span class="adm-module-tag">FAQ</span>
     </div>
   </a>
 
   <a href="reportes.php" class="adm-module-card">
     <div class="adm-module-card-head">
       <div class="adm-module-icon" style="background:#ecfeff;color:#0e7490"><span class="material-symbols-rounded">monitoring</span></div>
-      <p class="adm-module-name">Reportes</p>
+      <p class="adm-module-name">Reportes y estadísticas</p>
     </div>
     <p class="adm-module-desc">Libros más prestados, atrasos, actividad por mes y bitácora del panel.</p>
     <div class="adm-module-items">
@@ -185,14 +185,25 @@ require_once __DIR__ . '/_layout.php';
     </div>
   </a>
 
+  <a href="respaldos.php" class="adm-module-card">
+    <div class="adm-module-card-head">
+      <div class="adm-module-icon" style="background:#eef2ff;color:#4338ca"><span class="material-symbols-rounded">backup</span></div>
+      <p class="adm-module-name">Respaldos de datos</p>
+    </div>
+    <p class="adm-module-desc">Exporta toda la información a un archivo o restáurala en otra computadora.</p>
+    <div class="adm-module-items">
+      <span class="adm-module-tag">Exportar</span><span class="adm-module-tag">Importar</span><span class="adm-module-tag">Copia de seguridad</span>
+    </div>
+  </a>
+
   <a href="configuracion.php" class="adm-module-card">
     <div class="adm-module-card-head">
       <div class="adm-module-icon" style="background:var(--tsj-gray-100);color:var(--tsj-gray-600)"><span class="material-symbols-rounded">settings</span></div>
-      <p class="adm-module-name">Configuración General</p>
+      <p class="adm-module-name">Configuración</p>
     </div>
-    <p class="adm-module-desc">Correos del sistema, redes sociales, información del footer.</p>
+    <p class="adm-module-desc">Datos del portal, correos de contacto, redes sociales, administradores y seguridad.</p>
     <div class="adm-module-items">
-      <span class="adm-module-tag">Correos</span><span class="adm-module-tag">Redes sociales</span><span class="adm-module-tag">Footer</span>
+      <span class="adm-module-tag">Correos</span><span class="adm-module-tag">Redes sociales</span><span class="adm-module-tag">Administradores</span>
     </div>
   </a>
 

@@ -5,7 +5,7 @@ $loginUrl = (defined('PLATAFORMA_URL') ? PLATAFORMA_URL : '/plataforma') . '/log
 if (!isGlobalAdmin()) { header('Location: ' . $loginUrl); exit; }
 
 $adm_page  = 'visitantes';
-$adm_title = 'Visitantes';
+$adm_title = 'Directorio y carreras';
 
 try {
     $db = getPDO(DB_NAME);
@@ -67,15 +67,29 @@ require_once __DIR__ . '/_layout.php';
 
 <div class="adm-page-header">
   <div>
-    <h1 class="adm-page-title">Gestión de Visitantes</h1>
-    <p class="adm-page-desc">Directorio, docentes, coordinadores, planes de estudio y contenido de servicios.</p>
+    <h1 class="adm-page-title">Directorio y carreras</h1>
+    <p class="adm-page-desc">Directorio de personal, docentes, coordinadores, carreras, planes de estudio, secretarías y datos de Nuevo Ingreso del portal.</p>
   </div>
+</div>
+
+<div class="adm-pending" style="margin-bottom:18px">
+  <span class="material-symbols-rounded">info</span>
+  <span>
+    ¿No encuentras algo? Cada pestaña gestiona una parte:
+    <strong>Directorio</strong> (personal y áreas) ·
+    <strong>Docentes</strong> ·
+    <strong>Coordinadores</strong> ·
+    <strong>Oferta académica</strong> (crear/editar carreras: color, ícono, retícula y textos) ·
+    <strong>Planes de estudio</strong> (materias de cada carrera) ·
+    <strong>Secretarías</strong> ·
+    <strong>Nuevo ingreso</strong> (examen y requisitos de admisión).
+  </span>
 </div>
 
 <div class="adm-tabs">
   <?php
   $tabs = ['directorio'=>'Directorio','docentes'=>'Docentes','coord'=>'Coordinadores',
-           'materias'=>'Planes de Estudio','oferta'=>'Oferta Académica','secretarias'=>'Secretarías','servicios'=>'Nuevo Ingreso'];
+           'oferta'=>'Oferta académica (carreras)','materias'=>'Planes de estudio (materias)','secretarias'=>'Secretarías','servicios'=>'Nuevo ingreso'];
   foreach ($tabs as $key => $label): ?>
     <button class="adm-tab <?= $key==='directorio'?'active':'' ?>"
             data-tab-group="vis" data-tab="<?= $key ?>" onclick="showTab('vis','<?= $key ?>')">
@@ -446,6 +460,11 @@ require_once __DIR__ . '/_layout.php';
         <input type="hidden" name="_csrf" value="<?= $csrf ?>">
         <input type="hidden" name="accion" value="carrera_agregar" id="car-accion">
         <input type="hidden" name="id" id="car-id">
+        <!-- ── Subsección: Datos básicos ── -->
+        <div class="adm-subform-head">
+          <span class="material-symbols-rounded">badge</span> Datos básicos
+        </div>
+        <p class="adm-subform-desc">Identidad de la carrera: clave, nombre, color e ícono. Es lo mínimo para crearla.</p>
         <div class="adm-form-grid cols-3">
           <div class="adm-field">
             <label>Clave <span style="color:var(--tsj-pink)">*</span></label>
@@ -471,24 +490,6 @@ require_once __DIR__ . '/_layout.php';
           <div class="adm-field" style="grid-column:span 2">
             <label>Descripción breve (aparece en la tarjeta pública)</label>
             <textarea name="descripcion" id="car-descripcion" rows="2" placeholder="Breve descripción de la carrera para la página de Oferta Académica"></textarea>
-          </div>
-          <!-- Textos académicos de la carrera -->
-          <div class="adm-field" style="grid-column:1/-1">
-            <label>Objetivo General</label>
-            <textarea name="objetivo_general" id="car-objetivo" rows="4" placeholder="Describe el objetivo general de la carrera..."></textarea>
-          </div>
-          <div class="adm-field" style="grid-column:1/-1">
-            <label>Perfil Profesional</label>
-            <textarea name="perfil_profesional" id="car-perfil" rows="4" placeholder="Describe el perfil del profesional egresado..."></textarea>
-          </div>
-          <div class="adm-field" style="grid-column:1/-1">
-            <label>Objetivos Educacionales</label>
-            <textarea name="objetivos_educacionales" id="car-objetivos-edu" rows="4" placeholder="Lista los objetivos educacionales..."></textarea>
-          </div>
-          <div class="adm-field" style="grid-column:1/-1">
-            <label>Atributos de Egreso</label>
-            <span class="adm-field-help">Un atributo por línea. Se muestran como lista numerada en la página pública.</span>
-            <textarea name="atributos_egreso" id="car-atributos" rows="5" placeholder="Capacidad de análisis y diseño de sistemas..."></textarea>
           </div>
           <div class="adm-field" style="grid-column:1/-1">
             <label>Ícono de la carrera</label>
@@ -533,6 +534,39 @@ require_once __DIR__ . '/_layout.php';
               <?php endforeach; ?>
             </div>
           </div>
+        </div><!-- /Datos básicos -->
+
+        <!-- ── Subsección: Textos académicos ── -->
+        <div class="adm-subform-head adm-subform-head--sep">
+          <span class="material-symbols-rounded">menu_book</span> Textos académicos
+        </div>
+        <p class="adm-subform-desc">Se muestran en la página pública de la carrera (Oferta académica). Puedes dejarlos en blanco y completarlos después.</p>
+        <div class="adm-form-grid cols-1">
+          <div class="adm-field">
+            <label>Objetivo General</label>
+            <textarea name="objetivo_general" id="car-objetivo" rows="4" placeholder="Describe el objetivo general de la carrera..."></textarea>
+          </div>
+          <div class="adm-field">
+            <label>Perfil Profesional</label>
+            <textarea name="perfil_profesional" id="car-perfil" rows="4" placeholder="Describe el perfil del profesional egresado..."></textarea>
+          </div>
+          <div class="adm-field">
+            <label>Objetivos Educacionales</label>
+            <textarea name="objetivos_educacionales" id="car-objetivos-edu" rows="4" placeholder="Lista los objetivos educacionales..."></textarea>
+          </div>
+          <div class="adm-field">
+            <label>Atributos de Egreso</label>
+            <span class="adm-field-help">Un atributo por línea. Se muestran como lista numerada en la página pública.</span>
+            <textarea name="atributos_egreso" id="car-atributos" rows="5" placeholder="Capacidad de análisis y diseño de sistemas..."></textarea>
+          </div>
+        </div>
+
+        <!-- ── Subsección: Archivos y multimedia ── -->
+        <div class="adm-subform-head adm-subform-head--sep">
+          <span class="material-symbols-rounded">attach_file</span> Archivos y multimedia
+        </div>
+        <p class="adm-subform-desc">Retícula en PDF e imagen de portada (esta última aparece en las tarjetas de Convenios).</p>
+        <div class="adm-form-grid cols-1">
           <div class="adm-field" style="grid-column:1/-1">
             <label>Retícula (mapa curricular)</label>
             <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">

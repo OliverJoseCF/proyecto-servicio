@@ -63,6 +63,17 @@ require_once __DIR__ . '/_layout.php';
   </div>
 </div>
 
+<div class="adm-pending" style="margin-bottom:18px">
+  <span class="material-symbols-rounded">info</span>
+  <span>
+    Usa las pestañas según lo que necesites:
+    <strong>Catálogo</strong> (agregar y editar libros) ·
+    <strong>Préstamos activos</strong> (libros prestados sin devolver) ·
+    <strong>Solicitudes pendientes</strong> (peticiones de estudiantes por aprobar) ·
+    <strong>Controles / Equipos</strong> (préstamo de controles y equipo). Las pestañas con número tienen asuntos esperando.
+  </span>
+</div>
+
 <div class="adm-tabs">
   <button class="adm-tab active" data-tab-group="bib" data-tab="catalogo" onclick="showTab('bib','catalogo')">
     Catálogo

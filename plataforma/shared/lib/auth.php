@@ -33,6 +33,38 @@ if (!empty($_SESSION['_auth']) && isset($_SESSION['_last_activity'])) {
     }
 }
 
+// ── Revalidación de la cuenta admin contra la BD ───────────────────────────────
+// Una sesión global cuyo admin proviene de la tabla `admins` (id > 0) debe seguir
+// existiendo y estar activa. Así, al desactivar o eliminar a un administrador, su
+// sesión se cierra en la siguiente petición (no espera al idle-timeout de 1 h).
+// La cuenta maestra (id 0, definida en config.local.php) se omite: no vive en la
+// tabla. Si la BD no responde, NO se cierra la sesión (resiliencia) y se reintenta
+// en la siguiente petición.
+if (!empty($_SESSION['_auth'])
+    && ($_SESSION['_module'] ?? '') === 'global'
+    && (int)($_SESSION['_admin_id'] ?? 0) > 0
+) {
+    if (!function_exists('getPDO') && file_exists(dirname(__DIR__) . '/config.php')) {
+        require_once dirname(__DIR__) . '/config.php';
+    }
+    if (function_exists('getPDO') && defined('DB_NAME')) {
+        try {
+            $_stmt = getPDO(DB_NAME)->prepare('SELECT activo FROM admins WHERE id = ?');
+            $_stmt->execute([(int)$_SESSION['_admin_id']]);
+            $_activo = $_stmt->fetchColumn();
+            // false = cuenta eliminada; 0 = cuenta desactivada → cerrar sesión.
+            if ($_activo === false || (int)$_activo !== 1) {
+                session_unset();
+                session_destroy();
+                session_start();
+            }
+            unset($_stmt, $_activo);
+        } catch (\Throwable $_e) {
+            // BD no disponible: se conserva la sesión y se revalida más tarde.
+        }
+    }
+}
+
 // ── CSRF ──────────────────────────────────────────────────────────────────────
 if (empty($_SESSION['_csrf'])) {
     $_SESSION['_csrf'] = bin2hex(random_bytes(32));

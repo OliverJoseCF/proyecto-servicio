@@ -5,7 +5,7 @@ $loginUrl = (defined('PLATAFORMA_URL') ? PLATAFORMA_URL : '/plataforma') . '/log
 if (!isGlobalAdmin()) { header('Location: ' . $loginUrl); exit; }
 
 $adm_page  = 'reportes';
-$adm_title = 'Reportes';
+$adm_title = 'Reportes y estadísticas';
 
 $topLibros = $atrasados = $porMes = $porCarrera = $tasaSol = $tasaSug = $bitacora = [];
 $db_ok = true;
@@ -75,7 +75,7 @@ require_once __DIR__ . '/_layout.php';
 
 <div class="adm-page-header">
   <div>
-    <h1 class="adm-page-title">Reportes y métricas</h1>
+    <h1 class="adm-page-title">Reportes y estadísticas</h1>
     <p class="adm-page-desc">Actividad de la plataforma para apoyar decisiones de acervo, convenios y operación.</p>
   </div>
 </div>

@@ -29,6 +29,16 @@ require_once __DIR__ . '/_layout.php';
   </div>
 </div>
 
+<div class="adm-pending" style="margin-bottom:18px">
+  <span class="material-symbols-rounded">info</span>
+  <span>
+    Dos pestañas:
+    <strong>Convenios por carrera</strong> (empresas con convenio: agregar, editar y revisar vencimientos) ·
+    <strong>Sugerencias de empresas</strong> (propuestas enviadas por alumnos, en espera de revisión).
+    Filtra por carrera con las pastillas y marca <em>“Solo vencidos / por vencer”</em> para detectar los que necesitan renovación.
+  </span>
+</div>
+
 <div class="adm-tabs">
   <button class="adm-tab active" data-tab-group="conv" data-tab="convenios" onclick="showTab('conv','convenios')">
     Convenios por carrera

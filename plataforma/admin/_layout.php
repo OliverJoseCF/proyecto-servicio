@@ -18,15 +18,25 @@ $theme_v  = filemtime(dirname(__DIR__) . '/shared/assets/css/theme.css');
 $admin_v  = filemtime(__DIR__ . '/assets/css/admin.css');
 
 $nav = [
-    'dashboard'     => ['label' => 'Dashboard',                'icon' => 'dashboard',        'href' => $base . '/admin/'],
-    'inicio'        => ['label' => 'Inicio del portal',        'icon' => 'home',             'href' => $base . '/admin/inicio.php'],
-    'visitantes'    => ['label' => 'Visitantes',               'icon' => 'badge',            'href' => $base . '/admin/visitantes.php'],
-    'biblioteca'    => ['label' => 'Biblioteca',               'icon' => 'menu_book',        'href' => $base . '/admin/biblioteca.php'],
-    'convenios'     => ['label' => 'Convenios',                'icon' => 'handshake',        'href' => $base . '/admin/convenios.php'],
-    'horarios'      => ['label' => 'Buscar Maestro',           'icon' => 'calendar_month',   'href' => $base . '/admin/horarios.php'],
-    'requisitos'    => ['label' => 'Serv. Social / Residencia','icon' => 'checklist',        'href' => $base . '/admin/requisitos.php'],
-    'reportes'      => ['label' => 'Reportes',                 'icon' => 'monitoring',       'href' => $base . '/admin/reportes.php'],
-    'configuracion' => ['label' => 'Configuración',            'icon' => 'settings',         'href' => $base . '/admin/configuracion.php'],
+    'dashboard'     => ['label' => 'Resumen',                       'icon' => 'dashboard',        'href' => $base . '/admin/'],
+    'inicio'        => ['label' => 'Página de inicio',              'icon' => 'home',             'href' => $base . '/admin/inicio.php'],
+    'visitantes'    => ['label' => 'Directorio y carreras',         'icon' => 'groups',           'href' => $base . '/admin/visitantes.php'],
+    'horarios'      => ['label' => 'Maestros y horarios',           'icon' => 'calendar_month',   'href' => $base . '/admin/horarios.php'],
+    'requisitos'    => ['label' => 'Servicio social y residencias', 'icon' => 'checklist',        'href' => $base . '/admin/requisitos.php'],
+    'biblioteca'    => ['label' => 'Biblioteca',                    'icon' => 'menu_book',        'href' => $base . '/admin/biblioteca.php'],
+    'convenios'     => ['label' => 'Convenios',                     'icon' => 'handshake',        'href' => $base . '/admin/convenios.php'],
+    'reportes'      => ['label' => 'Reportes y estadísticas',       'icon' => 'monitoring',       'href' => $base . '/admin/reportes.php'],
+    'respaldos'     => ['label' => 'Respaldos de datos',            'icon' => 'backup',           'href' => $base . '/admin/respaldos.php'],
+    'configuracion' => ['label' => 'Configuración',                 'icon' => 'settings',         'href' => $base . '/admin/configuracion.php'],
+];
+
+// Encabezado de sección que se muestra ANTES del ítem indicado (agrupa el menú).
+$navSections = [
+    'dashboard'  => 'Principal',
+    'inicio'     => 'Contenido del portal',
+    'visitantes' => 'Información académica',
+    'biblioteca' => 'Servicios al estudiante',
+    'reportes'   => 'Sistema',
 ];
 ?>
 <!DOCTYPE html>
@@ -39,11 +49,13 @@ $nav = [
   <link rel="icon" type="image/png" href="<?= $base ?>/shared/assets/img/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" />
   <style>
     .material-symbols-rounded {
       font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
       vertical-align: middle; line-height: 1;
+      font-display: block;
     }
   </style>
   <link rel="stylesheet" href="<?= $base ?>/shared/assets/css/theme.css?v=<?= $theme_v ?>">
@@ -65,10 +77,11 @@ $nav = [
     </div>
 
     <nav class="adm-nav" aria-label="Navegación del panel">
-      <span class="adm-nav-section">General</span>
+      <?php $_first_section = true; ?>
       <?php foreach ($nav as $key => $item): ?>
-        <?php if ($key === 'configuracion'): ?>
-          <span class="adm-nav-section" style="margin-top:8px">Sistema</span>
+        <?php if (isset($navSections[$key])): ?>
+          <span class="adm-nav-section"<?= $_first_section ? '' : ' style="margin-top:8px"' ?>><?= $navSections[$key] ?></span>
+          <?php $_first_section = false; ?>
         <?php endif; ?>
         <a href="<?= $item['href'] ?>"
            class="adm-nav-link <?= $adm_page === $key ? 'active' : '' ?>">
