@@ -1,0 +1,209 @@
+/* ============================================================
+   portal.css — Estilos del portal principal (index.php)
+   Carrusel, hero, secciones, módulos, avisos y FAQ.
+   Extraído del CSS inline de index.php para cachearse entre vistas.
+   ============================================================ */
+
+body { background: #f0f2f7; font-family: var(--tsj-font); }
+
+/* ── Carrusel ───────────────────────────────────────────── */
+.portal-carousel {
+    position: relative;
+    overflow: hidden;
+    background: var(--tsj-blue-dark);
+    max-height: 380px;
+}
+.portal-carousel-track {
+    display: flex;
+    transition: transform .5s ease;
+}
+.portal-carousel-slide {
+    min-width: 100%;
+    position: relative;
+}
+.portal-carousel-slide img {
+    width: 100%;
+    height: 380px;
+    object-fit: cover;
+    display: block;
+}
+.portal-carousel-caption {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(10,5,50,.75));
+    padding: 32px 40px 28px;
+    color: #fff;
+}
+.portal-carousel-caption h2 { margin:0 0 4px; font-size:1.4rem; font-weight:700; }
+.portal-carousel-caption p  { margin:0; font-size:.9rem; opacity:.85; }
+.portal-carousel-btn {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(255,255,255,.2); border: none; border-radius: 50%;
+    width: 40px; height: 40px; cursor: pointer; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px); transition: background .2s;
+    font-size: 20px; line-height: 1;
+}
+.portal-carousel-btn:hover { background: rgba(255,255,255,.35); }
+.portal-carousel-btn--prev { left: 16px; }
+.portal-carousel-btn--next { right: 16px; }
+.portal-carousel-dots {
+    position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 6px;
+}
+.portal-carousel-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,.4); cursor: pointer;
+    border: none; padding: 0; transition: background .2s;
+}
+.portal-carousel-dot.active { background: #fff; }
+
+/* ── Hero ───────────────────────────────────────────────── */
+.portal-hero {
+    background: linear-gradient(135deg, var(--tsj-blue-dark) 0%, var(--tsj-blue) 45%, #2a1080 100%);
+    padding: calc(var(--tsj-header-h) + 60px) 32px 72px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.portal-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+        radial-gradient(ellipse at 20% 50%, rgba(236,90,104,.12) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 30%, rgba(50,18,154,.3) 0%, transparent 55%);
+    pointer-events: none;
+}
+.portal-hero-label {
+    display: flex; align-items: center; justify-content: center;
+    gap: 14px; color: rgba(255,255,255,.45);
+    font-size: 11px; font-weight: 500; letter-spacing: 3px;
+    text-transform: uppercase; margin-bottom: 22px;
+}
+.portal-hero-label::before, .portal-hero-label::after {
+    content: ''; width: 40px; height: 1px; background: rgba(255,255,255,.2);
+}
+.portal-hero h1 {
+    font-size: clamp(2rem, 4.5vw, 3rem); font-weight: 800;
+    color: #fff; margin: 0 0 14px; line-height: 1.15; letter-spacing: -0.5px;
+}
+.portal-hero h1 span { color: var(--tsj-pink); }
+.portal-hero > p {
+    font-size: 1rem; color: rgba(255,255,255,.6);
+    max-width: 520px; margin: 0 auto; line-height: 1.7; font-weight: 300;
+}
+.portal-hero-wave {
+    position: absolute; bottom: -1px; left: 0; right: 0;
+    height: 40px; background: #f0f2f7;
+    clip-path: ellipse(55% 100% at 50% 100%);
+}
+
+/* ── Sección genérica ───────────────────────────────────── */
+.portal-section {
+    max-width: 1140px; margin: 0 auto; padding: 48px 24px 56px;
+}
+.portal-section-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 32px;
+}
+.portal-section-line { flex: 1; height: 1px; background: #d8dce8; }
+.portal-section-title {
+    font-size: 12px; font-weight: 700; letter-spacing: 2.5px;
+    text-transform: uppercase; color: #8892a8; white-space: nowrap;
+}
+
+/* ── Módulos ────────────────────────────────────────────── */
+.portal-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+}
+@media (max-width: 900px) { .portal-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .portal-grid { grid-template-columns: 1fr; } }
+
+.portal-card {
+    background: #fff; border-radius: var(--tsj-radius-lg);
+    padding: 28px 24px 24px; text-decoration: none; color: inherit;
+    display: flex; flex-direction: column; gap: 12px;
+    transition: transform .22s ease, box-shadow .22s ease;
+    box-shadow: 0 2px 10px rgba(20,10,80,.06);
+    border: 1px solid #e8eaf2; position: relative; overflow: hidden;
+}
+.portal-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--tsj-blue-dark), var(--tsj-blue));
+    opacity: 0; transition: opacity .22s;
+}
+.portal-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(26,9,96,.12); }
+.portal-card:hover::before { opacity: 1; }
+.portal-card-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: var(--tsj-blue-50);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.portal-card-icon svg { width:24px;height:24px;stroke:var(--tsj-blue);fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round; }
+.portal-card-body { flex: 1; }
+.portal-card h2 { font-size:1rem;font-weight:700;color:#1a0960;margin:0 0 6px; }
+.portal-card p  { font-size:.82rem;color:var(--tsj-gray-600);margin:0;line-height:1.55; }
+.portal-card-arrow {
+    display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;
+    color:var(--tsj-blue);margin-top:4px;opacity:0;
+    transform:translateX(-4px);transition:opacity .2s,transform .2s;
+}
+.portal-card:hover .portal-card-arrow { opacity:1;transform:translateX(0); }
+@media (hover:none) { .portal-card-arrow { opacity:1;transform:translateX(0); } }
+.portal-card-arrow svg { width:14px;height:14px;stroke:var(--tsj-blue);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round; }
+
+/* ── Avisos ─────────────────────────────────────────────── */
+.avisos-list { display:flex;flex-direction:column;gap:14px; }
+.aviso-card {
+    background:#fff;border-radius:var(--tsj-radius);
+    border-left:4px solid var(--tsj-pink);
+    padding:16px 20px;
+    box-shadow:0 2px 8px rgba(20,10,80,.06);
+    display:flex;gap:16px;align-items:flex-start;
+}
+.aviso-fecha {
+    background:var(--tsj-blue-50);color:var(--tsj-blue);
+    border-radius:8px;padding:6px 10px;
+    font-size:11px;font-weight:700;text-align:center;
+    min-width:52px;flex-shrink:0;line-height:1.3;
+}
+.aviso-fecha span { display:block;font-size:16px;font-weight:800; }
+.aviso-body h3 { margin:0 0 4px;font-size:.95rem;font-weight:700;color:#1a0960; }
+.aviso-body p  { margin:0;font-size:.82rem;color:var(--tsj-gray-600);line-height:1.5; }
+
+/* ── FAQ ────────────────────────────────────────────────── */
+.faq-list { display:flex;flex-direction:column;gap:10px; }
+.faq-item {
+    background:#fff;border-radius:var(--tsj-radius);
+    border:1px solid #e8eaf2;
+    box-shadow:0 2px 6px rgba(20,10,80,.04);overflow:hidden;
+}
+.faq-pregunta {
+    width:100%;background:none;border:none;
+    padding:16px 20px;text-align:left;cursor:pointer;
+    display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--tsj-font);font-size:.92rem;font-weight:600;color:#1a0960;
+    transition:background .2s;
+}
+.faq-pregunta:hover { background:#f8f9ff; }
+.faq-pregunta svg {
+    width:18px;height:18px;stroke:#8892a8;fill:none;
+    stroke-width:2.5;flex-shrink:0;transition:transform .25s;
+}
+.faq-item.open .faq-pregunta svg { transform:rotate(180deg); }
+.faq-respuesta {
+    display:grid;grid-template-rows:0fr;
+    transition:grid-template-rows .3s ease;
+    font-size:.88rem;color:var(--tsj-gray-600);line-height:1.6;
+}
+.faq-respuesta-inner {
+    overflow:hidden;padding:0 20px;
+    transition:padding .3s ease;
+}
+.faq-item.open .faq-respuesta { grid-template-rows:1fr; }
+.faq-item.open .faq-respuesta-inner { padding:0 20px 16px; }
+
+/* ── 2 columnas en escritorio para avisos+faq ────────── */
+.portal-two-col {
+    display:grid;grid-template-columns:1fr 1fr;gap:40px;
+}
+@media(max-width:720px){ .portal-two-col { grid-template-columns:1fr; } }

@@ -12,7 +12,8 @@ try {
     $db = getPDO(DB_NAME);
 
     $descsBD = [];
-    $rows = $db->query("SELECT clave, valor FROM configuracion WHERE clave LIKE 'desc_%'")->fetchAll();
+    // El guion bajo es comodín en LIKE: se escapa para no capturar otras claves 'desc...'
+    $rows = $db->query("SELECT clave, valor FROM configuracion WHERE clave LIKE 'desc\\_%'")->fetchAll();
     foreach ($rows as $r) $descsBD[$r['clave']] = $r['valor'];
 
     $filas = $db->query('SELECT clave, nombre, color, icono FROM carreras WHERE activo=1 ORDER BY orden')->fetchAll();

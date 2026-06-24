@@ -29,29 +29,21 @@ try {
     $offset    = ($pag - 1) * $porPagina;
 
     if ($q !== '') {
-        $stmt = $db->prepare("SELECT * FROM libros WHERE activo=1 AND (codigo LIKE ? OR nombre LIKE ? OR autor LIKE ?) ORDER BY codigo LIMIT $porPagina OFFSET $offset");
+        $stmt = $db->prepare("SELECT id, codigo, nombre, autor, editorial, categoria, ejemplares FROM libros WHERE activo=1 AND (codigo LIKE ? OR nombre LIKE ? OR autor LIKE ?) ORDER BY codigo LIMIT $porPagina OFFSET $offset");
         $stmt->execute([$like, $like, $like]);
         $libros = $stmt->fetchAll();
     } else {
-        $libros = $db->query("SELECT * FROM libros WHERE activo=1 ORDER BY codigo LIMIT $porPagina OFFSET $offset")->fetchAll();
+        $libros = $db->query("SELECT id, codigo, nombre, autor, editorial, categoria, ejemplares FROM libros WHERE activo=1 ORDER BY codigo LIMIT $porPagina OFFSET $offset")->fetchAll();
     }
 
     $prestamos   = $db->query('SELECT p.*,l.nombre libro_nombre FROM prestamos p JOIN libros l ON p.libro_id=l.id WHERE p.devuelto=0 ORDER BY p.fecha_devolucion LIMIT 500')->fetchAll();
     $solicitudes = $db->query('SELECT s.*,l.nombre libro_nombre FROM solicitudes_biblioteca s JOIN libros l ON s.libro_id=l.id WHERE s.estado="pendiente" ORDER BY s.created_at DESC LIMIT 500')->fetchAll();
-    // Defensivo: la tabla puede no existir aún en BDs creadas con esquemas previos
-    try {
-        $controles = $db->query("SELECT * FROM solicitud_controles ORDER BY (estado='Pendiente') DESC, fecha DESC, id DESC LIMIT 300")->fetchAll();
-    } catch (\PDOException $eCtrl) {
-        $controles = [];
-    }
     $db_ok = true;
 } catch (\Throwable $e) {
-    $libros = $prestamos = $solicitudes = $controles = [];
+    $libros = $prestamos = $solicitudes = [];
     $totalPags = 1;
     $db_ok  = false;
 }
-
-$controlesPend = count(array_filter($controles, fn($c) => $c['estado'] === 'Pendiente'));
 $csrf = csrfToken();
 require_once __DIR__ . '/_layout.php';
 ?>
@@ -59,7 +51,7 @@ require_once __DIR__ . '/_layout.php';
 <div class="adm-page-header">
   <div>
     <h1 class="adm-page-title">Gestión de Biblioteca</h1>
-    <p class="adm-page-desc">Catálogo de libros, préstamos activos, solicitudes de estudiantes y préstamo de controles.</p>
+    <p class="adm-page-desc">Catálogo de libros, préstamos activos y solicitudes de estudiantes.</p>
   </div>
 </div>
 
@@ -69,8 +61,7 @@ require_once __DIR__ . '/_layout.php';
     Usa las pestañas según lo que necesites:
     <strong>Catálogo</strong> (agregar y editar libros) ·
     <strong>Préstamos activos</strong> (libros prestados sin devolver) ·
-    <strong>Solicitudes pendientes</strong> (peticiones de estudiantes por aprobar) ·
-    <strong>Controles / Equipos</strong> (préstamo de controles y equipo). Las pestañas con número tienen asuntos esperando.
+    <strong>Solicitudes pendientes</strong> (peticiones de estudiantes por aprobar). Las pestañas con número tienen asuntos esperando.
   </span>
 </div>
 
@@ -83,9 +74,6 @@ require_once __DIR__ . '/_layout.php';
   </button>
   <button class="adm-tab" data-tab-group="bib" data-tab="solicitudes" onclick="showTab('bib','solicitudes')" id="tab-solicitudes">
     Solicitudes pendientes <?php if (count($solicitudes)): ?><span style="background:#f59e0b;color:#fff;font-size:11px;padding:1px 7px;border-radius:99px;margin-left:4px"><?= count($solicitudes) ?></span><?php endif; ?>
-  </button>
-  <button class="adm-tab" data-tab-group="bib" data-tab="controles" onclick="showTab('bib','controles')" id="tab-controles">
-    Controles / Equipos <?php if ($controlesPend): ?><span style="background:#8b5cf6;color:#fff;font-size:11px;padding:1px 7px;border-radius:99px;margin-left:4px"><?= $controlesPend ?></span><?php endif; ?>
   </button>
 </div>
 
@@ -278,55 +266,6 @@ require_once __DIR__ . '/_layout.php';
   </div>
 </div>
 
-<!-- ══ Controles / Equipos audiovisuales ════════════════════════ -->
-<div class="adm-tab-panel" data-tab-group="bib" data-tab="controles">
-  <div style="display:flex;margin-bottom:14px">
-    <a href="procesos/export.php?tipo=controles" class="adm-btn adm-btn--ghost adm-btn--sm" style="margin-left:auto">
-      <span class="material-symbols-rounded">download</span> Exportar CSV
-    </a>
-  </div>
-  <div class="adm-table-wrap">
-    <table class="adm-table">
-      <thead><tr><th>Fecha</th><th>Docente</th><th>Aula</th><th>Recibo</th><th>Hora préstamo</th><th>Hora entrega</th><th>Estado</th><th>Acciones</th></tr></thead>
-      <tbody>
-        <?php if (empty($controles)): ?>
-        <tr><td colspan="8" class="adm-table-empty">Sin solicitudes de controles.</td></tr>
-        <?php endif; ?>
-        <?php foreach ($controles as $c):
-          $estStyle = ['Pendiente' => 'warn', 'Aceptado' => 'ok', 'Rechazado' => 'danger'][$c['estado']] ?? 'info';
-        ?>
-        <tr id="ctrl-<?= $c['id'] ?>">
-          <td><?= htmlspecialchars($c['fecha']) ?></td>
-          <td style="font-weight:600"><?= htmlspecialchars($c['nombre_docente']) ?></td>
-          <td><?= htmlspecialchars($c['aula'] ?? '') ?></td>
-          <td><?= htmlspecialchars($c['recibo'] ?? '') ?></td>
-          <td><?= htmlspecialchars(substr($c['hora_prestamo'], 0, 5)) ?></td>
-          <td><?= htmlspecialchars(substr($c['hora_entrega'], 0, 5)) ?></td>
-          <td><span class="adm-status adm-status--<?= $estStyle ?>"><?= htmlspecialchars($c['estado']) ?></span></td>
-          <td class="actions">
-            <?php if ($c['estado'] === 'Pendiente'): ?>
-            <button class="adm-btn adm-btn--primary adm-btn--sm"
-                    onclick="procesarControl(<?= $c['id'] ?>,'Aceptado','<?= $csrf ?>')">
-              <span class="material-symbols-rounded">check</span> Aceptar
-            </button>
-            <button class="adm-btn adm-btn--danger adm-btn--sm"
-                    onclick="procesarControl(<?= $c['id'] ?>,'Rechazado','<?= $csrf ?>')">
-              <span class="material-symbols-rounded">close</span> Rechazar
-            </button>
-            <?php else: ?>
-            <button class="adm-btn adm-btn--ghost adm-btn--sm"
-                    onclick="procesarControl(<?= $c['id'] ?>,'Pendiente','<?= $csrf ?>')">
-              <span class="material-symbols-rounded">undo</span> Reabrir
-            </button>
-            <?php endif; ?>
-          </td>
-        </tr>
-        <?php endforeach; ?>
-      </tbody>
-    </table>
-  </div>
-</div>
-
 <script>
 function abrirEditarLibro(l){
   document.getElementById('lib-accion').value   = 'libro_editar';
@@ -359,12 +298,6 @@ function procesarSol(id, tipo, rowId, csrf){
   adminFetch('biblioteca',{_csrf: csrf, accion, id})
     .then(r=>{ if(r.ok) document.getElementById(rowId)?.remove(); });
 }
-function procesarControl(id, estado, csrf){
-  const msgs = { Aceptado:'¿Aceptar esta solicitud de control?', Rechazado:'¿Rechazar esta solicitud de control?', Pendiente:'¿Reabrir esta solicitud como pendiente?' };
-  if(!confirm(msgs[estado])) return;
-  adminFetch('biblioteca',{_csrf: csrf, accion:'control_estado', id, estado})
-    .then(r=>{ if(r.ok) setTimeout(()=>location.reload(), 900); });
-}
 function filtrarPrestamos(){
   const q    = document.getElementById('prest-filtro').value.trim().toLowerCase();
   const solo = document.getElementById('prest-atrasados').checked;
@@ -375,7 +308,7 @@ function filtrarPrestamos(){
   });
 }
 // Activar tab si viene desde dashboard con hash
-if(['#solicitudes','#prestamos','#controles'].includes(location.hash)) showTab('bib', location.hash.slice(1));
+if(['#solicitudes','#prestamos'].includes(location.hash)) showTab('bib', location.hash.slice(1));
 </script>
 
 <?php require_once __DIR__ . '/_layout_end.php'; ?>

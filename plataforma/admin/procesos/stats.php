@@ -30,11 +30,6 @@ try {
         'atrasados'   => (int) $db->query('SELECT COUNT(*) FROM prestamos WHERE devuelto=0 AND fecha_devolucion < CURDATE()')->fetchColumn(),
         'por_vencer'  => (int) $db->query('SELECT COUNT(*) FROM convenios WHERE activo=1 AND vencimiento IS NOT NULL AND vencimiento <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)')->fetchColumn(),
     ];
-    try {
-        $out['controles'] = (int) $db->query('SELECT COUNT(*) FROM solicitud_controles WHERE estado="Pendiente"')->fetchColumn();
-    } catch (\PDOException $eCtrl) {
-        $out['controles'] = 0;
-    }
     echo json_encode($out);
 } catch (\Throwable $e) {
     http_response_code(500);

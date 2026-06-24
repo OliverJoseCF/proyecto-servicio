@@ -13,15 +13,15 @@
 --    • Todas las tablas con su estructura completa
 --    • Datos iniciales de todos los módulos
 --
---  Tablas (25):
+--  Tablas (24):
 --    configuracion
 --    carrusel_fotos, avisos
 --    carreras
 --    directorio, docentes, docente_carrera, coordinadores, materias,
 --    atributos_egreso, secretarias, nuevo_ingreso_config
---    libros, prestamos, solicitudes_biblioteca, solicitud_controles
+--    libros, prestamos, solicitudes_biblioteca
 --    convenios, sugerencias_empresa
---    profesores, horarios
+--    horarios
 --    requisitos_items, timeline_fases,
 --    documentos_descargables, faq
 --    admin_log, admins
@@ -448,28 +448,12 @@ CREATE TABLE `solicitudes_biblioteca` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- Préstamos de controles y equipos audiovisuales (kiosko de biblioteca)
-CREATE TABLE `solicitud_controles` (
-  `id`             INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `fecha`          DATE         NOT NULL,
-  `nombre_docente` VARCHAR(150) NOT NULL,
-  `aula`           VARCHAR(50),
-  `recibo`         VARCHAR(50),
-  `hora_prestamo`  TIME         NOT NULL,
-  `hora_entrega`   TIME         NOT NULL,
-  `estado`         ENUM('Pendiente','Aceptado','Rechazado') NOT NULL DEFAULT 'Pendiente',
-  `created_at`     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
 -- ================================================================
 -- 6. CONVENIOS
 -- ================================================================
 
 CREATE TABLE `convenios` (
   `id`                INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `carrera_id`        INT UNSIGNED,
   `nombre`            VARCHAR(300) NOT NULL  COMMENT 'Nombre de la empresa',
   `tipo_convenio`     VARCHAR(100) NOT NULL DEFAULT 'residencia'
                       COMMENT 'residencia | servicio_social | practicas | otro',
@@ -483,13 +467,26 @@ CREATE TABLE `convenios` (
   `created_at`        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at`        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`carrera_id`) REFERENCES `carreras`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  KEY `idx_conv_activo` (`activo`),
+  KEY `idx_conv_venc` (`vencimiento`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `convenios` (`carrera_id`, `nombre`, `tipo_convenio`, `sector`, `nombre_contacto`, `correo_contacto`, `vencimiento`) VALUES
-  (4, 'Empresa Tecnológica S.A.',  'residencia',     'privado', 'Carlos Mendoza',  'cmendoza@empresa.com',    '2026-12-31'),
-  (4, 'Estudio Creativo MX',       'servicio_social','privado', 'Ana Torres',      'ana.torres@estudio.mx',   '2026-06-30'),
-  (2, 'Industrias del Bajío S.A.', 'practicas',      'privado', 'Roberto Sánchez', 'rsanchez@industrias.com', '2026-08-15');
+-- Carreras asociadas a cada convenio (sin filas = aplica a todas las carreras)
+CREATE TABLE `convenio_carreras` (
+  `convenio_id` INT UNSIGNED NOT NULL,
+  `carrera_id`  INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`convenio_id`, `carrera_id`),
+  FOREIGN KEY (`convenio_id`) REFERENCES `convenios`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`carrera_id`)  REFERENCES `carreras`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `convenios` (`nombre`, `tipo_convenio`, `sector`, `nombre_contacto`, `correo_contacto`, `vencimiento`) VALUES
+  ('Empresa Tecnológica S.A.',  'residencia',     'privado', 'Carlos Mendoza',  'cmendoza@empresa.com',    '2026-12-31'),
+  ('Estudio Creativo MX',       'servicio_social','privado', 'Ana Torres',      'ana.torres@estudio.mx',   '2026-06-30'),
+  ('Industrias del Bajío S.A.', 'practicas',      'privado', 'Roberto Sánchez', 'rsanchez@industrias.com', '2026-08-15');
+
+-- Empresa Tecnológica y Estudio Creativo → IADEV (id=4); Industrias del Bajío → II (id=2)
+INSERT INTO `convenio_carreras` (`convenio_id`, `carrera_id`) VALUES (1, 4), (2, 4), (3, 2);
 
 
 CREATE TABLE `sugerencias_empresa` (
@@ -509,34 +506,14 @@ CREATE TABLE `sugerencias_empresa` (
 -- 7. HORARIOS / BUSCAR MAESTRO
 -- ================================================================
 
-CREATE TABLE `profesores` (
-  `id_profesor` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `nombre`      VARCHAR(100) NOT NULL,
-  `apellido`    VARCHAR(100) NOT NULL,
-  `correo`      VARCHAR(254),
-  `foto`        VARCHAR(500) COMMENT 'Ruta a la imagen de perfil',
-  `activo`      TINYINT(1)   NOT NULL DEFAULT 1,
-  `created_at`  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at`  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id_profesor`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-INSERT INTO `profesores` (`nombre`, `apellido`, `correo`, `foto`) VALUES
-  ('Miguel Ángel',  'Delgado López',    'miguel.delgado@chapala.tecmm.edu.mx',    'miguel.png'),
-  ('Alberto',       'Chavolla',          'alberto.chavolla@chapala.tecmm.edu.mx',  NULL),
-  ('Julio César',   'Chávez Novoa',     'julio.chavez@chapala.tecmm.edu.mx',       'julio.png'),
-  ('Francisco',     'González Siordia', 'francisco.gonzales@chapala.tecmm.edu.mx', NULL),
-  ('José Jorge',    'Hernández Ochoa',  'jorge.hernandez@chapala.tecmm.edu.mx',    'jorge.png'),
-  ('Carmen Leticia','Salcedo Quevedo',  'carmen.salcedo@chapala.tecmm.edu.mx',     'carmen.png'),
-  ('José Guadalupe','Gamas Gamas',      'jose.gamas@chapala.tecmm.edu.mx',         'gamas.png'),
-  ('Edgar',         'Martínez',          NULL,                                      NULL),
-  ('Rodolfo',       'Rojas',             NULL,                                      NULL),
-  ('María',         'Gómez',             NULL,                                      NULL);
-
+-- Los maestros NO tienen tabla propia: se reutiliza `docentes` (la misma que
+-- alimenta el módulo de Visitantes). Por eso `horarios.id_profesor` referencia
+-- `docentes(id)`. La antigua tabla `profesores` se retiró por estar duplicada y
+-- sin uso. En BDs existentes elimínala con:  DROP TABLE IF EXISTS `profesores`;
 
 CREATE TABLE `horarios` (
   `id_horario`     INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `id_profesor`    INT UNSIGNED NOT NULL,
+  `id_profesor`    INT UNSIGNED NOT NULL COMMENT 'FK a docentes(id) — el maestro del horario',
   `id_carrera`     INT UNSIGNED,
   `semestre`       VARCHAR(10),
   `imagen_horario` VARCHAR(500) COMMENT 'URL completa al PDF o imagen del horario',
@@ -544,8 +521,8 @@ CREATE TABLE `horarios` (
   `created_at`     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at`     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_horario`),
-  FOREIGN KEY (`id_profesor`) REFERENCES `profesores`(`id_profesor`) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (`id_carrera`)  REFERENCES `carreras`(`id`)             ON DELETE SET NULL ON UPDATE CASCADE
+  FOREIGN KEY (`id_profesor`) REFERENCES `docentes`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`id_carrera`)  REFERENCES `carreras`(`id`)  ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -724,16 +701,19 @@ CREATE VIEW `v_convenios` AS
   SELECT cv.id, cv.nombre, cv.tipo_convenio, cv.sector,
          cv.nombre_contacto, cv.correo_contacto, cv.telefono_contacto,
          cv.logo, cv.vencimiento, cv.activo,
-         c.id AS carrera_id, c.clave AS carrera_clave, c.nombre AS carrera_nombre
+         GROUP_CONCAT(DISTINCT c.id    ORDER BY c.id    SEPARATOR ',') AS carrera_ids,
+         GROUP_CONCAT(DISTINCT c.clave ORDER BY c.clave SEPARATOR ',') AS carrera_claves
   FROM `convenios` cv
-  LEFT JOIN `carreras` c ON cv.carrera_id = c.id;
+  LEFT JOIN `convenio_carreras` cc ON cc.convenio_id = cv.id
+  LEFT JOIN `carreras` c ON c.id = cc.carrera_id
+  GROUP BY cv.id;
 
 CREATE VIEW `v_horarios` AS
   SELECT h.id_horario, h.semestre, h.imagen_horario, h.activo,
-         p.id_profesor, p.nombre, p.apellido, p.correo AS correo_profesor, p.foto,
+         d.id AS id_profesor, d.nombre, '' AS apellido, d.correo AS correo_profesor, d.foto,
          c.id AS carrera_id, c.clave AS carrera_clave, c.nombre AS carrera_nombre
   FROM `horarios` h
-  JOIN  `profesores` p ON h.id_profesor = p.id_profesor
+  JOIN  `docentes` d ON h.id_profesor = d.id
   LEFT JOIN `carreras` c ON h.id_carrera = c.id;
 
 CREATE VIEW `v_materias` AS

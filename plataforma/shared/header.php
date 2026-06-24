@@ -49,7 +49,7 @@ $base = PLATAFORMA_URL;
 $nav_items = [
     'inicio'     => ['label' => 'Inicio',                   'href' => $base . '/',                                 'icon' => 'home'],
     'visitantes' => ['label' => 'Directorio',               'href' => $base . '/modulos/visitantes/Directorio.php', 'icon' => 'contacts'],
-    'biblioteca' => ['label' => 'Biblioteca',               'href' => $base . '/modulos/biblioteca/buscar.php',     'icon' => 'menu_book'],
+    'biblioteca' => ['label' => 'Biblioteca', 'href' => $base . '/modulos/biblioteca/buscar.php', 'icon' => 'menu_book'],
     'convenios'  => ['label' => 'Convenios',                'href' => $base . '/modulos/convenios/index.php',       'icon' => 'handshake'],
     'horarios'   => ['label' => 'Buscar Maestro',           'href' => $base . '/modulos/horarios/index.php',        'icon' => 'manage_search'],
     'requisitos' => ['label' => 'Serv. Social / Residencia','href' => $base . '/modulos/requisitos/residencia.php', 'icon' => 'checklist'],
@@ -104,10 +104,21 @@ try {
 
   <?php foreach ($tsj_extra_css as $css): ?>
   <?php
-    $abs    = $module_dir . '/' . ltrim($css, '/');
-    $css_v  = file_exists($abs) ? filemtime($abs) : $theme_v;
+    /* Cada entrada puede ser un string (ruta/URL simple) o un array con atributos:
+       ['href' => ..., 'integrity' => 'sha384-...', 'crossorigin' => 'anonymous'] */
+    $css_href = is_array($css) ? ($css['href'] ?? '') : $css;
+    if ($css_href === '') continue;
+    $css_ext  = (bool) preg_match('#^https?://#i', $css_href);
+    $abs      = $module_dir . '/' . ltrim($css_href, '/');
+    $css_v    = (!$css_ext && file_exists($abs)) ? filemtime($abs) : $theme_v;
+    $css_url  = $css_ext ? $css_href : $css_href . '?v=' . $css_v;
+    $css_intg = is_array($css) ? ($css['integrity'] ?? '') : '';
+    $css_cors = is_array($css) ? ($css['crossorigin'] ?? ($css_intg ? 'anonymous' : '')) : '';
   ?>
-  <link rel="stylesheet" href="<?= htmlspecialchars($css, ENT_QUOTES, 'UTF-8') ?>?v=<?= $css_v ?>" />
+  <link rel="stylesheet" href="<?= htmlspecialchars($css_url, ENT_QUOTES, 'UTF-8') ?>"<?php
+    if ($css_intg): ?> integrity="<?= htmlspecialchars($css_intg, ENT_QUOTES, 'UTF-8') ?>"<?php endif;
+    if ($css_cors): ?> crossorigin="<?= htmlspecialchars($css_cors, ENT_QUOTES, 'UTF-8') ?>"<?php endif;
+  ?> />
   <?php endforeach; ?>
 
   <?php if ($tsj_head_extra): /* Solo inyectar HTML de confianza (generado por el propio módulo) */ ?>
@@ -139,6 +150,24 @@ try {
     <nav aria-label="Navegación principal">
       <ul class="tsj-nav">
         <?php foreach ($nav_items as $key => $item): ?>
+          <?php if (!empty($item['sub'])): ?>
+          <li class="tsj-has-dropdown">
+            <a href="<?= htmlspecialchars($item['href'], ENT_QUOTES, 'UTF-8') ?>"
+               <?php if ($tsj_module === $key): ?> class="active" aria-current="page"<?php endif; ?>
+               aria-haspopup="true">
+              <?= htmlspecialchars($item['label'], ENT_QUOTES, 'UTF-8') ?>
+              <span class="material-symbols-rounded tsj-dropdown-arrow" aria-hidden="true">expand_more</span>
+            </a>
+            <div class="tsj-dropdown" role="menu">
+              <?php foreach ($item['sub'] as $sub): ?>
+              <a href="<?= htmlspecialchars($sub['href'], ENT_QUOTES, 'UTF-8') ?>" role="menuitem">
+                <span class="material-symbols-rounded" aria-hidden="true"><?= $sub['icon'] ?></span>
+                <?= htmlspecialchars($sub['label'], ENT_QUOTES, 'UTF-8') ?>
+              </a>
+              <?php endforeach; ?>
+            </div>
+          </li>
+          <?php else: ?>
           <li>
             <a href="<?= htmlspecialchars($item['href'], ENT_QUOTES, 'UTF-8') ?>"
                <?php if ($tsj_module === $key): ?>
@@ -147,6 +176,7 @@ try {
               <?= htmlspecialchars($item['label'], ENT_QUOTES, 'UTF-8') ?>
             </a>
           </li>
+          <?php endif; ?>
         <?php endforeach; ?>
 
         <!-- Dropdown Oferta Académica -->
@@ -223,12 +253,29 @@ try {
 
     <p class="tsj-menu-section">Módulos</p>
     <?php foreach ($nav_items as $key => $item): ?>
+      <?php if (!empty($item['sub'])): ?>
+      <button class="tsj-menu-toggle <?= $tsj_module === $key ? 'open' : '' ?>"
+              id="tsj-<?= $key ?>-toggle" aria-expanded="<?= $tsj_module === $key ? 'true' : 'false' ?>">
+        <span class="material-symbols-rounded" aria-hidden="true"><?= htmlspecialchars($item['icon'] ?? 'circle') ?></span>
+        <?= htmlspecialchars($item['label'], ENT_QUOTES, 'UTF-8') ?>
+        <span class="material-symbols-rounded tsj-toggle-arrow" aria-hidden="true">expand_more</span>
+      </button>
+      <div class="tsj-menu-subitems <?= $tsj_module === $key ? 'open' : '' ?>" id="tsj-<?= $key ?>-subitems">
+        <?php foreach ($item['sub'] as $sub): ?>
+        <a class="tsj-menu-item" href="<?= htmlspecialchars($sub['href'], ENT_QUOTES, 'UTF-8') ?>">
+          <span class="material-symbols-rounded" aria-hidden="true"><?= $sub['icon'] ?></span>
+          <?= htmlspecialchars($sub['label'], ENT_QUOTES, 'UTF-8') ?>
+        </a>
+        <?php endforeach; ?>
+      </div>
+      <?php else: ?>
       <a class="tsj-menu-item <?= $tsj_module === $key ? 'active' : '' ?>"
          href="<?= htmlspecialchars($item['href'], ENT_QUOTES, 'UTF-8') ?>"
          <?= $tsj_module === $key ? 'aria-current="page"' : '' ?>>
         <span class="material-symbols-rounded" aria-hidden="true"><?= htmlspecialchars($item['icon'] ?? 'circle') ?></span>
         <?= htmlspecialchars($item['label'], ENT_QUOTES, 'UTF-8') ?>
       </a>
+      <?php endif; ?>
     <?php endforeach; ?>
 
     <!-- Oferta Académica con toggle en móvil -->
@@ -257,15 +304,16 @@ try {
 
 <script>
 (function () {
-  // ── Toggle Oferta Académica en menú móvil ───────────────────
-  var toggle   = document.getElementById('tsj-oferta-toggle');
-  var subitems = document.getElementById('tsj-oferta-subitems');
-  if (toggle && subitems) {
+  // ── Toggle de submenús colapsables en el panel móvil ────────
+  document.querySelectorAll('.tsj-menu-toggle').forEach(function (toggle) {
+    var subId    = toggle.id.replace('-toggle', '-subitems');
+    var subitems = document.getElementById(subId);
+    if (!subitems) return;
     toggle.addEventListener('click', function () {
       var open = subitems.classList.toggle('open');
       toggle.classList.toggle('open', open);
-      toggle.setAttribute('aria-expanded', open);
+      toggle.setAttribute('aria-expanded', String(open));
     });
-  }
+  });
 })();
 </script>

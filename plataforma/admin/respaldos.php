@@ -89,7 +89,7 @@ require_once __DIR__ . '/_layout.php';
     </span>
   </div>
 
-  <form data-proc="backup_import">
+  <form data-proc="backup_import" data-confirm="Esto BORRARÁ todos los datos actuales y los reemplazará por el contenido del respaldo. Se guardará un respaldo de seguridad automático antes. ¿Continuar?">
     <input type="hidden" name="_csrf" value="<?= $csrf ?>">
     <input type="hidden" name="accion" value="importar_respaldo">
     <div class="adm-form-grid cols-2">

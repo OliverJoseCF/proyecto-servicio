@@ -34,6 +34,7 @@ if ($accion === 'aviso_editar') {
     $desde  = str('publicar_desde', 10) ?: null;
     $hasta  = str('publicar_hasta', 10) ?: null;
     if (!$id || !$titulo) jsonErr('Datos incompletos');
+    if (!$fecha)  $fecha = date('Y-m-d');   // `fecha` es NOT NULL; evita romper el UPDATE si se vacía
     if ($desde && $hasta && $desde > $hasta) jsonErr('La fecha "desde" no puede ser posterior a "hasta"');
     try {
         $db->prepare('UPDATE avisos SET titulo=?,descripcion=?,fecha=?,publicar_desde=?,publicar_hasta=? WHERE id=?')

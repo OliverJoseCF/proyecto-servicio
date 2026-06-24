@@ -62,6 +62,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($autenticado) {
+            try {
+                if (!isset($db)) { $db = getPDO(DB_NAME); }
+                $adminId  = isset($admin) ? (int)$admin['id'] : null;
+                $adminNom = isset($admin) ? $admin['nombre'] : 'Cuenta maestra';
+                $db->prepare('INSERT INTO admin_log (modulo, accion, detalle, admin_id, admin_nombre) VALUES (?,?,?,?,?)')
+                   ->execute(['login', 'login_exitoso', 'Acceso exitoso — ' . $email . ' desde ' . $ip, $adminId, $adminNom]);
+            } catch (\Throwable $e) {}
             $dest = $redirect ?: PLATAFORMA_URL . '/admin/';
             header('Location: ' . $dest);
             exit;

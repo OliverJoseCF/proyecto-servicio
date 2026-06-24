@@ -366,8 +366,19 @@
   border-radius: 2px 2px 0 0;
 }
 .adm-tab:focus-visible { outline: 2px solid var(--tsj-pink); outline-offset: -2px; }
-.adm-tab-panel { display: none; }
-.adm-tab-panel.active { display: block; }
+.adm-tab-panel {
+  display: block;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
+}
+.adm-tab-panel.active {
+  height: auto;
+  overflow: visible;
+  visibility: visible;
+  pointer-events: auto;
+}
 
 /* ── Toolbar (search + actions) ────────────────────────────────── */
 .adm-toolbar {

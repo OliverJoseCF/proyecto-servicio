@@ -77,6 +77,7 @@ require_once __DIR__ . '/../../shared/header.php';
       <img class="doc-card-foto"
            src="<?= $fotoSrc ?? $placeholder ?>"
            alt="<?= htmlspecialchars($d['nombre']) ?>"
+           loading="lazy"
            <?= $fotoSrc ? 'onerror="this.src=\'' . $placeholder . '\'"' : '' ?>>
       <div class="doc-card-body">
         <div class="doc-card-nombre"><?= htmlspecialchars($d['nombre']) ?></div>

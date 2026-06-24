@@ -60,15 +60,22 @@ if ($accion === 'directorio_toggle') {
 }
 
 // ══ DOCENTES ════════════════════════════════════════════════════
+// La relación docente↔carrera es muchos-a-muchos y vive en `docente_carrera`.
+// El formulario envía las carreras marcadas en carrera_ids[] (checkboxes).
 if ($accion === 'docente_agregar') {
     $nombre     = str('nombre', 150);
     $correo     = str('correo', 254);
-    $carrera_id = postInt('carrera_id');
     $foto       = str('foto', 500);
+    $carreraIds = array_values(array_unique(array_filter(
+        array_map('intval', (array)($_POST['carrera_ids'] ?? [])))));
     if (!$nombre) jsonErr('El nombre es requerido');
-    $db->prepare('INSERT INTO docentes (nombre,correo,carrera_id,foto) VALUES (?,?,?,?)')
-       ->execute([$nombre,$correo,$carrera_id ?: null,$foto ?: null]);
-    $newId = $db->lastInsertId();
+    $db->prepare('INSERT INTO docentes (nombre,correo,foto) VALUES (?,?,?)')
+       ->execute([$nombre,$correo,$foto ?: null]);
+    $newId = (int)$db->lastInsertId();
+    if ($carreraIds) {
+        $stmtDC = $db->prepare('INSERT IGNORE INTO docente_carrera (docente_id,carrera_id) VALUES (?,?)');
+        foreach ($carreraIds as $cid) $stmtDC->execute([$newId, $cid]);
+    }
     jsonOk('Docente agregado', ['id' => $newId], "Docente agregado: $nombre (ID $newId)");
 }
 
@@ -76,11 +83,18 @@ if ($accion === 'docente_editar') {
     $id         = postInt('id');
     $nombre     = str('nombre', 150);
     $correo     = str('correo', 254);
-    $carrera_id = postInt('carrera_id');
     $foto       = str('foto', 500);
+    $carreraIds = array_values(array_unique(array_filter(
+        array_map('intval', (array)($_POST['carrera_ids'] ?? [])))));
     if (!$id || !$nombre) jsonErr('Datos incompletos');
-    $db->prepare('UPDATE docentes SET nombre=?,correo=?,carrera_id=?,foto=? WHERE id=?')
-       ->execute([$nombre,$correo,$carrera_id ?: null,$foto ?: null,$id]);
+    $db->prepare('UPDATE docentes SET nombre=?,correo=?,foto=? WHERE id=?')
+       ->execute([$nombre,$correo,$foto ?: null,$id]);
+    // Resincronizar las carreras del docente (M:N): se reemplazan por completo.
+    $db->prepare('DELETE FROM docente_carrera WHERE docente_id=?')->execute([$id]);
+    if ($carreraIds) {
+        $stmtDC = $db->prepare('INSERT IGNORE INTO docente_carrera (docente_id,carrera_id) VALUES (?,?)');
+        foreach ($carreraIds as $cid) $stmtDC->execute([$id, $cid]);
+    }
     jsonOk('Docente actualizado', [], "Docente actualizado: $nombre (ID $id)");
 }
 
@@ -92,6 +106,19 @@ if ($accion === 'docente_eliminar') {
     $nombre = $sN->fetchColumn() ?: '?';
     $db->prepare('DELETE FROM docentes WHERE id=?')->execute([$id]);
     jsonOk('Docente eliminado', [], "Docente eliminado: $nombre (ID $id)");
+}
+
+if ($accion === 'docente_toggle') {
+    $id = postInt('id');
+    if (!$id) jsonErr('ID inválido');
+    $db->prepare('UPDATE docentes SET activo = 1 - activo WHERE id=?')->execute([$id]);
+    $stmtActivo = $db->prepare('SELECT nombre, activo FROM docentes WHERE id=?');
+    $stmtActivo->execute([$id]);
+    $row    = $stmtActivo->fetch();
+    $activo = (int)($row['activo'] ?? 0);
+    $nombre = $row['nombre'] ?? '?';
+    jsonOk($activo ? 'Docente activo' : 'Docente inactivo', ['activo' => $activo],
+        'Docente ' . ($activo ? 'activado' : 'desactivado') . ": $nombre (ID $id)");
 }
 
 // ══ COORDINADORES ════════════════════════════════════════════════
@@ -369,8 +396,9 @@ if ($accion === 'carrera_toggle') {
 if ($accion === 'carrera_eliminar') {
     $id = postInt('id');
     if (!$id) jsonErr('ID inválido');
-    // Verificar que no tenga docentes, materias o coordinadores asociados
-    $stmtD = $db->prepare('SELECT COUNT(*) FROM docentes WHERE carrera_id=?');
+    // Verificar que no tenga docentes, materias o coordinadores asociados.
+    // Los docentes se relacionan vía la tabla pivote docente_carrera (M:N).
+    $stmtD = $db->prepare('SELECT COUNT(*) FROM docente_carrera WHERE carrera_id=?');
     $stmtD->execute([$id]);
     $stmtM = $db->prepare('SELECT COUNT(*) FROM materias WHERE carrera_id=?');
     $stmtM->execute([$id]);

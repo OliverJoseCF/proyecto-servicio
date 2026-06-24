@@ -33,8 +33,14 @@ if ($accion === 'libro_editar') {
     $categoria = str('categoria', 100);
     $ejemplares= postInt('ejemplares', 1);
     if (!$id || !$codigo || !$nombre) jsonErr('Datos incompletos');
-    $db->prepare('UPDATE libros SET codigo=?,nombre=?,autor=?,editorial=?,categoria=?,ejemplares=? WHERE id=?')
-       ->execute([$codigo,$nombre,$autor,$editorial,$categoria,$ejemplares,$id]);
+    try {
+        $db->prepare('UPDATE libros SET codigo=?,nombre=?,autor=?,editorial=?,categoria=?,ejemplares=? WHERE id=?')
+           ->execute([$codigo,$nombre,$autor,$editorial,$categoria,$ejemplares,$id]);
+    } catch (\PDOException $e) {
+        // Mismo manejo amigable que al agregar: choque con el UNIQUE de `codigo`
+        if ($e->getCode() === '23000') jsonErr('Ya existe un libro con ese código');
+        throw $e;
+    }
     jsonOk('Libro actualizado', [], "Libro actualizado: [$codigo] $nombre (ID $id)");
 }
 
@@ -73,25 +79,22 @@ if ($accion === 'prestamo_registrar') {
     $tipo    = str('tipo', 20) === 'consulta_sala' ? 'consulta_sala' : 'prestamo';
     $dias    = max(1, min(60, postInt('dias', 7)));
     if (!$codigo || !$nombre) jsonErr('Código de libro y nombre del estudiante son requeridos');
-    $stmt = $db->prepare('SELECT id FROM libros WHERE codigo=? AND activo=1');
+    $stmt = $db->prepare('SELECT id, ejemplares FROM libros WHERE codigo=? AND activo=1');
     $stmt->execute([$codigo]);
-    $libroId = $stmt->fetchColumn();
-    if (!$libroId) jsonErr('No existe un libro activo con el código "' . $codigo . '"');
+    $libro = $stmt->fetch();
+    if (!$libro) jsonErr('No existe un libro activo con el código "' . $codigo . '"');
+    $libroId = (int)$libro['id'];
+    // Control de stock: no prestar más copias de las que existen (cuenta activos no devueltos)
+    $act = $db->prepare('SELECT COUNT(*) FROM prestamos WHERE libro_id=? AND devuelto=0');
+    $act->execute([$libroId]);
+    if ((int)$act->fetchColumn() >= (int)$libro['ejemplares']) {
+        jsonErr('No hay ejemplares disponibles de este libro: todas las copias están prestadas.');
+    }
     $db->prepare('INSERT INTO prestamos (libro_id,estudiante_nombre,estudiante_control,carrera,tipo,fecha_prestamo,fecha_devolucion)
                   VALUES (?,?,?,?,?,CURDATE(), DATE_ADD(CURDATE(), INTERVAL ' . $dias . ' DAY))')
        ->execute([$libroId, $nombre, $control, $carrera, $tipo]);
     $newId = $db->lastInsertId();
     jsonOk('Préstamo registrado', [], "Préstamo registrado: $nombre — [$codigo] ($dias días, ID $newId)");
-}
-
-// ══ CONTROLES / EQUIPOS AUDIOVISUALES ══════════════════════════
-if ($accion === 'control_estado') {
-    $id     = postInt('id');
-    $estado = str('estado', 20);
-    if (!$id || !in_array($estado, ['Pendiente', 'Aceptado', 'Rechazado'], true)) jsonErr('Datos inválidos');
-    $db->prepare('UPDATE solicitud_controles SET estado=? WHERE id=?')->execute([$estado, $id]);
-    jsonOk('Solicitud marcada como ' . strtolower($estado),
-        [], 'Control audiovisual — solicitud marcada como ' . strtolower($estado) . " (ID $id)");
 }
 
 // ══ SOLICITUDES ════════════════════════════════════════════════
@@ -105,6 +108,14 @@ if ($accion === 'solicitud_aprobar') {
         $sol->execute([$id]);
         $row = $sol->fetch();
         if (!$row) jsonErr('Solicitud no encontrada o ya procesada');
+
+        // Control de stock: no aprobar si no quedan ejemplares disponibles
+        $disp = $db->prepare('SELECT l.ejemplares - (SELECT COUNT(*) FROM prestamos WHERE libro_id=l.id AND devuelto=0)
+                              FROM libros l WHERE l.id=?');
+        $disp->execute([$row['libro_id']]);
+        if ((int)$disp->fetchColumn() <= 0) {
+            jsonErr('No hay ejemplares disponibles de este libro; no se puede aprobar la solicitud.');
+        }
 
         $db->prepare('UPDATE solicitudes_biblioteca SET estado="aprobada", updated_at=NOW() WHERE id=?')
            ->execute([$id]);

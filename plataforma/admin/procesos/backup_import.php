@@ -64,9 +64,25 @@ if (!$statements) {
     jsonErr('No se encontraron sentencias SQL ejecutables en el archivo.');
 }
 
+// Rechazo TOTAL si el dump contiene sentencias fuera del alcance de un respaldo de
+// datos: gestión de usuarios/privilegios, rutinas almacenadas, triggers, eventos o
+// lectura/escritura de archivos del servidor. Se aborta ANTES de tocar la base.
+foreach ($statements as $stmt) {
+    if (preg_match('/\b(GRANT|REVOKE|LOAD\s+DATA|INTO\s+(?:OUTFILE|DUMPFILE)|(?:CREATE|DROP|ALTER)\s+(?:USER|TRIGGER|PROCEDURE|FUNCTION|EVENT))\b/i', $stmt)) {
+        jsonErr('El respaldo contiene sentencias no permitidas (usuarios, privilegios, rutinas, triggers o acceso a archivos). Importación cancelada por seguridad; la base NO se modificó.');
+    }
+}
+
 @set_time_limit(0);
 
 $pdo = db();
+
+// Punto de restauración: la importación recrea cada tabla con DROP + CREATE, y en
+// MySQL los DDL hacen commit implícito (NO son reversibles con transacción). Antes
+// de tocar nada, generamos un respaldo automático de la base actual en disco para
+// poder revertir a mano si la importación falla a la mitad.
+$autoBackup = crearRespaldoSeguridad($pdo);
+
 $ejecutadas = 0;
 $ignoradas  = 0;
 
@@ -100,13 +116,19 @@ try {
     try { $pdo->exec('SET FOREIGN_KEY_CHECKS = 1'); } catch (\Throwable $e2) {}
     error_log('[TSJ] Error importando respaldo: ' . $e->getMessage());
     jsonErr('Error al restaurar (sentencia ' . ($ejecutadas + 1) . '): ' . $e->getMessage()
-        . '. La base puede haber quedado a medias; vuelve a importar un respaldo válido.', 500);
+        . '. La base puede haber quedado a medias.'
+        . ($autoBackup ? ' Se guardó un respaldo de seguridad del estado PREVIO en el servidor: ' . $autoBackup . ' — restáuralo si es necesario.' : '')
+        . ' Vuelve a importar un respaldo válido.', 500);
 }
+
+$msgBackup = $autoBackup
+    ? ' Se guardó un respaldo de seguridad del estado previo en: ' . $autoBackup
+    : ' (No se pudo crear el respaldo de seguridad automático; revisa permisos del directorio temporal.)';
 
 jsonOk(
     "Respaldo restaurado correctamente: $ejecutadas sentencias aplicadas.",
-    ['ejecutadas' => $ejecutadas, 'ignoradas' => $ignoradas],
-    "Importación de respaldo: $ejecutadas sentencias ejecutadas, $ignoradas ignoradas (archivo: " . mb_substr($file['name'], 0, 120) . ')'
+    ['ejecutadas' => $ejecutadas, 'ignoradas' => $ignoradas, 'respaldo_previo' => $autoBackup],
+    "Importación de respaldo: $ejecutadas sentencias ejecutadas, $ignoradas ignoradas (archivo: " . mb_substr($file['name'], 0, 120) . ').' . $msgBackup
 );
 
 /* ───────────────────────────────────────────────────────────────────────── */
@@ -205,4 +227,80 @@ function splitSqlStatements(string $sql): array
     if ($trimmed !== '') { $statements[] = $trimmed; }
 
     return $statements;
+}
+
+/**
+ * Crea un respaldo .sql de la base actual en el directorio temporal del servidor
+ * (fuera del webroot, para que no sea descargable públicamente) antes de importar.
+ *
+ * @return string|null Ruta del archivo creado, o null si no se pudo generar.
+ */
+function crearRespaldoSeguridad(PDO $pdo): ?string
+{
+    $path = rtrim(sys_get_temp_dir(), '/\\') . DIRECTORY_SEPARATOR
+          . 'kiosko_tsj_preimport_' . date('Ymd_His') . '_' . bin2hex(random_bytes(3)) . '.sql';
+    try {
+        $fh = @fopen($path, 'w');
+        if ($fh === false) {
+            error_log('[TSJ] No se pudo abrir el archivo de respaldo de seguridad: ' . $path);
+            return null;
+        }
+        volcarBaseAArchivo($pdo, $fh);
+        fclose($fh);
+        return $path;
+    } catch (\Throwable $e) {
+        error_log('[TSJ] Falló el respaldo de seguridad pre-importación: ' . $e->getMessage());
+        return null;
+    }
+}
+
+/**
+ * Vuelca estructura + datos de todas las tablas y vistas al handle dado.
+ * Mismo formato que procesos/backup_export.php (mysqldump en PHP puro).
+ */
+function volcarBaseAArchivo(PDO $db, $out): void
+{
+    $baseTables = [];
+    $views      = [];
+    foreach ($db->query('SHOW FULL TABLES')->fetchAll(PDO::FETCH_NUM) as $r) {
+        if (strtoupper($r[1]) === 'VIEW') { $views[] = $r[0]; } else { $baseTables[] = $r[0]; }
+    }
+
+    fwrite($out, "-- Respaldo automático de seguridad previo a importación\n");
+    fwrite($out, "-- Generado: " . date('Y-m-d H:i:s') . "\n\n");
+    fwrite($out, "SET NAMES utf8mb4;\n");
+    fwrite($out, "SET FOREIGN_KEY_CHECKS = 0;\n");
+    fwrite($out, "SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';\n\n");
+
+    foreach ($baseTables as $table) {
+        fwrite($out, "DROP TABLE IF EXISTS `$table`;\n");
+        $createRow = $db->query("SHOW CREATE TABLE `$table`")->fetch(PDO::FETCH_NUM);
+        fwrite($out, ($createRow[1] ?? '') . ";\n\n");
+
+        $stmt        = $db->query("SELECT * FROM `$table`");
+        $rowsInBatch = 0;
+        $first       = true;
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $vals = [];
+            foreach ($row as $v) {
+                if ($v === null)                       { $vals[] = 'NULL'; }
+                elseif (is_int($v) || is_float($v))    { $vals[] = (string) $v; }
+                else                                   { $vals[] = $db->quote((string) $v); }
+            }
+            if ($first) { fwrite($out, "INSERT INTO `$table` VALUES\n"); $first = false; }
+            fwrite($out, ($rowsInBatch === 0 ? '' : ",\n") . '(' . implode(',', $vals) . ')');
+            if (++$rowsInBatch >= 100) { fwrite($out, ";\n"); $rowsInBatch = 0; $first = true; }
+        }
+        if ($rowsInBatch > 0) { fwrite($out, ";\n"); }
+        fwrite($out, "\n");
+    }
+
+    foreach ($views as $view) {
+        fwrite($out, "DROP VIEW IF EXISTS `$view`;\n");
+        $createRow = $db->query("SHOW CREATE VIEW `$view`")->fetch(PDO::FETCH_NUM);
+        $createSql = preg_replace('/\sDEFINER=`[^`]*`@`[^`]*`/', '', $createRow[1] ?? '');
+        fwrite($out, $createSql . ";\n\n");
+    }
+
+    fwrite($out, "SET FOREIGN_KEY_CHECKS = 1;\n");
 }

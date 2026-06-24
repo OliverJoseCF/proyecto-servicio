@@ -37,19 +37,24 @@ $sectorLabels = [
 // ── Query dinámica ───────────────────────────────────────────────
 try {
     $db     = getPDO(DB_NAME);
-    $where  = ['cv.activo = 1'];
+    $where  = ['cv.activo = 1', '(cv.vencimiento IS NULL OR cv.vencimiento >= CURDATE())'];
     $params = [];
 
-    if ($carrera !== '') { $where[] = '(c.clave = ? OR cv.carrera_id IS NULL)'; $params[] = $carrera; }
+    if ($carrera !== '') {
+        // Sin filas en convenio_carreras = aplica a todas las carreras; de lo contrario, solo si coincide
+        $where[] = '(NOT EXISTS (SELECT 1 FROM convenio_carreras cc2 WHERE cc2.convenio_id = cv.id)
+                     OR EXISTS  (SELECT 1 FROM convenio_carreras cc3
+                                 JOIN carreras c3 ON cc3.carrera_id = c3.id
+                                 WHERE cc3.convenio_id = cv.id AND c3.clave = ?))';
+        $params[] = $carrera;
+    }
     if ($tipo    !== '') { $where[] = 'cv.tipo_convenio = ?'; $params[] = $tipo; }
     if ($sector  !== '') { $where[] = 'cv.sector = ?';       $params[] = $sector; }
 
     $sql = 'SELECT cv.id, cv.nombre, cv.tipo_convenio, cv.sector,
                    cv.nombre_contacto, cv.correo_contacto, cv.telefono_contacto,
-                   cv.logo, cv.vencimiento,
-                   c.clave AS carrera_clave, c.nombre AS carrera_nombre
+                   cv.logo, cv.vencimiento
             FROM convenios cv
-            LEFT JOIN carreras c ON cv.carrera_id = c.id
             WHERE ' . implode(' AND ', $where) . '
             ORDER BY cv.nombre';
 
@@ -139,7 +144,7 @@ function filtroUrl(string $campo, string $val): string {
   <div class="cvl-grid">
     <?php foreach ($convenios as $cv):
       $venceTs  = $cv['vencimiento'] ? strtotime($cv['vencimiento']) : null;
-      $vencida  = $venceTs && $venceTs < time();
+      $vencida  = $venceTs && $venceTs < strtotime('today'); // compara solo fecha
       $fechaStr = $venceTs ? date('d/m/Y', $venceTs) : null;
       $tipoLabel   = $tipoLabels[$cv['tipo_convenio']]   ?? $cv['tipo_convenio'];
       $sectorLabel = $sectorLabels[$cv['sector']] ?? $cv['sector'];

@@ -30,30 +30,37 @@ function subirLogoConvenio(): ?string {
 // ══ CONVENIOS ════════════════════════════════════════════════════
 if ($accion === 'convenio_agregar') {
     $nombre      = str('nombre', 300);
-    $tipo        = str('tipo_convenio', 100);
+    $_tipo_raw   = str('tipo_convenio', 100);
+    $tipo        = in_array($_tipo_raw, ['residencia','servicio_social','practicas','otro'], true) ? $_tipo_raw : 'residencia';
     $_sector_raw = str('sector', 20);
     $sector      = in_array($_sector_raw, ['privado','publico','ac','otro'], true) ? $_sector_raw : 'privado';
-    $carrera_id = postInt('carrera_id');
+    $carrerasIds = array_values(array_filter(array_map('intval', (array)($_POST['carreras_ids'] ?? []))));
     $contacto   = str('nombre_contacto', 200);
     $correo     = str('correo_contacto', 254);
     $telefono   = telefono('telefono_contacto');
     $vence      = str('vencimiento', 10) ?: null;
     if (!$nombre) jsonErr('El nombre de la empresa es requerido');
     $logo = subirLogoConvenio() ?? (str('logo', 500) ?: null);
-    $db->prepare('INSERT INTO convenios (nombre,tipo_convenio,sector,carrera_id,nombre_contacto,correo_contacto,telefono_contacto,logo,vencimiento)
-                  VALUES (?,?,?,?,?,?,?,?,?)')
-       ->execute([$nombre,$tipo,$sector,$carrera_id ?: null,$contacto,$correo,$telefono,$logo,$vence]);
-    $newId = $db->lastInsertId();
+    if ($logo !== null && !urlSegura($logo)) jsonErr('La URL del logo no es válida (usa http(s):// o sube un archivo).');
+    $db->prepare('INSERT INTO convenios (nombre,tipo_convenio,sector,nombre_contacto,correo_contacto,telefono_contacto,logo,vencimiento)
+                  VALUES (?,?,?,?,?,?,?,?)')
+       ->execute([$nombre,$tipo,$sector,$contacto,$correo,$telefono,$logo,$vence]);
+    $newId = (int)$db->lastInsertId();
+    if (!empty($carrerasIds)) {
+        $stmtC = $db->prepare('INSERT IGNORE INTO convenio_carreras (convenio_id, carrera_id) VALUES (?, ?)');
+        foreach ($carrerasIds as $cid) $stmtC->execute([$newId, $cid]);
+    }
     jsonOk('Convenio agregado', ['id' => $newId], "Convenio agregado: $nombre (ID $newId)");
 }
 
 if ($accion === 'convenio_editar') {
     $id          = postInt('id');
     $nombre      = str('nombre', 300);
-    $tipo        = str('tipo_convenio', 100);
+    $_tipo_raw   = str('tipo_convenio', 100);
+    $tipo        = in_array($_tipo_raw, ['residencia','servicio_social','practicas','otro'], true) ? $_tipo_raw : 'residencia';
     $_sector_raw = str('sector', 20);
     $sector      = in_array($_sector_raw, ['privado','publico','ac','otro'], true) ? $_sector_raw : 'privado';
-    $carrera_id = postInt('carrera_id');
+    $carrerasIds = array_values(array_filter(array_map('intval', (array)($_POST['carreras_ids'] ?? []))));
     $contacto   = str('nombre_contacto', 200);
     $correo     = str('correo_contacto', 254);
     $telefono   = telefono('telefono_contacto');
@@ -62,14 +69,21 @@ if ($accion === 'convenio_editar') {
     $logoNuevo = subirLogoConvenio();
     if ($logoNuevo === null) {
         $logoNuevo = str('logo', 500) ?: null;
+        if ($logoNuevo !== null && !urlSegura($logoNuevo)) jsonErr('La URL del logo no es válida (usa http(s):// o sube un archivo).');
         if ($logoNuevo === null) {
             $stmtL = $db->prepare('SELECT logo FROM convenios WHERE id=?');
             $stmtL->execute([$id]);
             $logoNuevo = $stmtL->fetchColumn() ?: null;
         }
     }
-    $db->prepare('UPDATE convenios SET nombre=?,tipo_convenio=?,sector=?,carrera_id=?,nombre_contacto=?,correo_contacto=?,telefono_contacto=?,logo=?,vencimiento=? WHERE id=?')
-       ->execute([$nombre,$tipo,$sector,$carrera_id ?: null,$contacto,$correo,$telefono,$logoNuevo,$vence,$id]);
+    $db->prepare('UPDATE convenios SET nombre=?,tipo_convenio=?,sector=?,nombre_contacto=?,correo_contacto=?,telefono_contacto=?,logo=?,vencimiento=? WHERE id=?')
+       ->execute([$nombre,$tipo,$sector,$contacto,$correo,$telefono,$logoNuevo,$vence,$id]);
+    // Reemplazar carreras asociadas
+    $db->prepare('DELETE FROM convenio_carreras WHERE convenio_id=?')->execute([$id]);
+    if (!empty($carrerasIds)) {
+        $stmtC = $db->prepare('INSERT IGNORE INTO convenio_carreras (convenio_id, carrera_id) VALUES (?, ?)');
+        foreach ($carrerasIds as $cid) $stmtC->execute([$id, $cid]);
+    }
     jsonOk('Convenio actualizado', [], "Convenio actualizado: $nombre (ID $id)");
 }
 

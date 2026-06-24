@@ -2,6 +2,18 @@
 $tsj_module    = 'visitantes';
 $tsj_title     = 'Secretarías';
 $tsj_extra_css = ['style.css'];
+require_once __DIR__ . '/../../shared/config.php';
+
+// Datos desde BD (editables desde el panel admin). Defensivo ante fallo de conexión.
+try {
+    $db          = getPDO(DB_NAME);
+    $secretarias = $db->query(
+        'SELECT nombre, rol, correo, telefono FROM secretarias WHERE activo=1 ORDER BY orden, nombre'
+    )->fetchAll();
+} catch (\Throwable $e) {
+    $secretarias = [];
+}
+
 require_once __DIR__ . '/../../shared/header.php';
 ?>
 <main id="main">
@@ -13,6 +25,7 @@ require_once __DIR__ . '/../../shared/header.php';
     </p>
   </div>
 
+  <?php if (!empty($secretarias)): ?>
   <div class="table-container">
     <table>
       <thead>
@@ -24,39 +37,31 @@ require_once __DIR__ . '/../../shared/header.php';
         </tr>
       </thead>
       <tbody>
+        <?php foreach ($secretarias as $s):
+          $tel = preg_replace('/\D/', '', (string)($s['telefono'] ?? '')); ?>
         <tr>
-          <td class="nombre">Laura Martínez</td>
-          <td>Secretaria Administrativa</td>
-          <td class="correo"><a href="mailto:laura.martinez@chapala.tecmm.edu.mx">laura.martinez@chapala.tecmm.edu.mx</a></td>
-          <td><a href="tel:+523312345678">331-234-5678</a></td>
+          <td class="nombre"><?= htmlspecialchars($s['nombre'], ENT_QUOTES, 'UTF-8') ?></td>
+          <td><?= htmlspecialchars($s['rol'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
+          <td class="correo">
+            <?php if (!empty($s['correo'])): ?>
+              <a href="mailto:<?= htmlspecialchars($s['correo'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($s['correo'], ENT_QUOTES, 'UTF-8') ?></a>
+            <?php endif; ?>
+          </td>
+          <td>
+            <?php if (!empty($s['telefono'])): ?>
+              <a href="tel:<?= htmlspecialchars($tel, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($s['telefono'], ENT_QUOTES, 'UTF-8') ?></a>
+            <?php endif; ?>
+          </td>
         </tr>
-        <tr>
-          <td class="nombre">María López</td>
-          <td>Recepcionista</td>
-          <td class="correo"><a href="mailto:maria.lopez@chapala.tecmm.edu.mx">maria.lopez@chapala.tecmm.edu.mx</a></td>
-          <td><a href="tel:+523314567890">331-456-7890</a></td>
-        </tr>
-        <tr>
-          <td class="nombre">Patricia Gómez</td>
-          <td>Secretaria de Dirección</td>
-          <td class="correo"><a href="mailto:patricia.gomez@chapala.tecmm.edu.mx">patricia.gomez@chapala.tecmm.edu.mx</a></td>
-          <td><a href="tel:+523325678901">332-567-8901</a></td>
-        </tr>
-        <tr>
-          <td class="nombre">Ana Rivera</td>
-          <td>Asistente Académica</td>
-          <td class="correo"><a href="mailto:ana.rivera@chapala.tecmm.edu.mx">ana.rivera@chapala.tecmm.edu.mx</a></td>
-          <td><a href="tel:+523336789012">333-678-9012</a></td>
-        </tr>
-        <tr>
-          <td class="nombre">Gabriela Torres</td>
-          <td>Secretaria de Control Escolar</td>
-          <td class="correo"><a href="mailto:gabriela.torres@chapala.tecmm.edu.mx">gabriela.torres@chapala.tecmm.edu.mx</a></td>
-          <td><a href="tel:+523347890123">334-789-0123</a></td>
-        </tr>
+        <?php endforeach; ?>
       </tbody>
     </table>
   </div>
+  <?php else: ?>
+  <div class="seccion" role="status" style="max-width:1000px;">
+    <p style="margin:0;">No hay secretarías registradas por el momento. Contacta al Departamento Académico para más información.</p>
+  </div>
+  <?php endif; ?>
 
   <a href="index.php" class="top-right" aria-label="Volver al menú principal">
     <img src="imagenes/casa.png" alt="">

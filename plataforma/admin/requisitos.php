@@ -127,7 +127,7 @@ function renderTipoTab(string $tipo, array $d, string $csrf): void {
             <?php foreach ($d['documentos'] as $doc): ?>
             <tr id="doc-<?= $doc['id'] ?>">
               <td style="font-weight:600"><?= htmlspecialchars($doc['nombre']) ?></td>
-              <td><a href="<?= htmlspecialchars($doc['url']) ?>" target="_blank" style="color:var(--tsj-blue);font-size:12.5px"><?= htmlspecialchars(substr($doc['url'],0,50)) ?>…</a></td>
+              <td><a href="<?= htmlspecialchars($doc['url']) ?>" target="_blank" style="color:var(--tsj-blue);font-size:12.5px"><?= htmlspecialchars(mb_strlen($doc['url'])>50 ? mb_substr($doc['url'],0,50).'…' : $doc['url']) ?></a></td>
               <td><span class="adm-status adm-status--info"><?= htmlspecialchars($doc['tipo_archivo']) ?></span></td>
               <td class="actions">
                 <button class="adm-btn adm-btn--ghost adm-btn--sm" onclick="abrirEditarDoc(<?= htmlspecialchars(json_encode($doc)) ?>,'<?= $tipo ?>')">
@@ -143,20 +143,38 @@ function renderTipoTab(string $tipo, array $d, string $csrf): void {
         </table>
       </div>
       <div class="adm-form-card" style="margin-top:14px" id="form-doc-wrap-<?= $tipo ?>">
-        <form data-proc="requisitos" data-reload class="form-doc" id="form-doc-<?= $tipo ?>">
+        <form data-proc="requisitos" data-reload class="form-doc" id="form-doc-<?= $tipo ?>" enctype="multipart/form-data">
           <input type="hidden" name="_csrf" value="<?= $csrf ?>">
           <input type="hidden" name="accion" value="doc_agregar" class="doc-accion">
           <input type="hidden" name="tipo" value="<?= $tipo ?>">
           <input type="hidden" name="id" class="doc-id">
-          <div class="adm-form-grid cols-3">
-            <div class="adm-field"><label>Nombre del documento</label><input type="text" name="nombre" class="doc-nombre" required></div>
-            <div class="adm-field"><label>URL del archivo</label><input type="url" name="url" class="doc-url" required></div>
-            <div class="adm-field"><label>Tipo</label>
+          <div class="adm-form-grid cols-2">
+            <div class="adm-field" style="grid-column:1/-1">
+              <label>Nombre del documento <span style="color:var(--tsj-pink)">*</span></label>
+              <input type="text" name="nombre" class="doc-nombre" required>
+            </div>
+            <div class="adm-field">
+              <label>Subir PDF</label>
+              <div class="doc-archivo-actual" style="display:none;margin-bottom:8px;padding:8px 10px;background:var(--tsj-blue-50);border:1px solid #c7d2fe;border-radius:8px;font-size:12.5px;color:var(--tsj-blue-dark)">
+                <span class="material-symbols-rounded" style="font-size:15px;vertical-align:middle">picture_as_pdf</span>
+                Archivo actual: <a class="doc-archivo-link" href="#" target="_blank" rel="noopener" style="color:var(--tsj-blue);font-weight:600">Ver</a>
+              </div>
+              <input type="file" name="doc_archivo" class="doc-file" accept=".pdf,application/pdf">
+              <span class="adm-field-help">PDF · máx. 10 MB. Si subes un archivo no necesitas llenar la URL.</span>
+            </div>
+            <div class="adm-field">
+              <label>URL externa <span style="color:var(--tsj-gray-400);font-weight:400">(si no subes PDF)</span></label>
+              <input type="url" name="url" class="doc-url" placeholder="https://drive.google.com/…">
+              <span class="adm-field-help">Google Drive, OneDrive u otro enlace de descarga directo.</span>
+            </div>
+            <div class="adm-field">
+              <label>Tipo de enlace</label>
               <select name="tipo_archivo" class="doc-tipo">
                 <option value="Google Drive">Google Drive</option>
-                <option value="PDF">PDF local</option>
+                <option value="PDF">PDF directo</option>
                 <option value="Otro">Otro</option>
               </select>
+              <span class="adm-field-help">Solo aplica cuando usas URL. Al subir PDF se pone automático.</span>
             </div>
           </div>
           <div class="adm-form-actions">
@@ -295,20 +313,80 @@ function addFaq(containerId){
   div.querySelector('input').focus();
 }
 
+// Lógica exclusión mutua: archivo ↔ URL
+(function () {
+  document.addEventListener('change', function (e) {
+    var file = e.target;
+    if (!file.matches('.doc-file')) return;
+    var form = file.closest('form');
+    if (!form) return;
+    var urlInput = form.querySelector('.doc-url');
+    var tipoSel  = form.querySelector('.doc-tipo');
+    if (file.files && file.files.length > 0) {
+      urlInput.value    = '';
+      urlInput.disabled = true;
+      urlInput.style.opacity = '0.4';
+      if (tipoSel) { tipoSel.disabled = true; tipoSel.style.opacity = '0.4'; }
+    } else {
+      urlInput.disabled = false;
+      urlInput.style.opacity = '';
+      if (tipoSel) { tipoSel.disabled = false; tipoSel.style.opacity = ''; }
+    }
+  });
+  document.addEventListener('input', function (e) {
+    var urlInput = e.target;
+    if (!urlInput.matches('.doc-url')) return;
+    var form = urlInput.closest('form');
+    if (!form) return;
+    var fileInput = form.querySelector('.doc-file');
+    if (!fileInput) return;
+    if (urlInput.value.trim() !== '') {
+      fileInput.disabled = true;
+      fileInput.style.opacity = '0.4';
+    } else {
+      fileInput.disabled = false;
+      fileInput.style.opacity = '';
+    }
+  });
+  // Al resetear el formulario, restaurar estados
+  document.addEventListener('reset', function (e) {
+    var form = e.target;
+    if (!form.matches('.form-doc')) return;
+    setTimeout(function () {
+      var fi = form.querySelector('.doc-file');
+      var ui = form.querySelector('.doc-url');
+      var ts = form.querySelector('.doc-tipo');
+      if (fi) { fi.disabled = false; fi.style.opacity = ''; }
+      if (ui) { ui.disabled = false; ui.style.opacity = ''; }
+      if (ts) { ts.disabled = false; ts.style.opacity = ''; }
+    }, 0);
+  });
+})();
+
 function abrirEditarDoc(doc, tipo){
-  const form = document.getElementById('form-doc-'+tipo);
+  const form    = document.getElementById('form-doc-'+tipo);
   form.querySelector('.doc-accion').value = 'doc_editar';
   form.querySelector('.doc-id').value     = doc.id;
   form.querySelector('.doc-nombre').value = doc.nombre||'';
   form.querySelector('.doc-url').value    = doc.url||'';
   const sel = form.querySelector('.doc-tipo');
   for(let o of sel.options){ if(o.value===doc.tipo_archivo){ o.selected=true; break; } }
+  // Mostrar enlace al archivo actual
+  const actWrap = form.querySelector('.doc-archivo-actual');
+  const actLink = form.querySelector('.doc-archivo-link');
+  if (actWrap && actLink && doc.url) {
+    actLink.href        = doc.url;
+    actLink.textContent = doc.nombre || 'Ver archivo';
+    actWrap.style.display = '';
+  }
   form.scrollIntoView({behavior:'smooth'});
 }
 function resetFormDoc(tipo){
   const form = document.getElementById('form-doc-'+tipo);
   form.querySelector('.doc-accion').value='doc_agregar';
   form.querySelector('.doc-id').value='';
+  const actWrap = form.querySelector('.doc-archivo-actual');
+  if (actWrap) actWrap.style.display = 'none';
   form.reset();
 }
 </script>
