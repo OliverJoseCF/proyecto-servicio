@@ -250,7 +250,7 @@ El admin está en `http://tudominio.com/plataforma/login.php`
 
 **Credenciales de administrador:**
 - Email: `admin@chapala.tecmm.edu.mx`
-- Contraseña: `Admin2024!TSJ`
+- Contraseña: `Admin2026!TSJ`
 
 ### Checklist de producción
 

@@ -43,7 +43,7 @@ Panel de administración: `http://localhost/plataforma/login.php`
 | Campo | Valor |
 |---|---|
 | Usuario (email) | `admin@chapala.tecmm.edu.mx` |
-| Contraseña | `Admin2024!TSJ` |
+| Contraseña | `Admin2026!TSJ` |
 
 > Cambia la contraseña despues de la instalacion editando `plataforma/shared/config.local.php`.
 
