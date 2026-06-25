@@ -1,0 +1,133 @@
+Genera una presentación de PowerPoint profesional para un proyecto escolar de residencias profesionales.
+
+ESTILO VISUAL:
+- Diseño simple, limpio y fácil de leer — nada recargado
+- Colores institucionales: azul marino #1e3a5f como base, turquesa #0ea5e9 como acento
+- Tipografía grande y legible (mínimo 20pt en cuerpo, 36pt+ en títulos)
+- Fondo blanco o gris muy claro — sin fondos oscuros con texto blanco que cansen la vista
+- Máximo 5 líneas de texto por diapositiva — si hay más, divídela en dos
+- Íconos simples para acompañar los puntos clave (usa íconos de Office o similares)
+- Que se vea moderno pero sobrio — es para un comité académico, no para marketing
+
+---
+
+INFORMACIÓN DEL PROYECTO:
+
+Nombre: Plataforma de Servicios Estudiantiles — TSJ Chapala
+Institución: Tecnológico Superior de Jalisco, Campus Chapala
+Tipo: Proyecto de residencias profesionales / servicio social
+Tecnologías usadas: PHP 8, MySQL, HTML5, CSS3, JavaScript (sin frameworks, desarrollado desde cero)
+
+---
+
+DESCRIPCIÓN GENERAL:
+
+Portal web institucional que centraliza en un solo lugar todos los servicios digitales del plantel
+para alumnos, docentes y público en general, con un panel de administración completo para que
+el personal gestione toda la información sin necesidad de conocimientos técnicos.
+
+---
+
+MÓDULOS DEL SISTEMA:
+
+1. Portal principal — Página de inicio con acceso visual a todos los servicios
+2. Directorio institucional — Docentes, coordinadores y personal por carrera con fotos y contacto
+3. Biblioteca — Catálogo de libros, préstamos y solicitudes en línea
+4. Convenios empresariales — Directorio de empresas para prácticas y residencias
+5. Horarios — Consulta de horarios de maestros por carrera y semestre
+6. Requisitos — Guías de residencias profesionales y servicio social con documentos descargables
+7. Panel de administración — Gestión completa, reportes, bitácora y respaldo de base de datos
+
+---
+
+CARACTERÍSTICAS DESTACADAS:
+
+- Diseño responsive (celular, tablet y computadora)
+- Panel admin sin necesidad de conocimientos técnicos
+- Múltiples administradores con control de acceso
+- Bitácora automática de todos los cambios
+- Exportación de reportes a Excel/CSV
+- Respaldo y restauración de base de datos desde el panel
+- Seguridad: protección contra SQL injection, XSS, CSRF y fuerza bruta
+
+---
+
+ESTRUCTURA DE DIAPOSITIVAS (12 diapositivas):
+
+1. PORTADA
+   - Solo: nombre del proyecto, nombre de la institución, año (2026) y el tipo de proyecto (Residencias Profesionales / Servicio Social)
+   - NO incluir nombre de estudiante ni datos personales
+   - Diseño centrado, limpio, con el color institucional como fondo o franja decorativa
+   - Sin imagen
+
+2. PROBLEMÁTICA
+   - ¿Qué problema existía antes de este proyecto?
+   - Información dispersa, sin portal unificado, procesos manuales, difícil acceso para alumnos
+   - Sin imagen
+
+3. OBJETIVO GENERAL
+   - Una frase clara del objetivo
+   - Sin imagen
+
+4. ¿QUÉ ES LA PLATAFORMA?
+   - Descripción en 3-4 puntos clave
+   - [INSERTAR CAPTURA 1: Vista general del portal principal — la página de inicio completa]
+   - Instrucción para el presentador: coloca la captura a la derecha y el texto a la izquierda
+
+5. MÓDULOS DEL SISTEMA — PARTE 1
+   - Portal principal, Directorio, Biblioteca
+   - [INSERTAR CAPTURA 2: Vista del módulo de Directorio institucional]
+   - Un ícono por módulo, descripción de una línea cada uno
+
+6. MÓDULOS DEL SISTEMA — PARTE 2
+   - Convenios, Horarios, Requisitos
+   - [INSERTAR CAPTURA 3: Vista del módulo de Horarios o Convenios]
+   - Un ícono por módulo, descripción de una línea cada uno
+
+7. PANEL DE ADMINISTRACIÓN
+   - Qué puede hacer el personal desde el admin (gestión, reportes, respaldos)
+   - [INSERTAR CAPTURA 4: Vista del dashboard/inicio del panel de administración]
+   - Texto a la izquierda, captura a la derecha
+
+8. PANEL DE ADMINISTRACIÓN — DETALLE
+   - Bitácora de cambios, exportación CSV, respaldo de BD, múltiples admins
+   - [INSERTAR CAPTURA 5: Vista de la sección de reportes o bitácora del admin]
+
+9. SEGURIDAD Y TECNOLOGÍA
+   - Stack: PHP 8 + MySQL + HTML/CSS/JS puro
+   - Medidas de seguridad implementadas (lista con íconos de escudo o check)
+   - Sin imagen (solo íconos y texto)
+
+10. DEMOSTRACIÓN EN VIVO (diapositiva de transición)
+    - Slide simple que diga "Demostración" o "Demo en vivo"
+    - Sirve de pausa antes de mostrar el sistema real si lo van a demostrar
+
+11. IMPACTO Y BENEFICIOS
+    - 3 columnas: Para alumnos / Para docentes / Para la institución
+    - 2-3 puntos en cada columna
+    - Sin imagen
+
+12. CONCLUSIÓN Y AGRADECIMIENTO
+    - Logros del proyecto resumidos en 3 puntos
+    - Frase de cierre
+    - Agradecimiento al comité
+
+---
+
+IMPORTANTE SOBRE LAS CAPTURAS DE PANTALLA:
+Te estoy adjuntando 5 imágenes directamente en este mensaje. Úsalas en el PowerPoint así:
+
+- Imagen 1 (portal principal) → diapositiva 4
+- Imagen 2 (directorio institucional) → diapositiva 5
+- Imagen 3 (horarios o convenios) → diapositiva 6
+- Imagen 4 (dashboard del admin) → diapositiva 7
+- Imagen 5 (reportes o bitácora) → diapositiva 8
+
+Coloca cada imagen ocupando aproximadamente la mitad derecha de su diapositiva.
+El texto o puntos clave van en la mitad izquierda.
+Ajusta el recorte o tamaño de la imagen para que se vea bien y no tape el texto.
+No uses placeholders — inserta las imágenes reales directamente en el archivo .pptx.
+
+TONO: Profesional, directo y seguro. Presentación de entrega final ante comité académico.
+IDIOMA: Español.
+FORMATO: PowerPoint (.pptx) listo para descargar y usar.

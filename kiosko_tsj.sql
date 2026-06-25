@@ -108,7 +108,7 @@ CREATE TABLE `carrusel_fotos` (
 
 INSERT INTO `carrusel_fotos` (`url`, `titulo`, `subtitulo`, `orden`) VALUES
   ('https://placehold.co/1200x400/32129a/ffffff?text=Campus+Chapala', 'Bienvenido al Campus Chapala', 'Tecnológico Superior de Jalisco', 1),
-  ('https://placehold.co/1200x400/ec5a68/ffffff?text=Semestre+2025', 'Semestre Agosto-Diciembre 2025', 'Consulta horarios y servicios disponibles', 2),
+  ('https://placehold.co/1200x400/ec5a68/ffffff?text=Semestre+2026', 'Semestre Agosto-Diciembre 2026', 'Consulta horarios y servicios disponibles', 2),
   ('https://placehold.co/1200x400/1a0960/ffffff?text=Servicios', 'Servicios Académicos', 'Todo lo que necesitas en un solo lugar', 3);
 
 
@@ -131,9 +131,9 @@ CREATE TABLE `avisos` (
 --   ADD COLUMN `publicar_hasta` DATE NULL COMMENT 'NULL = sin fecha de caducidad' AFTER `publicar_desde`;
 
 INSERT INTO `avisos` (`titulo`, `descripcion`, `fecha`, `orden`) VALUES
-  ('Inicio de semestre agosto-diciembre 2025', 'El semestre inicia el 11 de agosto. Consulta tu horario en el módulo de Horarios.', '2025-07-15', 1),
-  ('Periodo de inscripciones abiertas',        'Las inscripciones para nuevo ingreso están abiertas hasta el 30 de julio.',          '2025-07-01', 2),
-  ('Suspensión de actividades 15 de septiembre','Por motivo del Día de la Independencia no habrá clases el 15 de septiembre.',       '2025-09-01', 3);
+  ('Inicio de semestre agosto-diciembre 2026', 'El semestre inicia el 11 de agosto. Consulta tu horario en el módulo de Horarios.', '2026-07-15', 1),
+  ('Periodo de inscripciones abiertas',        'Las inscripciones para nuevo ingreso están abiertas hasta el 30 de julio.',          '2026-07-01', 2),
+  ('Suspensión de actividades 15 de septiembre','Por motivo del Día de la Independencia no habrá clases el 15 de septiembre.',       '2026-09-01', 3);
 
 
 -- ================================================================
