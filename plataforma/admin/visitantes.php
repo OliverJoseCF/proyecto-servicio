@@ -135,7 +135,7 @@ require_once __DIR__ . '/_layout.php';
               <span class="material-symbols-rounded"><?= $p['activo'] ? 'visibility_off' : 'visibility' ?></span>
             </button>
             <button class="adm-btn adm-btn--ghost adm-btn--sm"
-                    onclick="abrirEditar('dir',<?= htmlspecialchars(json_encode($p)) ?>)">
+                    onclick="abrirEditar('dir',<?= htmlspecialchars(json_encode($p), ENT_QUOTES, 'UTF-8') ?>)">
               <span class="material-symbols-rounded">edit</span>
             </button>
             <button class="adm-btn adm-btn--danger adm-btn--sm"
@@ -161,7 +161,7 @@ require_once __DIR__ . '/_layout.php';
         <div class="adm-field"><label>Nombre completo <span style="color:var(--tsj-pink)">*</span></label><input type="text" name="nombre" id="dir-nombre" required></div>
         <div class="adm-field"><label>Puesto / Área</label><input type="text" name="puesto" id="dir-puesto"></div>
         <div class="adm-field"><label>Correo electrónico</label><input type="email" name="correo" id="dir-correo"></div>
-        <div class="adm-field"><label>Teléfono</label><input type="tel" name="telefono" id="dir-telefono" placeholder="S/N" inputmode="tel" maxlength="25" pattern="[0-9+\-\s()]{7,25}|S/N" title="Solo números, +, -, espacios y paréntesis (o 'S/N' si no aplica)"></div>
+        <div class="adm-field"><label>Teléfono</label><input type="text" name="telefono" id="dir-telefono" placeholder="S/N" inputmode="tel" maxlength="25" pattern="[0-9+\-\s()]{7,25}|S\/N" title="Número de teléfono (ej. 376-766-0000) o escribe S/N si no aplica"></div>
         <div class="adm-field"><label>Extensión</label><input type="text" name="extension" id="dir-extension" placeholder="Ej. Ext. 101"></div>
         <div class="adm-field"><label>Ubicación física</label><input type="text" name="ubicacion_fisica" id="dir-ubicacion" placeholder="Ej. Módulo A, Planta Baja"></div>
         <div class="adm-field" style="grid-column:1/-1">
@@ -245,7 +245,7 @@ require_once __DIR__ . '/_layout.php';
               <span class="material-symbols-rounded"><?= $dActivo ? 'person_off' : 'how_to_reg' ?></span>
             </button>
             <button class="adm-btn adm-btn--ghost adm-btn--sm"
-                    onclick="abrirEditarDoc(<?= htmlspecialchars(json_encode(['id'=>$d['id'],'nombre'=>$d['nombre'],'correo'=>$d['correo'],'foto'=>$d['foto'],'carrera_ids'=>$dCarreraIds])) ?>)">
+                    onclick="abrirEditarDoc(<?= htmlspecialchars(json_encode(['id'=>$d['id'],'nombre'=>$d['nombre'],'correo'=>$d['correo'],'foto'=>$d['foto'],'carrera_ids'=>$dCarreraIds]), ENT_QUOTES, 'UTF-8') ?>)">
               <span class="material-symbols-rounded">edit</span>
             </button>
             <button class="adm-btn adm-btn--danger adm-btn--sm"
@@ -321,7 +321,7 @@ require_once __DIR__ . '/_layout.php';
           <td><a href="mailto:<?= htmlspecialchars($c['correo'] ?? '') ?>" style="color:var(--tsj-blue)"><?= htmlspecialchars($c['correo'] ?? '') ?></a></td>
           <td class="actions">
             <button class="adm-btn adm-btn--ghost adm-btn--sm"
-                    onclick="abrirEditarCoord(<?= htmlspecialchars(json_encode($c)) ?>)">
+                    onclick="abrirEditarCoord(<?= htmlspecialchars(json_encode($c), ENT_QUOTES, 'UTF-8') ?>)">
               <span class="material-symbols-rounded">edit</span>
             </button>
             <button class="adm-btn adm-btn--danger adm-btn--sm"
@@ -452,7 +452,7 @@ require_once __DIR__ . '/_layout.php';
                 <span class="material-symbols-rounded"><?= $c['activo'] ? 'visibility_off' : 'visibility' ?></span>
               </button>
               <button class="adm-btn adm-btn--ghost adm-btn--sm"
-                      onclick="abrirEditarCarrera(<?= htmlspecialchars(json_encode($c)) ?>)">
+                      onclick="abrirEditarCarrera(<?= htmlspecialchars(json_encode($c), ENT_QUOTES, 'UTF-8') ?>)">
                 <span class="material-symbols-rounded">edit</span>
               </button>
               <button class="adm-btn adm-btn--danger adm-btn--sm"
@@ -647,7 +647,7 @@ require_once __DIR__ . '/_layout.php';
           <td><?= htmlspecialchars($s['telefono'] ?? '') ?></td>
           <td class="actions">
             <button class="adm-btn adm-btn--ghost adm-btn--sm"
-                    onclick="abrirEditarSec(<?= htmlspecialchars(json_encode($s)) ?>)">
+                    onclick="abrirEditarSec(<?= htmlspecialchars(json_encode($s), ENT_QUOTES, 'UTF-8') ?>)">
               <span class="material-symbols-rounded">edit</span>
             </button>
             <button class="adm-btn adm-btn--danger adm-btn--sm"
@@ -708,6 +708,24 @@ require_once __DIR__ . '/_layout.php';
 </div>
 
 <script>
+// ── Filtro teléfono directorio: solo dígitos/+/-/espacios/() o "S/N" ──
+(function () {
+  var campo = document.getElementById('dir-telefono');
+  if (!campo) return;
+  campo.addEventListener('input', function () {
+    var v = this.value;
+    var pos = this.selectionStart;
+    // Permitir mientras se está escribiendo "S/N" (parcial)
+    if (/^[Ss](\/([Nn])?)?$/.test(v)) return;
+    // Permitir número de teléfono (solo caracteres válidos)
+    var limpio = v.replace(/[^0-9+\-\s()]/g, '');
+    if (limpio !== v) {
+      this.value = limpio;
+      try { this.setSelectionRange(pos - 1, pos - 1); } catch (e) {}
+    }
+  });
+})();
+
 // ── Preview imagen de portada ────────────────────────────────────
 function previsualizarPortada(input) {
   var wrap = document.getElementById('car-imagen-preview-wrap');

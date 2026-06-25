@@ -57,6 +57,7 @@ if ($accion === 'horario_guardar') {
            ->execute([$semestre, $imagenFinal, $row['id_horario']]);
         jsonOk('Horario actualizado', [], "Horario actualizado: $profNombre (ID {$row['id_horario']})");
     } else {
+        if ($imagen === null) jsonErr('Debes subir un archivo (PDF o imagen) para crear un nuevo horario.');
         $db->prepare('INSERT INTO horarios (id_profesor,id_carrera,semestre,imagen_horario) VALUES (?,?,?,?)')
            ->execute([$profesor_id, $carrera_id ?: null, $semestre, $imagen]);
         $newId = $db->lastInsertId();

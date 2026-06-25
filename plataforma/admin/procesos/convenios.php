@@ -68,13 +68,10 @@ if ($accion === 'convenio_editar') {
     if (!$id || !$nombre) jsonErr('Datos incompletos');
     $logoNuevo = subirLogoConvenio();
     if ($logoNuevo === null) {
+        // El campo oculto `logo` guarda la URL actual al editar; si está vacío el admin
+        // eligió quitarlo (botón "Quitar"), así que se guarda NULL sin fallback a BD.
         $logoNuevo = str('logo', 500) ?: null;
         if ($logoNuevo !== null && !urlSegura($logoNuevo)) jsonErr('La URL del logo no es válida (usa http(s):// o sube un archivo).');
-        if ($logoNuevo === null) {
-            $stmtL = $db->prepare('SELECT logo FROM convenios WHERE id=?');
-            $stmtL->execute([$id]);
-            $logoNuevo = $stmtL->fetchColumn() ?: null;
-        }
     }
     $db->prepare('UPDATE convenios SET nombre=?,tipo_convenio=?,sector=?,nombre_contacto=?,correo_contacto=?,telefono_contacto=?,logo=?,vencimiento=? WHERE id=?')
        ->execute([$nombre,$tipo,$sector,$contacto,$correo,$telefono,$logoNuevo,$vence,$id]);

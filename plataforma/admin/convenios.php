@@ -371,8 +371,13 @@ function procesarSug(id, tipo, rowId, csrf){
     });
 }
 
-if(location.hash==='#sugerencias') showTab('conv','sugerencias');
-if(location.hash==='#vencimientos'){ document.getElementById('conv-vencidos').checked = true; aplicarFiltroConv(); }
+setTimeout(function() {
+  if (location.hash === '#sugerencias') showTab('conv', 'sugerencias');
+  if (location.hash === '#vencimientos') {
+    document.getElementById('conv-vencidos').checked = true;
+    aplicarFiltroConv();
+  }
+}, 0);
 </script>
 
 <?php require_once __DIR__ . '/_layout_end.php'; ?>

@@ -70,7 +70,10 @@ if ($accion === 'guardar_redes') {
 if ($accion === 'cambiar_password') {
     $nueva    = $_POST['nueva_password']    ?? '';
     $confirma = $_POST['confirma_password'] ?? '';
-    if (strlen($nueva) < 12)          jsonErr('La contraseña debe tener al menos 12 caracteres');
+    if (strlen($nueva) < 8)            jsonErr('La contraseña debe tener al menos 8 caracteres');
+    if (!preg_match('/[A-Z]/', $nueva)) jsonErr('La contraseña debe incluir al menos una mayúscula');
+    if (!preg_match('/[0-9]/', $nueva)) jsonErr('La contraseña debe incluir al menos un número');
+    if (!preg_match('/[^A-Za-z0-9]/', $nueva)) jsonErr('La contraseña debe incluir al menos un símbolo');
     if ($nueva !== $confirma)          jsonErr('Las contraseñas no coinciden');
 
     $hash    = password_hash($nueva, PASSWORD_BCRYPT, ['cost' => 12]);

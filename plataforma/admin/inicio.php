@@ -297,7 +297,7 @@ function toggleActivo(modulo, accion, id, btn) {
       if (json.ok) {
         var row  = btn.closest('tr');
         var icon = btn.querySelector('.material-symbols-rounded');
-        var badge = row.querySelector('.adm-status');
+        var badge = row.querySelector('.adm-status[data-off]');
         var activo = json.activo;
         row.style.opacity = activo ? '' : '0.5';
         icon.textContent  = activo ? 'visibility_off' : 'visibility';

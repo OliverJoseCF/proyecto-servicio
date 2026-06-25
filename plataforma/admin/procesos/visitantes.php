@@ -9,7 +9,10 @@ if ($accion === 'directorio_agregar') {
     $nombre   = str('nombre', 150);
     $puesto   = str('puesto', 150);
     $correo   = str('correo', 254);
-    $telefono = telefono('telefono') ?: 'S/N';
+    $telefonoBruto = str('telefono', 25);
+    $telefono = ($telefonoBruto === '' || strtoupper($telefonoBruto) === 'S/N')
+        ? 'S/N'
+        : (telefono('telefono') ?: 'S/N');
     $extension= str('extension', 20);
     $ubicacion= str('ubicacion_fisica', 200);
     $foto     = str('foto', 500);
@@ -26,7 +29,10 @@ if ($accion === 'directorio_editar') {
     $nombre   = str('nombre', 150);
     $puesto   = str('puesto', 150);
     $correo   = str('correo', 254);
-    $telefono = telefono('telefono') ?: 'S/N';
+    $telefonoBruto = str('telefono', 25);
+    $telefono = ($telefonoBruto === '' || strtoupper($telefonoBruto) === 'S/N')
+        ? 'S/N'
+        : (telefono('telefono') ?: 'S/N');
     $extension= str('extension', 20);
     $ubicacion= str('ubicacion_fisica', 200);
     $foto     = str('foto', 500);
