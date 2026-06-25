@@ -7,13 +7,15 @@ require_once __DIR__ . '/../../shared/config.php';
 
 try {
     $db         = getPDO(DB_NAME);
-    $personas   = $db->query('SELECT nombre, puesto, ubicacion_fisica, extension, correo, foto FROM directorio WHERE activo=1 ORDER BY orden, nombre')->fetchAll();
-    $secretarias = $db->query('SELECT nombre, rol, telefono, correo FROM secretarias WHERE activo=1 ORDER BY orden, nombre')->fetchAll();
-    $db_ok      = true;
+    $personas      = $db->query('SELECT nombre, puesto, ubicacion_fisica, extension, correo, foto FROM directorio WHERE activo=1 ORDER BY orden, nombre')->fetchAll();
+    $secretarias   = $db->query('SELECT nombre, rol, telefono, correo FROM secretarias WHERE activo=1 ORDER BY orden, nombre')->fetchAll();
+    $coordinadores = $db->query('SELECT co.nombre, co.correo, c.nombre AS carrera_nombre FROM coordinadores co JOIN carreras c ON co.carrera_id = c.id WHERE co.activo=1 ORDER BY c.orden, co.nombre')->fetchAll();
+    $db_ok         = true;
 } catch (\Throwable $e) {
-    $personas    = [];
-    $secretarias = [];
-    $db_ok       = false;
+    $personas      = [];
+    $secretarias   = [];
+    $coordinadores = [];
+    $db_ok         = false;
 }
 
 $base_img = (defined('PLATAFORMA_URL') ? PLATAFORMA_URL : '/plataforma') . '/modulos/visitantes/imagenes/';
@@ -185,6 +187,12 @@ require_once __DIR__ . '/../../shared/header.php';
       <span class="material-symbols-rounded" style="font-size:18px">badge</span>
       Personal Directivo
     </button>
+    <?php if (!empty($coordinadores)): ?>
+    <button class="dir-tab-btn" onclick="dirTab('coordinadores',this)">
+      <span class="material-symbols-rounded" style="font-size:18px">school</span>
+      Coordinadores
+    </button>
+    <?php endif; ?>
     <?php if (!empty($secretarias)): ?>
     <button class="dir-tab-btn" onclick="dirTab('secretarias',this)">
       <span class="material-symbols-rounded" style="font-size:18px">support_agent</span>
@@ -240,6 +248,33 @@ require_once __DIR__ . '/../../shared/header.php';
     </div>
     <?php endif; ?>
   </div>
+
+  <!-- Panel: Coordinadores -->
+  <?php if (!empty($coordinadores)): ?>
+  <div class="dir-panel" id="dir-panel-coordinadores">
+    <div class="dir-grid">
+      <?php foreach ($coordinadores as $co): ?>
+      <div class="dir-card">
+        <div style="width:100%;height:200px;background:linear-gradient(135deg,#edf2ff 0%,#dce4ff 100%);display:flex;align-items:center;justify-content:center">
+          <span class="material-symbols-rounded" style="font-size:64px;color:#5b73d4">manage_accounts</span>
+        </div>
+        <div class="dir-card-body">
+          <div class="dir-card-nombre"><?= htmlspecialchars($co['nombre']) ?></div>
+          <div class="dir-card-puesto">Coordinador<?php if ($co['carrera_nombre']): ?> — <?= htmlspecialchars($co['carrera_nombre']) ?><?php endif; ?></div>
+          <?php if ($co['correo']): ?>
+          <div class="dir-card-info">
+            <div class="dir-card-row">
+              <span class="material-symbols-rounded" aria-hidden="true">mail</span>
+              <a href="mailto:<?= htmlspecialchars($co['correo']) ?>"><?= htmlspecialchars($co['correo']) ?></a>
+            </div>
+          </div>
+          <?php endif; ?>
+        </div>
+      </div>
+      <?php endforeach; ?>
+    </div>
+  </div>
+  <?php endif; ?>
 
   <!-- Panel: Secretarías -->
   <?php if (!empty($secretarias)): ?>

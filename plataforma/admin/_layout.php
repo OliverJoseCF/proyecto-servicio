@@ -11,6 +11,9 @@
 if (!defined('PLATAFORMA_URL')) {
     require_once dirname(__DIR__) . '/shared/config.php';
 }
+if (!function_exists('tsjConfig')) {
+    require_once dirname(__DIR__) . '/shared/lib/config_data.php';
+}
 $base     = PLATAFORMA_URL;
 $adm_page = $adm_page    ?? 'dashboard';
 $adm_title = $adm_title  ?? 'Panel de Administración';
@@ -81,7 +84,7 @@ $navSections = [
            alt="TSJ" />
       <div class="adm-sidebar-title">
         Panel Admin
-        <span>TSJ Campus Chapala</span>
+        <span><?= htmlspecialchars(tsjConfig('campus', 'TSJ Campus Chapala'), ENT_QUOTES, 'UTF-8') ?></span>
       </div>
     </div>
 

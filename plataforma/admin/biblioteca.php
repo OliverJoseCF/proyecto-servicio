@@ -196,8 +196,8 @@ require_once __DIR__ . '/_layout.php';
           <td><?= htmlspecialchars($p['estudiante_control']) ?></td>
           <td><?= htmlspecialchars($p['libro_nombre']) ?></td>
           <td><span class="adm-status adm-status--info"><?= $p['tipo']==='prestamo'?'Préstamo':'Consulta sala' ?></span></td>
-          <td><?= htmlspecialchars($p['fecha_prestamo'] ?? '') ?></td>
-          <td><span class="adm-status adm-status--<?= $status ?>"><?= htmlspecialchars($p['fecha_devolucion'] ?? '—') ?></span></td>
+          <td><?= $p['fecha_prestamo'] ? date('d/m/Y', strtotime($p['fecha_prestamo'])) : '—' ?></td>
+          <td><span class="adm-status adm-status--<?= $status ?>"><?= $p['fecha_devolucion'] ? date('d/m/Y', strtotime($p['fecha_devolucion'])) : '—' ?></span></td>
           <td class="actions">
             <button class="adm-btn adm-btn--primary adm-btn--sm"
                     onclick="marcarDevuelto(<?= $p['id'] ?>,'prest-<?= $p['id'] ?>','<?= $csrf ?>')">
@@ -248,7 +248,7 @@ require_once __DIR__ . '/_layout.php';
           <td><?= $s['estudiante_control'] !== '' ? htmlspecialchars($s['estudiante_control']) : '<span style="color:var(--tsj-gray-400);font-size:12px">—</span>' ?></td>
           <td><?= htmlspecialchars($s['libro_nombre']) ?></td>
           <td><span class="adm-status adm-status--info"><?= $s['tipo']==='prestamo'?'Préstamo':'Consulta sala' ?></span></td>
-          <td><?= htmlspecialchars(substr($s['created_at'],0,10)) ?></td>
+          <td><?= $s['created_at'] ? date('d/m/Y', strtotime($s['created_at'])) : '—' ?></td>
           <td class="actions">
             <button class="adm-btn adm-btn--primary adm-btn--sm"
                     onclick="procesarSol(<?= $s['id'] ?>,'aprobar','sol-<?= $s['id'] ?>','<?= $csrf ?>')">

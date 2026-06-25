@@ -209,9 +209,63 @@ proyecto-servicio/
 
 ---
 
-## Solo para producción
+## Solo para producción (hosting con cPanel)
 
-Ejecuta `plataforma/sql/setup.sql` para crear el usuario con mínimos privilegios:
+Esta sección es para cuando el proyecto se sube a un servidor web real (hosting compartido).
+
+### 1. Subir los archivos
+
+1. Accede al **cPanel** del hosting → **Administrador de archivos**
+2. Entra a la carpeta `public_html/`
+3. Sube el `.zip` del proyecto y descomprímelo ahí
+4. La estructura debe quedar: `public_html/plataforma/`
+
+### 2. Crear la base de datos en el hosting
+
+1. En cPanel → **Bases de datos MySQL** → crea una nueva BD (ej: `kiosko_tsj`)
+2. Crea un usuario MySQL y asígnale **todos los privilegios** sobre esa BD
+3. Abre **phpMyAdmin**, selecciona la BD recién creada
+4. Pestaña **Importar** → sube el archivo `kiosko_tsj.sql`
+
+> En muchos hostings el nombre real de la BD queda como `nombreusuario_kiosko_tsj`.
+> Usa el nombre exacto que aparece en cPanel.
+
+### 3. Editar `config.local.php`
+
+Abre `plataforma/shared/config.local.php` desde el Administrador de archivos y ajusta:
+
+```php
+define('DB_HOST', 'localhost');
+define('DB_USER', 'usuario_mysql_del_hosting');   // el que creaste en cPanel
+define('DB_PASS', 'contraseña_del_usuario');
+define('DB_NAME', 'nombre_exacto_de_la_bd');      // ej: cuenta_kiosko_tsj
+```
+
+El resto del archivo (URL, hash de admin) no necesita cambiarse.
+
+### 4. Verificar que funciona
+
+Accede a `http://tudominio.com/plataforma` — debe cargar el portal.
+El admin está en `http://tudominio.com/plataforma/login.php`
+
+**Credenciales de administrador:**
+- Email: `admin@chapala.tecmm.edu.mx`
+- Contraseña: `Admin2024!TSJ`
+
+### Checklist de producción
+
+- [ ] BD `kiosko_tsj` importada desde `kiosko_tsj.sql`
+- [ ] `config.local.php` actualizado con credenciales del hosting
+- [ ] Portal carga en `http://tudominio.com/plataforma`
+- [ ] Login admin funciona
+- [ ] Carpeta `plataforma/modulos/horarios/horarios/` existe y tiene permisos de escritura (755)
+- [ ] Carpeta `plataforma/modulos/convenios/src/pages/upload/` existe y tiene permisos de escritura (755)
+
+---
+
+## Solo para producción avanzada (servidor Linux propio)
+
+Ejecuta `plataforma/sql/setup.sql` para crear un usuario MySQL con mínimos privilegios:
 
 ```bash
 # Edita primero TU_CLAVE_SEGURA en setup.sql, luego:
@@ -225,10 +279,9 @@ define('DB_USER', 'tsjplat');
 define('DB_PASS', 'TU_CLAVE_SEGURA');
 ```
 
-Checklist adicional de producción:
+Checklist adicional:
 
 - [ ] `display_errors = Off` y `log_errors = On` en `php.ini`
 - [ ] HTTPS habilitado + redirect HTTP→HTTPS
 - [ ] Directorios de upload sin permisos 777
-- [ ] `tools/.htaccess` bloqueando acceso web a los scripts de setup
 - [ ] MTA configurado si usas la función "Sugerir empresa" de Convenios (usa `mail()`)

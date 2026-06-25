@@ -161,12 +161,12 @@
 .adm-main {
   flex: 1;
   min-width: 0;
-  overflow-x: hidden;
   margin-left: 252px;
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
 }
+.adm-content { overflow-x: hidden; }
 
 /* Topbar */
 .adm-topbar {
@@ -337,10 +337,10 @@
 /* ── Tabs ──────────────────────────────────────────────────────── */
 .adm-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 2px;
   border-bottom: 2px solid var(--tsj-gray-200);
   margin-bottom: 24px;
-  overflow-x: auto;
   padding-bottom: 0;
 }
 .adm-tab {

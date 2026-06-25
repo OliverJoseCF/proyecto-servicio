@@ -207,7 +207,7 @@ require_once __DIR__ . '/_layout.php';
           <td style="font-weight:600"><?= htmlspecialchars($s['nombre_empresa']) ?></td>
           <td><a href="mailto:<?= htmlspecialchars($s['correo_empresa']) ?>" style="color:var(--tsj-blue)"><?= htmlspecialchars($s['correo_empresa']) ?></a></td>
           <td><?= htmlspecialchars($s['nombre_contacto'] ?? '') ?></td>
-          <td><?= htmlspecialchars(substr($s['created_at'],0,10)) ?></td>
+          <td><?= $s['created_at'] ? date('d/m/Y', strtotime($s['created_at'])) : '—' ?></td>
           <td class="actions">
             <button class="adm-btn adm-btn--primary adm-btn--sm"
                     onclick="procesarSug(<?= $s['id'] ?>,'aceptar','sug-<?= $s['id'] ?>','<?= $csrf ?>')">

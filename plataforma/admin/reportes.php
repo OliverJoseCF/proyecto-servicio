@@ -116,7 +116,7 @@ require_once __DIR__ . '/_layout.php';
             <td style="font-weight:600"><?= htmlspecialchars($a['estudiante_nombre']) ?></td>
             <td><?= htmlspecialchars($a['estudiante_control']) ?></td>
             <td><?= htmlspecialchars($a['libro_nombre']) ?></td>
-            <td><?= htmlspecialchars($a['fecha_devolucion']) ?></td>
+            <td><?= $a['fecha_devolucion'] ? date('d/m/Y', strtotime($a['fecha_devolucion'])) : '—' ?></td>
             <td><span class="adm-status adm-status--danger"><?= (int)$a['dias_atraso'] ?> día<?= $a['dias_atraso'] == 1 ? '' : 's' ?></span></td>
           </tr>
           <?php endforeach; ?>
@@ -290,7 +290,7 @@ require_once __DIR__ . '/_layout.php';
             if ($autor === '') $autor = 'Cuenta maestra';
             $modLabel  = $moduloLabels[$b['modulo']] ?? $b['modulo'];
             $isLogin   = $b['modulo'] === 'login';
-            $fechaFmt  = $b['created_at'] ? date('d/m/Y H:i', strtotime($b['created_at'])) : '—';
+            $fechaFmt  = $b['created_at'] ? date('d/m/Y g:i A', strtotime($b['created_at'])) : '—';
           ?>
           <tr data-modulo="<?= htmlspecialchars($b['modulo']) ?>"
               data-search="<?= htmlspecialchars(mb_strtolower($autor . ' ' . $modLabel . ' ' . ($b['accion'] ?? '') . ' ' . ($b['detalle'] ?? ''))) ?>">

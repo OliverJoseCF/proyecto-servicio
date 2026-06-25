@@ -133,7 +133,7 @@ require_once __DIR__ . '/_layout.php';
           $programado= $avDesde && $avDesde > $hoyStr;
         ?>
         <tr id="av-<?= $av['id'] ?>" <?= !$av['activo'] ? 'style="opacity:.5"' : '' ?>>
-          <td><span class="adm-status adm-status--info"><?= htmlspecialchars($av['fecha']) ?></span></td>
+          <td><span class="adm-status adm-status--info"><?= $av['fecha'] ? date('d/m/Y', strtotime($av['fecha'])) : '—' ?></span></td>
           <td style="font-weight:600"><?= htmlspecialchars($av['titulo']) ?></td>
           <td style="font-size:12.5px;color:var(--tsj-gray-600)"><?= htmlspecialchars(substr($av['descripcion'] ?? '', 0, 80)) ?><?= strlen($av['descripcion'] ?? '') > 80 ? '…' : '' ?></td>
           <td style="font-size:12px">
