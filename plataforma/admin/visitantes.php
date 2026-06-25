@@ -135,7 +135,7 @@ require_once __DIR__ . '/_layout.php';
               <span class="material-symbols-rounded"><?= $p['activo'] ? 'visibility_off' : 'visibility' ?></span>
             </button>
             <button class="adm-btn adm-btn--ghost adm-btn--sm"
-                    onclick="abrirEditar('dir',<?= htmlspecialchars(json_encode($p)) ?>)">
+                    onclick="abrirEditar('dir',<?= htmlspecialchars(json_encode($p), ENT_QUOTES, 'UTF-8') ?>)">
               <span class="material-symbols-rounded">edit</span>
             </button>
             <button class="adm-btn adm-btn--danger adm-btn--sm"
@@ -161,7 +161,7 @@ require_once __DIR__ . '/_layout.php';
         <div class="adm-field"><label>Nombre completo <span style="color:var(--tsj-pink)">*</span></label><input type="text" name="nombre" id="dir-nombre" required></div>
         <div class="adm-field"><label>Puesto / Área</label><input type="text" name="puesto" id="dir-puesto"></div>
         <div class="adm-field"><label>Correo electrónico</label><input type="email" name="correo" id="dir-correo"></div>
-        <div class="adm-field"><label>Teléfono</label><input type="tel" name="telefono" id="dir-telefono" placeholder="S/N" inputmode="tel" maxlength="25" pattern="[0-9+\-\s()]{7,25}|S/N" title="Solo números, +, -, espacios y paréntesis (o 'S/N' si no aplica)"></div>
+        <div class="adm-field"><label>Teléfono</label><input type="text" name="telefono" id="dir-telefono" placeholder="S/N" inputmode="tel" maxlength="25" pattern="[0-9+\-\s()]{7,25}|S\/N" title="Número de teléfono (ej. 376-766-0000) o escribe S/N si no aplica"></div>
         <div class="adm-field"><label>Extensión</label><input type="text" name="extension" id="dir-extension" placeholder="Ej. Ext. 101"></div>
         <div class="adm-field"><label>Ubicación física</label><input type="text" name="ubicacion_fisica" id="dir-ubicacion" placeholder="Ej. Módulo A, Planta Baja"></div>
         <div class="adm-field" style="grid-column:1/-1">
@@ -191,8 +191,9 @@ require_once __DIR__ . '/_layout.php';
 <!-- ══ TAB: Docentes ════════════════════════════════════════════ -->
 <div class="adm-tab-panel" data-tab-group="vis" data-tab="docentes">
   <div class="adm-career-pills" id="doc-pills">
-    <?php foreach ($carreras as $i => $c): ?>
-    <button class="adm-career-pill <?= $i===0?'active':'' ?>"
+    <button class="adm-career-pill active" data-clave="" onclick="filtrarDocentes('')">Todos</button>
+    <?php foreach ($carreras as $c): ?>
+    <button class="adm-career-pill" data-clave="<?= htmlspecialchars($c['clave']) ?>"
             onclick="filtrarDocentes('<?= $c['clave'] ?>')">
       <?= htmlspecialchars($c['clave']) ?>
     </button>
@@ -204,19 +205,20 @@ require_once __DIR__ . '/_layout.php';
   </div>
   <div class="adm-table-wrap">
     <table class="adm-table">
-      <thead><tr><th>Nombre</th><th>Foto</th><th>Correo</th><th>Carrera</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Nombre</th><th>Foto</th><th>Correo</th><th>Carrera</th><th>Estado</th><th>Acciones</th></tr></thead>
       <tbody id="doc-tbody">
         <?php if (empty($docentes)): ?>
-        <tr><td colspan="5" class="adm-table-empty">Sin docentes registrados.</td></tr>
+        <tr><td colspan="6" class="adm-table-empty">Sin docentes registrados.</td></tr>
         <?php endif; ?>
         <?php foreach ($docentes as $d):
           $dCarreras   = $docCarreras[$d['id']] ?? [];
           $dClaves     = array_column($dCarreras, 'clave');
           $dCarreraIds = array_column($dCarreras, 'id');
-          $dPrimClave  = $dClaves[0] ?? '';
+          $dActivo     = (int)($d['activo'] ?? 1);
         ?>
         <tr id="doc-<?= $d['id'] ?>" data-carrera="<?= htmlspecialchars(implode(' ', $dClaves)) ?>"
-            data-search="<?= htmlspecialchars(mb_strtolower($d['nombre'] . ' ' . ($d['correo'] ?? ''))) ?>">
+            data-search="<?= htmlspecialchars(mb_strtolower($d['nombre'] . ' ' . ($d['correo'] ?? ''))) ?>"
+            <?= !$dActivo ? 'style="opacity:.5"' : '' ?>>
           <td style="font-weight:600"><?= htmlspecialchars($d['nombre']) ?></td>
           <td class="col-photo">
             <img src="<?= $d['foto'] ? $base_img.htmlspecialchars($d['foto']) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='38'%3E%3Crect width='38' height='38' fill='%23e5e7eb'/%3E%3C/svg%3E" ?>"
@@ -230,9 +232,20 @@ require_once __DIR__ . '/_layout.php';
               <span style="color:var(--tsj-gray-400)">—</span>
             <?php endif; ?>
           </td>
+          <td>
+            <?php if ($dActivo): ?>
+              <span class="adm-status adm-status--ok activo-badge">Activo</span>
+            <?php else: ?>
+              <span class="adm-status adm-status--warn activo-badge">Inactivo</span>
+            <?php endif; ?>
+          </td>
           <td class="actions">
+            <button class="adm-btn adm-btn--ghost adm-btn--sm" title="<?= $dActivo ? 'Desactivar' : 'Activar' ?>"
+                    onclick="toggleActivoDoc('visitantes','docente_toggle',<?= $d['id'] ?>,this)">
+              <span class="material-symbols-rounded"><?= $dActivo ? 'person_off' : 'how_to_reg' ?></span>
+            </button>
             <button class="adm-btn adm-btn--ghost adm-btn--sm"
-                    onclick="abrirEditarDoc(<?= htmlspecialchars(json_encode(['id'=>$d['id'],'nombre'=>$d['nombre'],'correo'=>$d['correo'],'foto'=>$d['foto'],'carrera_ids'=>$dCarreraIds])) ?>)">
+                    onclick="abrirEditarDoc(<?= htmlspecialchars(json_encode(['id'=>$d['id'],'nombre'=>$d['nombre'],'correo'=>$d['correo'],'foto'=>$d['foto'],'carrera_ids'=>$dCarreraIds]), ENT_QUOTES, 'UTF-8') ?>)">
               <span class="material-symbols-rounded">edit</span>
             </button>
             <button class="adm-btn adm-btn--danger adm-btn--sm"
@@ -308,7 +321,7 @@ require_once __DIR__ . '/_layout.php';
           <td><a href="mailto:<?= htmlspecialchars($c['correo'] ?? '') ?>" style="color:var(--tsj-blue)"><?= htmlspecialchars($c['correo'] ?? '') ?></a></td>
           <td class="actions">
             <button class="adm-btn adm-btn--ghost adm-btn--sm"
-                    onclick="abrirEditarCoord(<?= htmlspecialchars(json_encode($c)) ?>)">
+                    onclick="abrirEditarCoord(<?= htmlspecialchars(json_encode($c), ENT_QUOTES, 'UTF-8') ?>)">
               <span class="material-symbols-rounded">edit</span>
             </button>
             <button class="adm-btn adm-btn--danger adm-btn--sm"
@@ -439,7 +452,7 @@ require_once __DIR__ . '/_layout.php';
                 <span class="material-symbols-rounded"><?= $c['activo'] ? 'visibility_off' : 'visibility' ?></span>
               </button>
               <button class="adm-btn adm-btn--ghost adm-btn--sm"
-                      onclick="abrirEditarCarrera(<?= htmlspecialchars(json_encode($c)) ?>)">
+                      onclick="abrirEditarCarrera(<?= htmlspecialchars(json_encode($c), ENT_QUOTES, 'UTF-8') ?>)">
                 <span class="material-symbols-rounded">edit</span>
               </button>
               <button class="adm-btn adm-btn--danger adm-btn--sm"
@@ -634,7 +647,7 @@ require_once __DIR__ . '/_layout.php';
           <td><?= htmlspecialchars($s['telefono'] ?? '') ?></td>
           <td class="actions">
             <button class="adm-btn adm-btn--ghost adm-btn--sm"
-                    onclick="abrirEditarSec(<?= htmlspecialchars(json_encode($s)) ?>)">
+                    onclick="abrirEditarSec(<?= htmlspecialchars(json_encode($s), ENT_QUOTES, 'UTF-8') ?>)">
               <span class="material-symbols-rounded">edit</span>
             </button>
             <button class="adm-btn adm-btn--danger adm-btn--sm"
@@ -695,6 +708,24 @@ require_once __DIR__ . '/_layout.php';
 </div>
 
 <script>
+// ── Filtro teléfono directorio: solo dígitos/+/-/espacios/() o "S/N" ──
+(function () {
+  var campo = document.getElementById('dir-telefono');
+  if (!campo) return;
+  campo.addEventListener('input', function () {
+    var v = this.value;
+    var pos = this.selectionStart;
+    // Permitir mientras se está escribiendo "S/N" (parcial)
+    if (/^[Ss](\/([Nn])?)?$/.test(v)) return;
+    // Permitir número de teléfono (solo caracteres válidos)
+    var limpio = v.replace(/[^0-9+\-\s()]/g, '');
+    if (limpio !== v) {
+      this.value = limpio;
+      try { this.setSelectionRange(pos - 1, pos - 1); } catch (e) {}
+    }
+  });
+})();
+
 // ── Preview imagen de portada ────────────────────────────────────
 function previsualizarPortada(input) {
   var wrap = document.getElementById('car-imagen-preview-wrap');
@@ -893,18 +924,38 @@ var docClaveActiva = '';
 function filtrarDocentes(clave){
   docClaveActiva = clave;
   document.querySelectorAll('#doc-pills .adm-career-pill').forEach(b=>{
-    b.classList.toggle('active', b.textContent.trim()===clave);
+    b.classList.toggle('active', (b.dataset.clave ?? b.textContent.trim()) === clave);
   });
   aplicarFiltroDoc();
 }
 function aplicarFiltroDoc(){
   const q = document.getElementById('doc-buscar').value.trim().toLowerCase();
   document.querySelectorAll('#doc-tbody tr[data-carrera]').forEach(tr=>{
-    const claves = (tr.dataset.carrera||'').split(' ');
+    const claves = (tr.dataset.carrera||'').split(' ').filter(Boolean);
     const okC = !docClaveActiva || claves.includes(docClaveActiva);
     const okQ = !q || (tr.dataset.search||'').includes(q);
     tr.style.display = (okC && okQ) ? '' : 'none';
   });
+}
+function toggleActivoDoc(modulo, accion, id, btn) {
+  var csrfEl = document.querySelector('input[name="_csrf"]');
+  var csrf   = csrfEl ? csrfEl.value : '';
+  adminFetch(modulo, { _csrf: csrf, accion: accion, id: id })
+    .then(function (json) {
+      if (json.ok) {
+        var row   = btn.closest('tr');
+        var icon  = btn.querySelector('.material-symbols-rounded');
+        var badge = row.querySelector('.activo-badge');
+        var activo = json.activo;
+        row.style.opacity = activo ? '' : '0.5';
+        icon.textContent  = activo ? 'person_off' : 'how_to_reg';
+        btn.title         = activo ? 'Desactivar' : 'Activar';
+        if (badge) {
+          badge.textContent = activo ? 'Activo' : 'Inactivo';
+          badge.className   = 'adm-status activo-badge ' + (activo ? 'adm-status--ok' : 'adm-status--warn');
+        }
+      }
+    });
 }
 function filtrarMaterias(clave){
   document.querySelectorAll('[data-carrera-sec]').forEach(s=>{
@@ -915,8 +966,7 @@ function filtrarMaterias(clave){
   });
 }
 document.addEventListener('DOMContentLoaded', function() {
-  var primerPill = document.querySelector('#doc-pills .adm-career-pill');
-  if (primerPill) filtrarDocentes(primerPill.textContent.trim());
+  filtrarDocentes('');
 });
 
 // ── Materia agregar fila ────────────────────────────────────────

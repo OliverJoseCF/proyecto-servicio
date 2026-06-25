@@ -56,18 +56,29 @@ if (!defined('HORARIOS_ADMIN_HASH'))   define('HORARIOS_ADMIN_HASH',   '');
 
 /**
  * Devuelve un objeto PDO listo para usar.
- * Usado por: Horarios, Convenios.
+ * Usado por: Horarios, Convenios, portal, config_data, auth, header.
+ *
+ * Singleton lazy por nombre de BD: la primera llamada abre la conexión y las
+ * siguientes (en el mismo request) reutilizan la misma instancia, evitando 2-4
+ * conexiones TCP+auth por request. Si la conexión falla, no se cachea nada y la
+ * siguiente llamada vuelve a intentarlo.
  */
 function getPDO(string $dbName): PDO {
+    static $pool = [];
+    if (isset($pool[$dbName])) {
+        return $pool[$dbName];
+    }
     $dsn = sprintf(
         'mysql:host=%s;port=%d;dbname=%s;charset=%s',
         DB_HOST, DB_PORT, $dbName, DB_CHARSET
     );
-    return new PDO($dsn, DB_USER, DB_PASS, [
+    $pdo = new PDO($dsn, DB_USER, DB_PASS, [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES   => false,
     ]);
+    $pool[$dbName] = $pdo;
+    return $pdo;
 }
 
 /**

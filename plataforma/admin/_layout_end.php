@@ -92,15 +92,21 @@ document.addEventListener('submit', function(e) {
   if (!proc) return;
   e.preventDefault();
 
+  // Confirmación opcional para acciones destructivas: data-confirm="mensaje"
+  if (form.dataset.confirm && !window.confirm(form.dataset.confirm)) {
+    return;
+  }
+
   var hasFile = form.querySelector('input[type="file"]');
   var data;
 
   if (hasFile) {
     // Si hay archivo, usar FormData directo
     data = new FormData(form);
-    var base = (document.querySelector('meta[name="plataforma-url"]')?.content || '/plataforma');
-    var url  = base + '/admin/procesos/' + proc + '.php';
-    var btn  = form.querySelector('[type="submit"]');
+    var base    = (document.querySelector('meta[name="plataforma-url"]')?.content || '/plataforma');
+    var url     = base + '/admin/procesos/' + proc + '.php';
+    var btn     = form.querySelector('[type="submit"]');
+    var btnHTML = btn ? btn.innerHTML : '';
     if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
     fetch(url, { method: 'POST', body: data })
       .then(function(r){ return r.json(); })
@@ -114,7 +120,7 @@ document.addEventListener('submit', function(e) {
         }, 1200);
       })
       .catch(function(err){ showToast('Error: ' + err.message, 'error'); })
-      .finally(function(){ if (btn) { btn.disabled = false; btn.textContent = 'Guardar'; } });
+      .finally(function(){ if (btn) { btn.disabled = false; btn.innerHTML = btnHTML; } });
     return;
   }
 

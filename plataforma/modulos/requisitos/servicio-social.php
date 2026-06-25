@@ -2,7 +2,11 @@
 $tsj_module    = 'requisitos';
 $tsj_title     = 'Servicio Social';
 $tsj_extra_css = [
-    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css',
+    [
+        'href'        => 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css',
+        'integrity'   => 'sha384-/o6I2CkkWC//PSjvWC/eYN7l3xM3tJm8ZzVkCOfp//W05QcE3mlGskpoHB6XqI+B',
+        'crossorigin' => 'anonymous',
+    ],
     'assets/css/style.css',
 ];
 require_once __DIR__ . '/../../shared/config.php';

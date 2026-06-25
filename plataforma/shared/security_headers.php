@@ -14,11 +14,11 @@ if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
 
 $csp = implode('; ', [
     "default-src 'self'",
-    "script-src 'self' https://cdn.jsdelivr.net https://code.jquery.com https://cdn.datatables.net https://cdnjs.cloudflare.com 'unsafe-inline'",
-    "style-src 'self' https://cdn.datatables.net https://cdn.jsdelivr.net https://cdnjs.cloudflare.com 'unsafe-inline'",
+    "script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com 'unsafe-inline'",
+    "style-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com 'unsafe-inline'",
     "font-src 'self' https://cdnjs.cloudflare.com",
-    "img-src 'self' data: blob:",
-    "connect-src 'self'",
+    "img-src 'self' data: blob: https://placehold.co",
+    "connect-src 'self' data:",
     "frame-src 'self' https://www.google.com",
     "object-src 'none'",
     "base-uri 'self'",

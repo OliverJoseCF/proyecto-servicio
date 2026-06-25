@@ -21,15 +21,9 @@ try {
         'atrasados'  => $db->query('SELECT COUNT(*) FROM prestamos WHERE devuelto=0 AND fecha_devolucion < CURDATE()')->fetchColumn(),
         'por_vencer' => $db->query('SELECT COUNT(*) FROM convenios WHERE activo=1 AND vencimiento IS NOT NULL AND vencimiento <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)')->fetchColumn(),
     ];
-    // Defensivo: la tabla puede no existir aún en BDs creadas con esquemas previos
-    try {
-        $stats['controles'] = $db->query('SELECT COUNT(*) FROM solicitud_controles WHERE estado="Pendiente"')->fetchColumn();
-    } catch (\PDOException $eCtrl) {
-        $stats['controles'] = 0;
-    }
     $db_ok = true;
 } catch (\Throwable $e) {
-    $stats = array_fill_keys(['libros','convenios','docentes','horarios','prestamos','solicitudes','sugerencias','controles','atrasados','por_vencer'], '—');
+    $stats = array_fill_keys(['libros','convenios','docentes','horarios','prestamos','solicitudes','sugerencias','atrasados','por_vencer'], '—');
     $db_ok = false;
     $db_err = $e->getMessage();
 }
@@ -74,18 +68,12 @@ require_once __DIR__ . '/_layout.php';
   </div>
 </div>
 
-<?php if ($db_ok && ($stats['solicitudes'] > 0 || $stats['sugerencias'] > 0 || $stats['controles'] > 0 || $stats['atrasados'] > 0 || $stats['por_vencer'] > 0)): ?>
+<?php if ($db_ok && ($stats['solicitudes'] > 0 || $stats['sugerencias'] > 0 || $stats['atrasados'] > 0 || $stats['por_vencer'] > 0)): ?>
 <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
   <?php if ($stats['solicitudes'] > 0): ?>
   <a href="biblioteca.php#solicitudes" class="adm-alert-badge" style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:#fef3c7;border:1.5px solid #fcd34d;border-radius:8px;color:#92400e;font-size:13px;font-weight:600;text-decoration:none">
     <span class="material-symbols-rounded" style="font-size:18px">notifications</span>
     <?= $stats['solicitudes'] ?> solicitud<?= $stats['solicitudes'] > 1 ? 'es' : '' ?> pendiente<?= $stats['solicitudes'] > 1 ? 's' : '' ?> en biblioteca
-  </a>
-  <?php endif; ?>
-  <?php if ($stats['controles'] > 0): ?>
-  <a href="biblioteca.php#controles" style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:#f5f3ff;border:1.5px solid #c4b5fd;border-radius:8px;color:#5b21b6;font-size:13px;font-weight:600;text-decoration:none">
-    <span class="material-symbols-rounded" style="font-size:18px">videocam</span>
-    <?= $stats['controles'] ?> solicitud<?= $stats['controles'] > 1 ? 'es' : '' ?> de controles pendiente<?= $stats['controles'] > 1 ? 's' : '' ?>
   </a>
   <?php endif; ?>
   <?php if ($stats['atrasados'] > 0): ?>
@@ -154,7 +142,7 @@ require_once __DIR__ . '/_layout.php';
         <span style="margin-left:auto;background:#f59e0b;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px"><?= $stats['solicitudes'] ?></span>
       <?php endif; ?>
     </div>
-    <p class="adm-module-desc">Catálogo de libros, préstamos activos, solicitudes de estudiantes y préstamo de controles.</p>
+    <p class="adm-module-desc">Catálogo de libros, préstamos activos y solicitudes de estudiantes.</p>
     <div class="adm-module-items">
       <span class="adm-module-tag">Catálogo</span><span class="adm-module-tag">Préstamos</span><span class="adm-module-tag">Solicitudes</span>
     </div>

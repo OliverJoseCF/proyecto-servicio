@@ -11,6 +11,9 @@
 if (!defined('PLATAFORMA_URL')) {
     require_once dirname(__DIR__) . '/shared/config.php';
 }
+if (!function_exists('tsjConfig')) {
+    require_once dirname(__DIR__) . '/shared/lib/config_data.php';
+}
 $base     = PLATAFORMA_URL;
 $adm_page = $adm_page    ?? 'dashboard';
 $adm_title = $adm_title  ?? 'Panel de Administración';
@@ -48,6 +51,15 @@ $navSections = [
   <meta name="plataforma-url" content="<?= htmlspecialchars($base) ?>" />
   <link rel="icon" type="image/png" href="<?= $base ?>/shared/assets/img/favicon.png" />
   <!-- Fuentes self-hosted (Poppins + Material Symbols) — sin dependencia del CDN de Google -->
+  <!-- Preload explícito: evita el flash de fuente al cambiar de panel (font-display:swap) -->
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+        href="<?= $base ?>/shared/assets/fonts/poppins/poppins-400-latin.woff2" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+        href="<?= $base ?>/shared/assets/fonts/poppins/poppins-500-latin.woff2" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+        href="<?= $base ?>/shared/assets/fonts/poppins/poppins-600-latin.woff2" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+        href="<?= $base ?>/shared/assets/fonts/poppins/poppins-700-latin.woff2" />
   <link rel="preload" as="font" type="font/woff2" crossorigin
         href="<?= $base ?>/shared/assets/fonts/material-symbols/material-symbols-rounded.woff2" />
   <link rel="stylesheet" href="<?= $base ?>/shared/assets/fonts/fonts.css" />
@@ -72,7 +84,7 @@ $navSections = [
            alt="TSJ" />
       <div class="adm-sidebar-title">
         Panel Admin
-        <span>TSJ Campus Chapala</span>
+        <span><?= htmlspecialchars(tsjConfig('campus', 'TSJ Campus Chapala'), ENT_QUOTES, 'UTF-8') ?></span>
       </div>
     </div>
 

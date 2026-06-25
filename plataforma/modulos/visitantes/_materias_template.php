@@ -740,7 +740,7 @@ $imgPlaceholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' 
                 $foto = $d['foto'] ? htmlspecialchars($base_img . $d['foto']) : $imgPlaceholder;
               ?>
               <div class="car-doc-card">
-                <img src="<?= $foto ?>" alt="" onerror="this.src='<?= $imgPlaceholder ?>'">
+                <img src="<?= $foto ?>" alt="" loading="lazy" onerror="this.src='<?= $imgPlaceholder ?>'">
                 <div class="car-doc-nombre"><?= htmlspecialchars($d['nombre']) ?></div>
                 <?php if (!empty($d['correo'])): ?>
                 <a href="mailto:<?= htmlspecialchars($d['correo']) ?>" class="car-doc-mail">

@@ -10,7 +10,17 @@ $adm_title = 'Convenios';
 try {
     $db          = getPDO(DB_NAME);
     $carreras    = $db->query('SELECT * FROM carreras ORDER BY orden')->fetchAll();
-    $convenios   = $db->query('SELECT cv.*,c.clave carrera_clave,c.nombre carrera_nombre FROM convenios cv LEFT JOIN carreras c ON cv.carrera_id=c.id ORDER BY cv.activo DESC, cv.nombre LIMIT 500')->fetchAll();
+    $convenios   = $db->query(
+        'SELECT cv.*,
+                GROUP_CONCAT(DISTINCT c.id    ORDER BY c.id    SEPARATOR ",") AS carreras_ids_str,
+                GROUP_CONCAT(DISTINCT c.clave ORDER BY c.clave SEPARATOR ",") AS carreras_claves
+         FROM convenios cv
+         LEFT JOIN convenio_carreras cc ON cc.convenio_id = cv.id
+         LEFT JOIN carreras c ON c.id = cc.carrera_id
+         GROUP BY cv.id
+         ORDER BY cv.activo DESC, cv.nombre
+         LIMIT 500'
+    )->fetchAll();
     $sugerencias = $db->query('SELECT * FROM sugerencias_empresa WHERE estado="pendiente" ORDER BY created_at DESC')->fetchAll();
     $db_ok = true;
 } catch (\Throwable $e) {
@@ -71,33 +81,39 @@ require_once __DIR__ . '/_layout.php';
 
   <div class="adm-table-wrap">
     <table class="adm-table">
-      <thead><tr><th>Empresa</th><th>Tipo</th><th>Carrera</th><th>Contacto</th><th>Correo</th><th>Vencimiento</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Empresa</th><th>Tipo</th><th>Carreras</th><th>Contacto</th><th>Correo</th><th>Vencimiento</th><th>Estado</th><th>Acciones</th></tr></thead>
       <tbody id="conv-tbody">
         <?php if (empty($convenios)): ?>
         <tr><td colspan="8" class="adm-table-empty">Sin convenios registrados.</td></tr>
         <?php endif; ?>
         <?php foreach ($convenios as $cv):
           $vence   = $cv['vencimiento'] ? new DateTime($cv['vencimiento']) : null;
-          $hoy     = new DateTime();
+          $hoy     = new DateTime('today'); // medianoche — compara solo fecha, no hora
           $status  = !$vence ? 'info' : ($hoy > $vence ? 'danger' : ($vence->diff($hoy)->days <= 30 ? 'warn' : 'ok'));
+          $cvClaves = $cv['carreras_claves'] ?? '';
         ?>
-        <tr id="cv-<?= $cv['id'] ?>" data-carrera="<?= htmlspecialchars($cv['carrera_clave'] ?? '') ?>"
+        <tr id="cv-<?= $cv['id'] ?>" data-carreras="<?= htmlspecialchars($cvClaves) ?>"
             data-search="<?= htmlspecialchars(mb_strtolower($cv['nombre'] . ' ' . ($cv['nombre_contacto'] ?? '') . ' ' . ($cv['correo_contacto'] ?? ''))) ?>"
             data-vence="<?= in_array($status, ['danger', 'warn'], true) ? '1' : '0' ?>"
+            data-status="<?= $status ?>"
             <?= !$cv['activo'] ? 'style="opacity:.5"' : '' ?>>
           <td style="font-weight:600"><?= htmlspecialchars($cv['nombre']) ?></td>
           <td><span class="adm-status adm-status--info"><?= htmlspecialchars($cv['tipo_convenio']) ?></span></td>
-          <td><?= htmlspecialchars($cv['carrera_clave'] ?? '—') ?></td>
+          <td style="font-size:12px"><?= $cvClaves ? htmlspecialchars($cvClaves) : '<span style="color:var(--tsj-gray-400)">Todas</span>' ?></td>
           <td><?= htmlspecialchars($cv['nombre_contacto'] ?? '') ?></td>
           <td><?= $cv['correo_contacto'] ? '<a href="mailto:'.htmlspecialchars($cv['correo_contacto']).'" style="color:var(--tsj-blue)">'.htmlspecialchars($cv['correo_contacto']).'</a>' : '—' ?></td>
-          <td><span class="adm-status adm-status--<?= $status ?>"><?= $cv['vencimiento'] ? htmlspecialchars($cv['vencimiento']) : 'Sin fecha' ?></span></td>
-          <td>
-            <?php if ($cv['activo']): ?>
-              <span class="adm-status adm-status--ok">Activo</span>
-            <?php else: ?>
-              <span class="adm-status adm-status--warn">Inactivo</span>
-            <?php endif; ?>
-          </td>
+          <td><span class="adm-status adm-status--<?= $status ?>"><?= $cv['vencimiento'] ? date('d/m/Y', strtotime($cv['vencimiento'])) : 'Sin fecha' ?></span></td>
+          <td><?php
+            if (!$cv['activo']):
+              echo '<span class="adm-status adm-status--warn conv-estado-badge">Inactivo</span>';
+            elseif ($status === 'danger'):
+              echo '<span class="adm-status adm-status--danger conv-estado-badge">Vencido</span>';
+            elseif ($status === 'warn'):
+              echo '<span class="adm-status adm-status--warn conv-estado-badge">Por vencer</span>';
+            else:
+              echo '<span class="adm-status adm-status--ok conv-estado-badge">Activo</span>';
+            endif;
+          ?></td>
           <td class="actions">
             <button class="adm-btn adm-btn--ghost adm-btn--sm" title="<?= $cv['activo'] ? 'Desactivar' : 'Activar' ?>"
                     onclick="toggleActivo('convenios','convenio_toggle',<?= $cv['id'] ?>,this)">
@@ -142,13 +158,17 @@ require_once __DIR__ . '/_layout.php';
             <option value="otro">Otro</option>
           </select>
         </div>
-        <div class="adm-field"><label>Carrera</label>
-          <select name="carrera_id" id="conv-carrera">
-            <option value="">Todas las carreras</option>
+        <div class="adm-field" style="grid-column:1/-1">
+          <label>Carreras <span style="font-weight:400;color:var(--tsj-gray-400);font-size:11px">(sin selección = aplica a todas)</span></label>
+          <div style="display:flex;flex-wrap:wrap;gap:10px 20px;margin-top:6px">
             <?php foreach ($carreras as $c): ?>
-            <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['clave'].' — '.$c['nombre']) ?></option>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-weight:400">
+              <input type="checkbox" name="carreras_ids[]" value="<?= $c['id'] ?>" class="conv-carrera-chk"
+                     style="width:15px;height:15px;accent-color:var(--tsj-blue);cursor:pointer">
+              <span><strong><?= htmlspecialchars($c['clave']) ?></strong> — <?= htmlspecialchars($c['nombre']) ?></span>
+            </label>
             <?php endforeach; ?>
-          </select>
+          </div>
         </div>
         <div class="adm-field"><label>Nombre del contacto</label><input type="text" name="nombre_contacto" id="conv-contacto"></div>
         <div class="adm-field"><label>Correo del contacto</label><input type="email" name="correo_contacto" id="conv-correo"></div>
@@ -187,7 +207,7 @@ require_once __DIR__ . '/_layout.php';
           <td style="font-weight:600"><?= htmlspecialchars($s['nombre_empresa']) ?></td>
           <td><a href="mailto:<?= htmlspecialchars($s['correo_empresa']) ?>" style="color:var(--tsj-blue)"><?= htmlspecialchars($s['correo_empresa']) ?></a></td>
           <td><?= htmlspecialchars($s['nombre_contacto'] ?? '') ?></td>
-          <td><?= htmlspecialchars(substr($s['created_at'],0,10)) ?></td>
+          <td><?= $s['created_at'] ? date('d/m/Y', strtotime($s['created_at'])) : '—' ?></td>
           <td class="actions">
             <button class="adm-btn adm-btn--primary adm-btn--sm"
                     onclick="procesarSug(<?= $s['id'] ?>,'aceptar','sug-<?= $s['id'] ?>','<?= $csrf ?>')">
@@ -214,14 +234,22 @@ function toggleActivo(modulo, accion, id, btn) {
       if (json.ok) {
         var row   = btn.closest('tr');
         var icon  = btn.querySelector('.material-symbols-rounded');
-        var badge = row.querySelector('.adm-status:last-of-type');
+        var badge  = row.querySelector('.conv-estado-badge');
         var activo = json.activo;
         row.style.opacity = activo ? '' : '0.5';
         icon.textContent  = activo ? 'visibility_off' : 'visibility';
         btn.title         = activo ? 'Desactivar' : 'Activar';
         if (badge) {
-          badge.textContent = activo ? 'Activo' : 'Inactivo';
-          badge.className   = 'adm-status ' + (activo ? 'adm-status--ok' : 'adm-status--warn');
+          if (!activo) {
+            badge.textContent = 'Inactivo';
+            badge.className   = 'adm-status conv-estado-badge adm-status--warn';
+          } else {
+            var s = row.dataset.status || 'ok';
+            var map = { danger: ['Vencido','adm-status--danger'], warn: ['Por vencer','adm-status--warn'], ok: ['Activo','adm-status--ok'], info: ['Activo','adm-status--ok'] };
+            var e = map[s] || map.ok;
+            badge.textContent = e[0];
+            badge.className   = 'adm-status conv-estado-badge ' + e[1];
+          }
         }
       }
     });
@@ -239,9 +267,10 @@ function aplicarFiltroConv(){
   const q    = document.getElementById('conv-buscar').value.trim().toLowerCase();
   const solo = document.getElementById('conv-vencidos').checked;
   let visibles = 0;
-  document.querySelectorAll('#conv-tbody tr[data-carrera]').forEach(tr=>{
-    // Sin carrera asignada (todas) → aparece en "Todos" y en cualquier carrera específica
-    const okC = !convClaveActiva || tr.dataset.carrera===convClaveActiva || tr.dataset.carrera==='';
+  document.querySelectorAll('#conv-tbody tr[data-carreras]').forEach(tr=>{
+    // Sin carreras (data-carreras='') → convenio global, aparece siempre
+    const claves = tr.dataset.carreras ? tr.dataset.carreras.split(',') : [];
+    const okC = !convClaveActiva || claves.length === 0 || claves.includes(convClaveActiva);
     const okQ = !q || (tr.dataset.search||'').includes(q);
     const okV = !solo || tr.dataset.vence==='1';
     const show = okC && okQ && okV;
@@ -297,8 +326,11 @@ function abrirEditarConv(cv){
   for(let o of tipo.options){ if(o.value===cv.tipo_convenio){ o.selected=true; break; } }
   const sec = document.getElementById('conv-sector');
   for(let o of sec.options){ if(o.value===cv.sector){ o.selected=true; break; } }
-  const car = document.getElementById('conv-carrera');
-  for(let o of car.options){ if(o.value==cv.carrera_id){ o.selected=true; break; } }
+  // Marcar carreras: desmarcar todas primero, luego marcar las del convenio
+  var ids = (cv.carreras_ids_str || '').split(',').filter(Boolean);
+  document.querySelectorAll('.conv-carrera-chk').forEach(function(cb){
+    cb.checked = ids.includes(cb.value);
+  });
   document.getElementById('form-conv-titulo').textContent='Editar: '+cv.nombre;
   document.getElementById('form-conv').scrollIntoView({behavior:'smooth'});
 }
@@ -306,6 +338,7 @@ function resetFormConv(){
   document.getElementById('conv-accion').value='convenio_agregar';
   document.getElementById('conv-id').value='';
   document.getElementById('form-conv').reset();
+  document.querySelectorAll('.conv-carrera-chk').forEach(function(cb){ cb.checked=false; });
   document.getElementById('form-conv-titulo').textContent='Agregar convenio';
   quitarLogoConv();
 }
@@ -338,8 +371,13 @@ function procesarSug(id, tipo, rowId, csrf){
     });
 }
 
-if(location.hash==='#sugerencias') showTab('conv','sugerencias');
-if(location.hash==='#vencimientos'){ document.getElementById('conv-vencidos').checked = true; aplicarFiltroConv(); }
+setTimeout(function() {
+  if (location.hash === '#sugerencias') showTab('conv', 'sugerencias');
+  if (location.hash === '#vencimientos') {
+    document.getElementById('conv-vencidos').checked = true;
+    aplicarFiltroConv();
+  }
+}, 0);
 </script>
 
 <?php require_once __DIR__ . '/_layout_end.php'; ?>

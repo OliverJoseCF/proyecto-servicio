@@ -113,3 +113,13 @@ function telefono(string $key, bool $obligatorio = false): string {
     }
     return $val;
 }
+
+/**
+ * Valida una URL que más tarde se imprimirá en un href/src.
+ * Acepta: cadena vacía (campo opcional), URL absoluta http(s):// o ruta del propio
+ * sitio que empiece por '/'. Rechaza esquemas peligrosos (javascript:, data:, vbscript:).
+ */
+function urlSegura(string $url): bool {
+    if ($url === '') return true;
+    return (bool) preg_match('#^(https?://|/)#i', $url);
+}

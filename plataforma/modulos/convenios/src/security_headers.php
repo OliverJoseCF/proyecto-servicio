@@ -18,11 +18,11 @@ if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
 // Para añadir SRI a los recursos CDN, generarlos en: https://www.srihash.org/
 $csp = implode('; ', [
     "default-src 'self'",
-    "script-src 'self' https://cdn.jsdelivr.net https://code.jquery.com https://cdn.datatables.net https://cdnjs.cloudflare.com",
-    "style-src 'self' https://cdn.datatables.net https://cdn.jsdelivr.net 'unsafe-inline'",
+    "script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com 'unsafe-inline'",
+    "style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'",
     "font-src 'self'",
-    "img-src 'self' data: blob:",
-    "connect-src 'self' https://cdn.datatables.net",
+    "img-src 'self' data: blob: https://placehold.co",
+    "connect-src 'self' data:",
     "frame-src 'none'",
     "object-src 'none'",
     "base-uri 'self'",

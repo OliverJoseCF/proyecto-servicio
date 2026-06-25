@@ -55,9 +55,16 @@ try {
     $bitacoraTotal   = 0;
     $bitacoraLimite  = 200;
     try {
-        $bitacora = $db->query(
-            'SELECT * FROM admin_log ORDER BY id DESC LIMIT ' . $bitacoraLimite
-        )->fetchAll();
+        // Defensivo: admin_nombre puede no existir en BDs previas al multi-admin
+        try {
+            $bitacora = $db->query(
+                'SELECT created_at, admin_nombre, modulo, accion, detalle FROM admin_log ORDER BY id DESC LIMIT ' . $bitacoraLimite
+            )->fetchAll();
+        } catch (\PDOException $eCol) {
+            $bitacora = $db->query(
+                'SELECT created_at, modulo, accion, detalle FROM admin_log ORDER BY id DESC LIMIT ' . $bitacoraLimite
+            )->fetchAll();
+        }
         $bitacoraTotal   = (int)$db->query('SELECT COUNT(*) FROM admin_log')->fetchColumn();
         $bitacoraModulos = $db->query('SELECT DISTINCT modulo FROM admin_log ORDER BY modulo')->fetchAll(PDO::FETCH_COLUMN);
     } catch (\PDOException $eLog) {
@@ -109,7 +116,7 @@ require_once __DIR__ . '/_layout.php';
             <td style="font-weight:600"><?= htmlspecialchars($a['estudiante_nombre']) ?></td>
             <td><?= htmlspecialchars($a['estudiante_control']) ?></td>
             <td><?= htmlspecialchars($a['libro_nombre']) ?></td>
-            <td><?= htmlspecialchars($a['fecha_devolucion']) ?></td>
+            <td><?= $a['fecha_devolucion'] ? date('d/m/Y', strtotime($a['fecha_devolucion'])) : '—' ?></td>
             <td><span class="adm-status adm-status--danger"><?= (int)$a['dias_atraso'] ?> día<?= $a['dias_atraso'] == 1 ? '' : 's' ?></span></td>
           </tr>
           <?php endforeach; ?>
@@ -125,6 +132,7 @@ require_once __DIR__ . '/_layout.php';
     <?php if (empty($topLibros)): ?>
       <p style="font-size:13px;color:var(--tsj-gray-500);margin:0">Aún no hay préstamos registrados.</p>
     <?php else: ?>
+    <div class="adm-table-wrap">
     <table class="adm-table">
       <thead><tr><th>#</th><th>Código</th><th>Título</th><th style="text-align:right">Préstamos</th></tr></thead>
       <tbody>
@@ -138,6 +146,7 @@ require_once __DIR__ . '/_layout.php';
         <?php endforeach; ?>
       </tbody>
     </table>
+    </div>
     <?php endif; ?>
   </div>
 
@@ -188,7 +197,6 @@ require_once __DIR__ . '/_layout.php';
       <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
         <a href="procesos/export.php?tipo=solicitudes" class="adm-btn adm-btn--ghost adm-btn--sm"><span class="material-symbols-rounded">download</span> Solicitudes CSV</a>
         <a href="procesos/export.php?tipo=convenios" class="adm-btn adm-btn--ghost adm-btn--sm"><span class="material-symbols-rounded">download</span> Convenios CSV</a>
-        <a href="procesos/export.php?tipo=controles" class="adm-btn adm-btn--ghost adm-btn--sm"><span class="material-symbols-rounded">download</span> Controles CSV</a>
       </div>
     </div>
     <?php
@@ -228,7 +236,12 @@ require_once __DIR__ . '/_layout.php';
 
   <!-- ── Bitácora ── -->
   <div style="grid-column:1/-1">
-    <div class="adm-form-title" style="margin-bottom:12px"><span class="material-symbols-rounded">history</span> Últimas acciones del panel (bitácora)</div>
+    <div class="adm-form-title" style="margin-bottom:12px">
+      <span class="material-symbols-rounded">history</span> Últimas acciones del panel (bitácora)
+      <a href="procesos/export.php?tipo=bitacora" class="adm-btn adm-btn--ghost adm-btn--sm" style="margin-left:auto">
+        <span class="material-symbols-rounded">download</span> Exportar CSV
+      </a>
+    </div>
     <?php if (empty($bitacora)): ?>
     <div class="adm-table-wrap">
       <p class="adm-table-empty" style="margin:0">
@@ -238,6 +251,21 @@ require_once __DIR__ . '/_layout.php';
     </div>
     <?php else: ?>
 
+    <?php $moduloLabels = [
+        'login'         => 'Acceso',
+        'biblioteca'    => 'Biblioteca',
+        'convenios'     => 'Convenios',
+        'admins'        => 'Administradores',
+        'configuracion' => 'Configuración',
+        'inicio'        => 'Inicio',
+        'visitantes'    => 'Visitantes',
+        'requisitos'    => 'Requisitos',
+        'horarios'      => 'Horarios',
+        'respaldos'     => 'Respaldo',
+        'backup_export' => 'Respaldo',
+        'backup_import' => 'Importación',
+    ]; ?>
+
     <!-- Filtros de bitácora -->
     <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
       <input type="text" id="log-buscar" placeholder="Buscar por acción o detalle…" oninput="filtrarBitacora()"
@@ -245,8 +273,9 @@ require_once __DIR__ . '/_layout.php';
       <select id="log-modulo" onchange="filtrarBitacora()"
               style="padding:9px 12px;border:1.5px solid var(--tsj-gray-200);border-radius:8px;font-size:13px;font-family:inherit;background:#fff">
         <option value="">Todos los módulos</option>
-        <?php foreach ($bitacoraModulos as $mod): ?>
-        <option value="<?= htmlspecialchars($mod) ?>"><?= htmlspecialchars($mod) ?></option>
+        <?php foreach ($bitacoraModulos as $mod):
+          $lbl = $moduloLabels[$mod] ?? $mod; ?>
+        <option value="<?= htmlspecialchars($mod) ?>"><?= htmlspecialchars($lbl) ?></option>
         <?php endforeach; ?>
       </select>
       <span id="log-contador" style="font-size:12.5px;color:var(--tsj-gray-500);margin-left:auto"></span>
@@ -254,17 +283,20 @@ require_once __DIR__ . '/_layout.php';
 
     <div class="adm-table-wrap">
       <table class="adm-table">
-        <thead><tr><th>Fecha y hora</th><th>Realizó</th><th>Módulo</th><th>Acción</th><th>Detalle</th></tr></thead>
+        <thead><tr><th>Fecha y hora</th><th>Realizó</th><th>Módulo</th><th>Detalle</th></tr></thead>
         <tbody id="log-tbody">
           <?php foreach ($bitacora as $b):
-            $autor = trim($b['admin_nombre'] ?? '');
-            if ($autor === '') $autor = 'Cuenta maestra'; ?>
+            $autor     = trim($b['admin_nombre'] ?? '');
+            if ($autor === '') $autor = 'Cuenta maestra';
+            $modLabel  = $moduloLabels[$b['modulo']] ?? $b['modulo'];
+            $isLogin   = $b['modulo'] === 'login';
+            $fechaFmt  = $b['created_at'] ? date('d/m/Y g:i A', strtotime($b['created_at'])) : '—';
+          ?>
           <tr data-modulo="<?= htmlspecialchars($b['modulo']) ?>"
-              data-search="<?= htmlspecialchars(mb_strtolower($autor . ' ' . ($b['accion'] ?? '') . ' ' . ($b['detalle'] ?? ''))) ?>">
-            <td style="white-space:nowrap;font-size:12.5px"><?= htmlspecialchars($b['created_at']) ?></td>
+              data-search="<?= htmlspecialchars(mb_strtolower($autor . ' ' . $modLabel . ' ' . ($b['accion'] ?? '') . ' ' . ($b['detalle'] ?? ''))) ?>">
+            <td style="white-space:nowrap;font-size:12.5px"><?= htmlspecialchars($fechaFmt) ?></td>
             <td style="font-size:12.5px;font-weight:600;white-space:nowrap"><?= htmlspecialchars($autor) ?></td>
-            <td><span class="adm-status adm-status--info"><?= htmlspecialchars($b['modulo']) ?></span></td>
-            <td><code style="font-size:12px;background:var(--tsj-gray-100);padding:2px 6px;border-radius:4px"><?= htmlspecialchars($b['accion']) ?></code></td>
+            <td><span class="adm-status <?= $isLogin ? 'adm-status--ok' : 'adm-status--info' ?>"><?= htmlspecialchars($modLabel) ?></span></td>
             <td style="font-size:12.5px;color:var(--tsj-gray-600)"><?= htmlspecialchars($b['detalle'] ?? '') ?></td>
           </tr>
           <?php endforeach; ?>
@@ -303,7 +335,7 @@ require_once __DIR__ . '/_layout.php';
         if (!empty){
           empty = document.createElement('tr');
           empty.id = 'log-empty-row';
-          empty.innerHTML = '<td colspan="5" class="adm-table-empty">No hay acciones que coincidan con el filtro.</td>';
+          empty.innerHTML = '<td colspan="4" class="adm-table-empty">No hay acciones que coincidan con el filtro.</td>';
           tbody.appendChild(empty);
         }
         empty.style.display = '';

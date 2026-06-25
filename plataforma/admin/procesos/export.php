@@ -1,6 +1,6 @@
 <?php
 /**
- * Exportación CSV para el panel admin (GET ?tipo=prestamos|solicitudes|convenios|controles).
+ * Exportación CSV para el panel admin (GET ?tipo=prestamos|solicitudes|convenios).
  * Solo lectura — requiere sesión de admin global. Incluye BOM UTF-8 para Excel.
  */
 ob_start();
@@ -34,18 +34,21 @@ $consultas = [
                       FROM solicitudes_biblioteca s JOIN libros l ON s.libro_id = l.id
                       ORDER BY s.created_at DESC',
     ],
-    'convenios' => [
-        'titulos' => ['ID', 'Empresa', 'Tipo de convenio', 'Sector', 'Carrera', 'Contacto', 'Correo', 'Teléfono', 'Vencimiento', 'Activo'],
-        'sql'     => 'SELECT cv.id, cv.nombre, cv.tipo_convenio, cv.sector, c.nombre, cv.nombre_contacto,
-                             cv.correo_contacto, cv.telefono_contacto, cv.vencimiento, IF(cv.activo, "Sí", "No")
-                      FROM convenios cv LEFT JOIN carreras c ON cv.carrera_id = c.id
-                      ORDER BY cv.nombre',
+    'bitacora' => [
+        'titulos' => ['Fecha y hora', 'Realizó', 'Módulo', 'Acción', 'Detalle'],
+        'sql'     => 'SELECT created_at, COALESCE(NULLIF(admin_nombre,""),"Cuenta maestra"), modulo, accion, COALESCE(detalle,"")
+                      FROM admin_log ORDER BY id DESC',
     ],
-    'controles' => [
-        'titulos' => ['ID', 'Fecha', 'Docente', 'Aula', 'Recibo', 'Hora préstamo', 'Hora entrega', 'Estado'],
-        'sql'     => 'SELECT id, fecha, nombre_docente, aula, recibo, hora_prestamo, hora_entrega, estado
-                      FROM solicitud_controles
-                      ORDER BY fecha DESC, id DESC',
+    'convenios' => [
+        'titulos' => ['ID', 'Empresa', 'Tipo de convenio', 'Sector', 'Carreras', 'Contacto', 'Correo', 'Teléfono', 'Vencimiento', 'Activo'],
+        'sql'     => 'SELECT cv.id, cv.nombre, cv.tipo_convenio, cv.sector,
+                             COALESCE(GROUP_CONCAT(DISTINCT c.clave ORDER BY c.clave SEPARATOR ", "), "Todas"),
+                             cv.nombre_contacto, cv.correo_contacto, cv.telefono_contacto, cv.vencimiento, IF(cv.activo, "Sí", "No")
+                      FROM convenios cv
+                      LEFT JOIN convenio_carreras cc ON cc.convenio_id = cv.id
+                      LEFT JOIN carreras c ON c.id = cc.carrera_id
+                      GROUP BY cv.id
+                      ORDER BY cv.nombre',
     ],
 ];
 
@@ -66,10 +69,22 @@ header('Content-Type: text/csv; charset=utf-8');
 header('Content-Disposition: attachment; filename="' . $tipo . '_' . date('Y-m-d') . '.csv"');
 header('Cache-Control: no-store');
 
+/**
+ * Neutraliza inyección de fórmulas CSV: Excel/LibreOffice ejecutan celdas que
+ * empiezan con = + - @ (o tab/retorno). Se antepone un apóstrofo para forzar texto.
+ */
+$csvCelda = static function ($v): string {
+    $v = (string) $v;
+    if ($v !== '' && preg_match('/^[=+\-@\t\r]/', $v)) {
+        return "'" . $v;
+    }
+    return $v;
+};
+
 $out = fopen('php://output', 'w');
 fwrite($out, "\xEF\xBB\xBF"); // BOM para que Excel detecte UTF-8
 fputcsv($out, $consultas[$tipo]['titulos']);
 foreach ($rows as $row) {
-    fputcsv($out, $row);
+    fputcsv($out, array_map($csvCelda, $row));
 }
 fclose($out);

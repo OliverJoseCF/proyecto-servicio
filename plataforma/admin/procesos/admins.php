@@ -5,7 +5,7 @@ $accion = str('accion', 30);
 $db     = db();
 
 // Política de contraseña: misma que el cambio de la cuenta maestra.
-const ADMIN_PW_MIN = 12;
+const ADMIN_PW_MIN = 8;
 
 // ══ AGREGAR ADMINISTRADOR ════════════════════════════════════════
 if ($accion === 'admin_agregar') {
@@ -15,7 +15,10 @@ if ($accion === 'admin_agregar') {
 
     if ($nombre === '')                              jsonErr('El nombre es requerido');
     if (!filter_var($email, FILTER_VALIDATE_EMAIL))  jsonErr('Correo electrónico inválido');
-    if (strlen($pass) < ADMIN_PW_MIN)                jsonErr('La contraseña debe tener al menos ' . ADMIN_PW_MIN . ' caracteres');
+    if (strlen($pass) < ADMIN_PW_MIN)                 jsonErr('La contraseña debe tener al menos ' . ADMIN_PW_MIN . ' caracteres');
+    if (!preg_match('/[A-Z]/', $pass))                jsonErr('La contraseña debe incluir al menos una mayúscula');
+    if (!preg_match('/[0-9]/', $pass))                jsonErr('La contraseña debe incluir al menos un número');
+    if (!preg_match('/[^A-Za-z0-9]/', $pass))         jsonErr('La contraseña debe incluir al menos un símbolo');
 
     // Email único (incluida la cuenta maestra)
     if (defined('GLOBAL_ADMIN_EMAIL') && $email === mb_strtolower(GLOBAL_ADMIN_EMAIL)) {
@@ -26,8 +29,14 @@ if ($accion === 'admin_agregar') {
     if ($dup->fetchColumn()) jsonErr('Ya existe un administrador con ese correo');
 
     $hash = password_hash($pass, PASSWORD_BCRYPT, ['cost' => 12]);
-    $db->prepare('INSERT INTO admins (nombre, email, password_hash) VALUES (?,?,?)')
-       ->execute([$nombre, $email, $hash]);
+    try {
+        $db->prepare('INSERT INTO admins (nombre, email, password_hash) VALUES (?,?,?)')
+           ->execute([$nombre, $email, $hash]);
+    } catch (\PDOException $e) {
+        // Red de seguridad ante condición de carrera contra el UNIQUE uq_admins_email
+        if ($e->getCode() === '23000') jsonErr('Ya existe un administrador con ese correo');
+        throw $e;
+    }
     $newId = $db->lastInsertId();
     jsonOk('Administrador agregado', ['id' => $newId], "Administrador agregado: $nombre <$email> (ID $newId)");
 }
@@ -52,13 +61,23 @@ if ($accion === 'admin_editar') {
     if ($dup->fetchColumn()) jsonErr('Otro administrador ya usa ese correo');
 
     if ($pass !== '') {
-        if (strlen($pass) < ADMIN_PW_MIN) jsonErr('La contraseña debe tener al menos ' . ADMIN_PW_MIN . ' caracteres');
-        $hash = password_hash($pass, PASSWORD_BCRYPT, ['cost' => 12]);
-        $db->prepare('UPDATE admins SET nombre=?, email=?, password_hash=? WHERE id=?')
-           ->execute([$nombre, $email, $hash, $id]);
-    } else {
-        $db->prepare('UPDATE admins SET nombre=?, email=? WHERE id=?')
-           ->execute([$nombre, $email, $id]);
+        if (strlen($pass) < ADMIN_PW_MIN)          jsonErr('La contraseña debe tener al menos ' . ADMIN_PW_MIN . ' caracteres');
+        if (!preg_match('/[A-Z]/', $pass))          jsonErr('La contraseña debe incluir al menos una mayúscula');
+        if (!preg_match('/[0-9]/', $pass))          jsonErr('La contraseña debe incluir al menos un número');
+        if (!preg_match('/[^A-Za-z0-9]/', $pass))  jsonErr('La contraseña debe incluir al menos un símbolo');
+    }
+    try {
+        if ($pass !== '') {
+            $hash = password_hash($pass, PASSWORD_BCRYPT, ['cost' => 12]);
+            $db->prepare('UPDATE admins SET nombre=?, email=?, password_hash=? WHERE id=?')
+               ->execute([$nombre, $email, $hash, $id]);
+        } else {
+            $db->prepare('UPDATE admins SET nombre=?, email=? WHERE id=?')
+               ->execute([$nombre, $email, $id]);
+        }
+    } catch (\PDOException $e) {
+        if ($e->getCode() === '23000') jsonErr('Otro administrador ya usa ese correo');
+        throw $e;
     }
     jsonOk('Administrador actualizado', [], "Administrador actualizado: $nombre <$email> (ID $id)");
 }

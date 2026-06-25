@@ -59,9 +59,9 @@ require_once __DIR__ . '/_layout.php';
           <td style="font-size:12.5px;color:var(--tsj-gray-600)"><?= htmlspecialchars($s['subtitulo'] ?? '—') ?></td>
           <td>
             <?php if ($s['activo']): ?>
-              <span class="adm-status adm-status--ok">Visible</span>
+              <span class="adm-status adm-status--ok" data-off="Oculta">Visible</span>
             <?php else: ?>
-              <span class="adm-status adm-status--warn">Oculta</span>
+              <span class="adm-status adm-status--warn" data-off="Oculta">Oculta</span>
             <?php endif; ?>
           </td>
           <td class="actions">
@@ -133,7 +133,7 @@ require_once __DIR__ . '/_layout.php';
           $programado= $avDesde && $avDesde > $hoyStr;
         ?>
         <tr id="av-<?= $av['id'] ?>" <?= !$av['activo'] ? 'style="opacity:.5"' : '' ?>>
-          <td><span class="adm-status adm-status--info"><?= htmlspecialchars($av['fecha']) ?></span></td>
+          <td><span class="adm-status adm-status--info"><?= $av['fecha'] ? date('d/m/Y', strtotime($av['fecha'])) : '—' ?></span></td>
           <td style="font-weight:600"><?= htmlspecialchars($av['titulo']) ?></td>
           <td style="font-size:12.5px;color:var(--tsj-gray-600)"><?= htmlspecialchars(substr($av['descripcion'] ?? '', 0, 80)) ?><?= strlen($av['descripcion'] ?? '') > 80 ? '…' : '' ?></td>
           <td style="font-size:12px">
@@ -149,9 +149,9 @@ require_once __DIR__ . '/_layout.php';
           </td>
           <td>
             <?php if ($av['activo']): ?>
-              <span class="adm-status adm-status--ok">Visible</span>
+              <span class="adm-status adm-status--ok" data-off="Oculto">Visible</span>
             <?php else: ?>
-              <span class="adm-status adm-status--warn">Oculto</span>
+              <span class="adm-status adm-status--warn" data-off="Oculto">Oculto</span>
             <?php endif; ?>
           </td>
           <td class="actions">
@@ -159,7 +159,7 @@ require_once __DIR__ . '/_layout.php';
                     onclick="toggleActivo('inicio','aviso_toggle',<?= $av['id'] ?>,this)">
               <span class="material-symbols-rounded"><?= $av['activo'] ? 'visibility_off' : 'visibility' ?></span>
             </button>
-            <button class="adm-btn adm-btn--ghost adm-btn--sm" onclick="abrirEditarAv(<?= htmlspecialchars(json_encode($av)) ?>)">
+            <button class="adm-btn adm-btn--ghost adm-btn--sm" onclick="abrirEditarAv(<?= htmlspecialchars(json_encode($av), ENT_QUOTES, 'UTF-8') ?>)">
               <span class="material-symbols-rounded">edit</span>
             </button>
             <button class="adm-btn adm-btn--danger adm-btn--sm" onclick="confirmarEliminar('inicio','aviso_eliminar',<?= $av['id'] ?>,'av-<?= $av['id'] ?>')">
@@ -297,13 +297,13 @@ function toggleActivo(modulo, accion, id, btn) {
       if (json.ok) {
         var row  = btn.closest('tr');
         var icon = btn.querySelector('.material-symbols-rounded');
-        var badge = row.querySelector('.adm-status');
+        var badge = row.querySelector('.adm-status[data-off]');
         var activo = json.activo;
         row.style.opacity = activo ? '' : '0.5';
         icon.textContent  = activo ? 'visibility_off' : 'visibility';
         btn.title         = activo ? 'Ocultar' : 'Mostrar';
         if (badge) {
-          badge.textContent  = activo ? 'Visible' : 'Oculto/a';
+          badge.textContent  = activo ? 'Visible' : (badge.dataset.off || 'Oculto');
           badge.className    = 'adm-status ' + (activo ? 'adm-status--ok' : 'adm-status--warn');
         }
       }

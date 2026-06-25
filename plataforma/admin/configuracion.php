@@ -260,8 +260,14 @@ require_once __DIR__ . '/_layout.php';
           <input type="email" name="email" id="admin-email" maxlength="254" required></div>
         <div class="adm-field" style="grid-column:1/-1">
           <label>Contraseña <span style="color:var(--tsj-pink)" id="admin-pass-req">*</span></label>
-          <input type="password" name="password" id="admin-password" placeholder="Mínimo 12 caracteres" minlength="12">
-          <span class="adm-field-help" id="admin-pass-help">Mínimo 12 caracteres.</span>
+          <input type="password" name="password" id="admin-password" placeholder="Mínimo 8 caracteres" minlength="8">
+          <span class="adm-field-help" id="admin-pass-help">Mínimo 8 caracteres.</span>
+          <div id="admin-pass-requisitos" style="display:none;margin-top:8px;display:flex;flex-direction:column;gap:4px;font-size:12.5px">
+            <span id="adm-req-len"  class="adm-req"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:middle">radio_button_unchecked</span> Mínimo 8 caracteres</span>
+            <span id="adm-req-may"  class="adm-req"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:middle">radio_button_unchecked</span> Al menos una mayúscula (A–Z)</span>
+            <span id="adm-req-num"  class="adm-req"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:middle">radio_button_unchecked</span> Al menos un número (0–9)</span>
+            <span id="adm-req-esp"  class="adm-req"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:middle">radio_button_unchecked</span> Al menos un símbolo (!@#$…)</span>
+          </div>
         </div>
       </div>
       <div class="adm-form-actions">
@@ -282,8 +288,9 @@ require_once __DIR__ . '/_layout.php';
     document.getElementById('admin-form-icon').textContent   = 'person_add';
     document.getElementById('admin-password').required = true;
     document.getElementById('admin-pass-req').style.display  = '';
-    document.getElementById('admin-pass-help').textContent   = 'Mínimo 12 caracteres.';
+    document.getElementById('admin-pass-help').textContent   = 'Mínimo 8 caracteres.';
     document.getElementById('admin-cancelar').style.display  = 'none';
+    actualizarRequisitosAdmin('');
   }
 
   function editarAdmin(id) {
@@ -299,6 +306,7 @@ require_once __DIR__ . '/_layout.php';
     document.getElementById('admin-password').required = false;
     document.getElementById('admin-pass-req').style.display  = 'none';
     document.getElementById('admin-pass-help').textContent   = 'Déjala en blanco para conservar la contraseña actual.';
+    actualizarRequisitosAdmin('');
     document.getElementById('admin-cancelar').style.display  = '';
     document.getElementById('admin-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
@@ -310,6 +318,29 @@ require_once __DIR__ . '/_layout.php';
     });
   }
 
+  var ADM_REQ_CSS = 'color:var(--tsj-gray-400)';
+  var ADM_OK_CSS  = 'color:#16a34a;font-weight:600';
+
+  function actualizarRequisitosAdmin(v) {
+    var box = document.getElementById('admin-pass-requisitos');
+    if (!box) return;
+    box.style.display = v.length > 0 ? 'flex' : 'none';
+    function set(id, ok) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.style.cssText = ok ? ADM_OK_CSS : ADM_REQ_CSS;
+      el.querySelector('.material-symbols-rounded').textContent = ok ? 'check_circle' : 'radio_button_unchecked';
+    }
+    set('adm-req-len', v.length >= 8);
+    set('adm-req-may', /[A-Z]/.test(v));
+    set('adm-req-num', /[0-9]/.test(v));
+    set('adm-req-esp', /[^A-Za-z0-9]/.test(v));
+  }
+
+  document.getElementById('admin-password').addEventListener('input', function () {
+    actualizarRequisitosAdmin(this.value);
+  });
+
   function eliminarAdmin(id) {
     if (!confirm('¿Eliminar esta cuenta de administrador? No se puede deshacer.')) return;
     var csrf = document.querySelector('#admin-form input[name="_csrf"]').value;
@@ -317,6 +348,17 @@ require_once __DIR__ . '/_layout.php';
       if (j.ok) {
         var row = document.getElementById('admin-row-' + id);
         if (row) row.remove();
+        var tbody = document.getElementById('admins-tbody');
+        if (tbody && !tbody.querySelector('tr[id^="admin-row-"]')) {
+          var empty = document.getElementById('admins-empty');
+          if (!empty) {
+            empty = document.createElement('tr');
+            empty.id = 'admins-empty';
+            empty.innerHTML = '<td colspan="5" class="adm-table-empty">Aún no hay cuentas. Crea la primera abajo.</td>';
+            tbody.appendChild(empty);
+          }
+          empty.style.display = '';
+        }
       }
     });
   }
@@ -335,7 +377,26 @@ require_once __DIR__ . '/_layout.php';
       El nuevo hash se escribe automáticamente en <strong>shared/config.local.php</strong>.
       Las cuentas del día a día se gestionan en la pestaña <strong>Administradores</strong>.</span>
     </div>
-    <form data-proc="configuracion" data-accion="cambiar_password">
+
+    <div class="adm-pending" style="background:#fefce8;border-color:#fde68a;color:#78350f;margin-bottom:16px">
+      <span class="material-symbols-rounded">help</span>
+      <span>
+        <strong>¿Olvidaste el correo o la contraseña?</strong> No hay recuperación por correo — la cuenta maestra
+        vive en el archivo <code>shared/config.local.php</code> del servidor. Para recuperarla:
+        <ol style="margin:8px 0 0 16px;line-height:1.8">
+          <li>Accede al servidor por <strong>FTP, cPanel o SSH</strong>.</li>
+          <li>Abre <code>shared/config.local.php</code> y edita <code>GLOBAL_ADMIN_EMAIL</code> con el correo que quieras usar.</li>
+          <li>Para generar un hash nuevo crea un archivo <code>hash.php</code> temporal en el servidor con:<br>
+              <code style="display:inline-block;background:#fef9c3;padding:2px 8px;border-radius:4px;margin-top:4px">
+                &lt;?php echo password_hash('TuNuevaContraseña1!', PASSWORD_BCRYPT, ['cost' =&gt; 12]);
+              </code>
+          </li>
+          <li>Ábrelo en el navegador, copia el resultado y pégalo en <code>GLOBAL_ADMIN_HASH</code>.</li>
+          <li><strong>Borra <code>hash.php</code> del servidor inmediatamente.</strong></li>
+        </ol>
+      </span>
+    </div>
+    <form data-proc="configuracion" data-accion="cambiar_password" id="form-cambiar-pass">
       <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="cambiar_password">
       <div class="adm-form-grid cols-2">
@@ -345,13 +406,75 @@ require_once __DIR__ . '/_layout.php';
           <span class="adm-field-help">Definido en config.local.php → GLOBAL_ADMIN_EMAIL</span>
         </div>
         <div class="adm-field"></div>
-        <div class="adm-field"><label>Nueva contraseña <span style="color:var(--tsj-pink)">*</span></label><input type="password" name="nueva_password" placeholder="Mínimo 12 caracteres" minlength="12" required></div>
-        <div class="adm-field"><label>Confirmar contraseña <span style="color:var(--tsj-pink)">*</span></label><input type="password" name="confirma_password" placeholder="Repite la contraseña" required></div>
+        <div class="adm-field">
+          <label>Nueva contraseña <span style="color:var(--tsj-pink)">*</span></label>
+          <input type="password" name="nueva_password" id="cfg-nueva-pass" placeholder="Mínimo 8 caracteres" minlength="8" required>
+          <div id="cfg-pass-requisitos" style="display:none;margin-top:8px;flex-direction:column;gap:4px;font-size:12.5px">
+            <span id="cfg-req-len" class="adm-req"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:middle">radio_button_unchecked</span> Mínimo 8 caracteres</span>
+            <span id="cfg-req-may" class="adm-req"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:middle">radio_button_unchecked</span> Al menos una mayúscula (A–Z)</span>
+            <span id="cfg-req-num" class="adm-req"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:middle">radio_button_unchecked</span> Al menos un número (0–9)</span>
+            <span id="cfg-req-esp" class="adm-req"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:middle">radio_button_unchecked</span> Al menos un símbolo (!@#$…)</span>
+          </div>
+        </div>
+        <div class="adm-field">
+          <label>Confirmar contraseña <span style="color:var(--tsj-pink)">*</span></label>
+          <input type="password" name="confirma_password" id="cfg-confirma-pass" placeholder="Repite la contraseña" required>
+          <span class="adm-field-help" id="cfg-pass-match" style="color:var(--tsj-danger);display:none">Las contraseñas no coinciden.</span>
+        </div>
       </div>
       <div class="adm-form-actions">
         <button type="submit" class="adm-btn adm-btn--warning"><span class="material-symbols-rounded">lock_reset</span> Cambiar contraseña</button>
       </div>
     </form>
+    <script>
+    (function () {
+      var nueva    = document.getElementById('cfg-nueva-pass');
+      var confirma = document.getElementById('cfg-confirma-pass');
+      var aviso    = document.getElementById('cfg-pass-match');
+      var form     = document.getElementById('form-cambiar-pass');
+      var box      = document.getElementById('cfg-pass-requisitos');
+
+      var OK_CSS  = 'color:#16a34a;font-weight:600';
+      var REQ_CSS = 'color:var(--tsj-gray-400)';
+
+      function setReq(id, ok) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.style.cssText = ok ? OK_CSS : REQ_CSS;
+        el.querySelector('.material-symbols-rounded').textContent = ok ? 'check_circle' : 'radio_button_unchecked';
+      }
+
+      function validarNueva() {
+        var v = nueva.value;
+        box.style.display = v.length > 0 ? 'flex' : 'none';
+        setReq('cfg-req-len', v.length >= 8);
+        setReq('cfg-req-may', /[A-Z]/.test(v));
+        setReq('cfg-req-num', /[0-9]/.test(v));
+        setReq('cfg-req-esp', /[^A-Za-z0-9]/.test(v));
+        validarConfirma();
+      }
+
+      function validarConfirma() {
+        var mismatch = confirma.value !== '' && nueva.value !== confirma.value;
+        aviso.style.display = mismatch ? '' : 'none';
+        confirma.setCustomValidity(mismatch ? 'Las contraseñas no coinciden' : '');
+      }
+
+      nueva.addEventListener('input', validarNueva);
+      confirma.addEventListener('input', validarConfirma);
+
+      form.addEventListener('submit', function (e) {
+        var v = nueva.value;
+        var falla = v.length < 8 || !/[A-Z]/.test(v) || !/[0-9]/.test(v) || !/[^A-Za-z0-9]/.test(v);
+        if (falla || nueva.value !== confirma.value) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          if (falla) { box.style.display = 'flex'; validarNueva(); nueva.focus(); }
+          else { aviso.style.display = ''; confirma.focus(); }
+        }
+      }, true);
+    })();
+    </script>
   </div>
 </div>
 

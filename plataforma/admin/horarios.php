@@ -134,7 +134,7 @@ require_once __DIR__ . '/_layout.php';
 
   <div class="adm-form-card" style="margin-top:20px">
     <div class="adm-form-title"><span class="material-symbols-rounded">upload_file</span> Agregar / actualizar horario</div>
-    <form data-proc="horarios" data-accion="horario_guardar" id="form-hor" enctype="multipart/form-data">
+    <form data-proc="horarios" data-reload id="form-hor" enctype="multipart/form-data">
       <input type="hidden" name="_csrf" value="<?= $csrf ?>">
       <input type="hidden" name="accion" value="horario_guardar">
       <div class="adm-form-grid cols-3">
@@ -173,7 +173,5 @@ require_once __DIR__ . '/_layout.php';
     </form>
   </div>
 </div>
-
-<script></script>
 
 <?php require_once __DIR__ . '/_layout_end.php'; ?>
