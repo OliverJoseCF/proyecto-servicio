@@ -103,7 +103,7 @@ require_once __DIR__ . '/_layout.php';
         <div class="adm-field"><label>Dirección</label><input type="text" name="direccion" value="<?= cfgVal('direccion','Carretera Chapala-Jocotepec km 7.5, Ajijic, Chapala, Jalisco') ?>"></div>
         <div class="adm-field"><label>Correo general de contacto</label><input type="email" name="correo_general" value="<?= cfgVal('correo_general','campus.chapala@tsj.edu.mx') ?>"></div>
         <div class="adm-field"><label>Teléfono</label><input type="tel" name="telefono" value="<?= cfgVal('telefono','376-766-0000') ?>" inputmode="tel" maxlength="25" pattern="[0-9+\-\s()]{7,25}" title="Solo números, +, -, espacios y paréntesis (entre 7 y 25 caracteres)"></div>
-        <div class="adm-field"><label>Horario de atención</label><input type="text" name="horario_atencion" value="<?= cfgVal('horario_atencion','Lun – Vie: 8:00 – 20:00 h') ?>"></div>
+        <div class="adm-field"><label>Horario de atención</label><input type="text" name="horario_atencion" value="<?= cfgVal('horario_atencion','Lun – Vie: 8:00 AM – 8:00 PM') ?>"></div>
         <div class="adm-field" style="grid-column:1/-1"><label>Enlace Google Maps (botón)</label><input type="url" name="maps_link_url" value="<?= cfgVal('maps_link_url') ?>"></div>
         <div class="adm-field" style="grid-column:1/-1"><label>Embed Google Maps (iframe src)</label><textarea name="maps_embed_url" style="min-height:60px"><?= cfgVal('maps_embed_url') ?></textarea><span class="adm-field-help">Ve a Google Maps → Compartir → Insertar mapa → copia la URL del src del iframe.</span></div>
       </div>

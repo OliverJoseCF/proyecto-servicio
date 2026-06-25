@@ -40,7 +40,7 @@ $_tsj_admin_links = [
     'inscripcion' => $base . '/admin/visitantes.php',
 ];
 $nav_items = $nav_items ?? [
-    'visitantes' => ['label' => 'Directorio',               'href' => $base . '/modulos/visitantes/index.php',       'icon' => 'contacts'],
+    'visitantes' => ['label' => 'Directorio',               'href' => $base . '/modulos/visitantes/Directorio.php',  'icon' => 'contacts'],
     'biblioteca' => ['label' => 'Biblioteca',               'href' => $base . '/modulos/biblioteca/buscar.php',      'icon' => 'menu_book'],
     'convenios'  => ['label' => 'Convenios',                'href' => $base . '/modulos/convenios/index.php',        'icon' => 'handshake'],
     'horarios'   => ['label' => 'Buscar Maestro',           'href' => $base . '/modulos/horarios/index.php',         'icon' => 'manage_search'],

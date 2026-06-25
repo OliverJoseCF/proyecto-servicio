@@ -167,9 +167,9 @@ require_once __DIR__ . '/_layout.php';
       <div class="adm-module-icon" style="background:#ecfeff;color:#0e7490"><span class="material-symbols-rounded">monitoring</span></div>
       <p class="adm-module-name">Reportes y estadísticas</p>
     </div>
-    <p class="adm-module-desc">Libros más prestados, atrasos, actividad por mes y bitácora del panel.</p>
+    <p class="adm-module-desc">Actividad del panel, convenios por vencer, distribución por sector/tipo y bitácora de acciones.</p>
     <div class="adm-module-items">
-      <span class="adm-module-tag">Top libros</span><span class="adm-module-tag">Atrasados</span><span class="adm-module-tag">CSV</span><span class="adm-module-tag">Bitácora</span>
+      <span class="adm-module-tag">Convenios</span><span class="adm-module-tag">Vencimientos</span><span class="adm-module-tag">Admins</span><span class="adm-module-tag">Bitácora</span>
     </div>
   </a>
 

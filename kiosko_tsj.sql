@@ -67,7 +67,7 @@ INSERT INTO `configuracion` (`clave`, `valor`, `descripcion`) VALUES
   ('plataforma_url',     '/plataforma',                            'URL base de la plataforma'),
   ('direccion',          'Carretera Chapala-Jocotepec km 7.5, Ajijic, Chapala, Jalisco', 'Dirección física'),
   ('telefono',           '376-766-0000',                           'Teléfono general'),
-  ('horario_atencion',   'Lun – Vie: 8:00 – 20:00 h',             'Horario de oficina'),
+  ('horario_atencion',   'Lun – Vie: 8:00 AM – 8:00 PM',          'Horario de oficina'),
   ('correo_general',     'campus.chapala@tsj.edu.mx',              'Correo general de contacto'),
   ('correo_biblioteca',  'biblioteca@chapala.tecmm.edu.mx',        'Correo de biblioteca'),
   ('correo_vinculacion', 'vinculacion@chapala.tecmm.edu.mx',       'Correo de vinculación/convenios'),

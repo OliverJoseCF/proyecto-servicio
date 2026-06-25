@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual de Usuario — Plataforma de Servicios Estudiantiles TSJ Chapala</title>
+<style>
+  :root{
+    --azul-marino:#0d2c54;
+    --azul-medio:#1d4e89;
+    --dorado:#c9a227;
+    --texto:#2b2b2b;
+    --gris:#555;
+    --gris-claro:#f4f6f9;
+    --gris-borde:#d9dee6;
+    --nota-bg:#eef4fb;
+    --nota-borde:#1d4e89;
+    --adv-bg:#fdf4e3;
+    --adv-borde:#c9a227;
+    --captura-bg:#f0f2f5;
+    --captura-borde:#b9c2cf;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    font-family:"Segoe UI", Calibri, Arial, sans-serif;
+    color:var(--texto);
+    line-height:1.6;
+    margin:0;
+    background:#e9ecf1;
+    font-size:11pt;
+  }
+
+  /* Hoja simulada en pantalla */
+  .pagina{
+    background:#fff;
+    max-width:8.5in;
+    margin:24px auto;
+    padding:0.9in 0.95in;
+    box-shadow:0 2px 14px rgba(0,0,0,.15);
+  }
+
+  /* ===== Encabezado / pie corriente (visibles al imprimir vía @page idealmente; aquí simulados por bloque) ===== */
+  .doc-header{
+    border-bottom:2px solid var(--azul-marino);
+    padding-bottom:6px;
+    margin-bottom:22px;
+    font-size:8.5pt;
+    color:var(--gris);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .doc-header strong{ color:var(--azul-marino); }
+
+  .doc-footer{
+    border-top:1px solid var(--gris-borde);
+    margin-top:30px;
+    padding-top:6px;
+    font-size:8.5pt;
+    color:var(--gris);
+    display:flex;
+    justify-content:space-between;
+  }
+
+  h1,h2,h3,h4{ color:var(--azul-marino); line-height:1.25; }
+  h1{ font-size:21pt; border-bottom:3px solid var(--dorado); padding-bottom:8px; margin-top:0; }
+  h2{ font-size:16pt; color:var(--azul-medio); margin-top:34px; border-bottom:1px solid var(--gris-borde); padding-bottom:5px; }
+  h3{ font-size:13pt; color:var(--azul-marino); margin-top:24px; }
+  h4{ font-size:11.5pt; color:var(--azul-medio); margin-top:18px; margin-bottom:6px; }
+
+  p{ margin:9px 0; text-align:justify; }
+
+  code, .ruta{
+    font-family:"Consolas","Courier New",monospace;
+    background:#eef1f5;
+    color:#0d2c54;
+    padding:1px 5px;
+    border-radius:3px;
+    font-size:9.5pt;
+    border:1px solid #dde3ec;
+  }
+
+  pre{
+    font-family:"Consolas","Courier New",monospace;
+    background:#0d2c54;
+    color:#eaf0f7;
+    padding:12px 14px;
+    border-radius:6px;
+    font-size:9pt;
+    overflow-x:auto;
+    line-height:1.45;
+    border-left:4px solid var(--dorado);
+  }
+  pre code{ background:none; border:none; color:inherit; padding:0; }
+
+  /* ===== Tablas ===== */
+  table{
+    border-collapse:collapse;
+    width:100%;
+    margin:16px 0;
+    font-size:10pt;
+  }
+  th{
+    background:var(--azul-marino);
+    color:#fff;
+    text-align:left;
+    padding:8px 10px;
+    border:1px solid var(--azul-marino);
+    font-weight:600;
+  }
+  td{
+    padding:7px 10px;
+    border:1px solid var(--gris-borde);
+    vertical-align:top;
+  }
+  tr:nth-child(even) td{ background:var(--gris-claro); }
+
+  /* ===== Recuadros NOTA / ADVERTENCIA ===== */
+  .nota, .advertencia{
+    margin:16px 0;
+    padding:11px 15px 11px 15px;
+    border-radius:5px;
+    font-size:10pt;
+  }
+  .nota{
+    background:var(--nota-bg);
+    border-left:5px solid var(--nota-borde);
+  }
+  .advertencia{
+    background:var(--adv-bg);
+    border-left:5px solid var(--adv-borde);
+  }
+  .nota .etq, .advertencia .etq{
+    display:block;
+    font-weight:700;
+    margin-bottom:3px;
+    letter-spacing:.3px;
+  }
+  .nota .etq{ color:var(--azul-medio); }
+  .advertencia .etq{ color:#9a7a12; }
+
+  /* ===== Marcador de captura ===== */
+  .captura{
+    background:var(--captura-bg);
+    border:1.5px dashed var(--captura-borde);
+    border-radius:6px;
+    padding:14px 16px;
+    margin:16px 0 6px 0;
+    text-align:center;
+    color:var(--gris);
+    font-size:9.5pt;
+  }
+  .captura .marca{
+    font-family:"Consolas","Courier New",monospace;
+    font-weight:700;
+    color:var(--azul-marino);
+    display:block;
+    margin-bottom:4px;
+  }
+  .pie-figura{
+    text-align:center;
+    font-size:9pt;
+    font-style:italic;
+    color:var(--gris);
+    margin:0 0 18px 0;
+  }
+
+  ol, ul{ margin:9px 0 9px 6px; padding-left:22px; }
+  li{ margin:5px 0; text-align:justify; }
+
+  ol.pasos > li{ margin:8px 0; }
+
+  /* ===== Portada ===== */
+  .portada{
+    min-height:9.0in;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:0.4in;
+  }
+  .portada .institucion{
+    font-size:12pt;
+    letter-spacing:2px;
+    color:var(--azul-medio);
+    text-transform:uppercase;
+    font-weight:600;
+    margin-bottom:8px;
+  }
+  .portada .logo-box{
+    margin:18px 0 30px 0;
+    width:62%;
+  }
+  .portada .titulo-grande{
+    font-size:38pt;
+    color:var(--azul-marino);
+    font-weight:800;
+    margin:14px 0 6px 0;
+    line-height:1.1;
+    border:none;
+  }
+  .portada .subtitulo{
+    font-size:14pt;
+    color:var(--azul-medio);
+    max-width:80%;
+    margin:6px auto 0 auto;
+    line-height:1.4;
+  }
+  .portada .linea-oro{
+    width:120px;
+    height:4px;
+    background:var(--dorado);
+    margin:28px auto;
+    border-radius:2px;
+  }
+  .portada .meta{
+    font-size:12pt;
+    color:var(--gris);
+    margin-top:6px;
+  }
+  .portada .meta strong{ color:var(--azul-marino); }
+  .portada .tipo-proyecto{
+    margin-top:34px;
+    font-size:10.5pt;
+    color:var(--gris);
+    font-style:italic;
+  }
+
+  /* ===== Tabla de contenido ===== */
+  .toc ol{ list-style:none; padding-left:0; }
+  .toc > ol > li{ font-weight:700; color:var(--azul-marino); margin-top:12px; font-size:11.5pt; }
+  .toc ol ol{ padding-left:22px; }
+  .toc ol ol li{ font-weight:400; color:var(--texto); margin-top:3px; font-size:10pt; }
+  .toc a{ color:inherit; text-decoration:none; }
+
+  .salto{ page-break-before:always; }
+
+  hr.sep{ border:none; border-top:1px solid var(--gris-borde); margin:26px 0; }
+
+  .badge{
+    display:inline-block;
+    background:var(--azul-medio);
+    color:#fff;
+    font-size:8.5pt;
+    padding:1px 8px;
+    border-radius:10px;
+    font-weight:600;
+    letter-spacing:.3px;
+  }
+
+  @media print{
+    body{ background:#fff; font-size:10.5pt; }
+    .pagina{ box-shadow:none; margin:0; max-width:none; padding:0.7in 0.75in; }
+    .salto{ page-break-before:always; }
+    .captura{ break-inside:avoid; }
+    table{ break-inside:auto; }
+    tr{ break-inside:avoid; }
+    .nota,.advertencia{ break-inside:avoid; }
+    h2,h3{ break-after:avoid; }
+  }
+  @page{
+    size:letter;
+    margin:0.8in 0.75in;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================ PORTADA ============================ -->
+<section class="pagina">
+  <div class="portada">
+    <div class="institucion">Tecnológico Superior de Jalisco · Campus Chapala</div>
+
+    <div class="captura logo-box">
+      <span class="marca">[CAPTURA #0: Logo institucional TSJ/TecMM]</span>
+      Inserte aquí el logotipo oficial del Tecnológico Superior de Jalisco.
+    </div>
+
+    <h1 class="titulo-grande">Manual de Usuario</h1>
+    <div class="subtitulo">Plataforma de Servicios Estudiantiles<br>Tecnológico Superior de Jalisco, Campus Chapala</div>
+
+    <div class="linea-oro"></div>
+
+    <div class="meta"><strong>Versión 1.0</strong> &nbsp;·&nbsp; Junio 2026</div>
+    <div class="tipo-proyecto">Proyecto de Residencias Profesionales / Servicio Social</div>
+  </div>
+</section>
+
+<!-- ============================ TABLA DE CONTENIDO ============================ -->
+<section class="pagina salto">
+  <div class="doc-header">
+    <span><strong>Manual de Usuario</strong> — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+
+  <h1>Tabla de Contenido</h1>
+
+  <div class="toc">
+    <ol>
+      <li><a href="#cap1">1. Introducción</a>
+        <ol>
+          <li>1.1 Propósito del manual y del sistema</li>
+          <li>1.2 Alcance de la plataforma</li>
+          <li>1.3 Público objetivo</li>
+          <li>1.4 Convenciones tipográficas del manual</li>
+          <li>1.5 Glosario de términos</li>
+        </ol>
+      </li>
+      <li><a href="#cap2">2. Requisitos del sistema</a>
+        <ol>
+          <li>2.1 Requisitos de software</li>
+          <li>2.2 Requisitos de hardware recomendados</li>
+          <li>2.3 Navegadores compatibles</li>
+        </ol>
+      </li>
+      <li><a href="#cap3">3. Instalación y puesta en marcha</a>
+        <ol>
+          <li>3.1 Obtener el proyecto</li>
+          <li>3.2 Importar la base de datos <code>kiosko_tsj</code></li>
+          <li>3.3 Crear el archivo de configuración local</li>
+          <li>3.4 Generar el hash de la contraseña del administrador</li>
+          <li>3.5 Configurar el alias de Apache</li>
+          <li>3.6 Crear las carpetas de subida</li>
+          <li>3.7 Verificación de la instalación</li>
+          <li>3.8 Despliegue en producción / hosting cPanel</li>
+          <li>3.9 Checklist de instalación</li>
+        </ol>
+      </li>
+      <li><a href="#cap4">4. Primer acceso y arranque diario</a>
+        <ol>
+          <li>4.1 Encender los servicios en XAMPP</li>
+          <li>4.2 Abrir el portal</li>
+          <li>4.3 Iniciar sesión en el panel</li>
+          <li>4.4 Cerrar sesión</li>
+        </ol>
+      </li>
+      <li><a href="#cap5">5. Guía del visitante (uso del portal)</a>
+        <ol>
+          <li>5.1 Recorrido de la página principal</li>
+          <li>5.2 Directorio y oferta académica</li>
+          <li>5.3 Nuevo ingreso / Reinscripción y comprobante PDF</li>
+          <li>5.4 Biblioteca: buscar y solicitar préstamo</li>
+          <li>5.5 Convenios y "Sugerir empresa"</li>
+          <li>5.6 Buscar maestro y consultar horario</li>
+          <li>5.7 Requisitos: residencia y servicio social</li>
+        </ol>
+      </li>
+      <li><a href="#cap6">6. Guía del administrador (panel de administración)</a>
+        <ol>
+          <li>6.1 Resumen (Dashboard)</li>
+          <li>6.2 Página de inicio</li>
+          <li>6.3 Directorio y carreras</li>
+          <li>6.4 Maestros y horarios</li>
+          <li>6.5 Servicio social y residencias</li>
+          <li>6.6 Biblioteca</li>
+          <li>6.7 Convenios</li>
+          <li>6.8 Reportes y estadísticas</li>
+          <li>6.9 Respaldos de datos</li>
+          <li>6.10 Configuración</li>
+        </ol>
+      </li>
+      <li><a href="#cap7">7. Respaldos y mantenimiento</a>
+        <ol>
+          <li>7.1 Exportar la base de datos</li>
+          <li>7.2 Importar / restaurar un respaldo</li>
+          <li>7.3 Buenas prácticas de respaldo</li>
+        </ol>
+      </li>
+      <li><a href="#cap8">8. Seguridad</a>
+        <ol>
+          <li>8.1 Cambio de contraseña del administrador</li>
+          <li>8.2 Gestión multi-administrador</li>
+          <li>8.3 Bitácora de auditoría</li>
+          <li>8.4 Protección del login y tokens CSRF</li>
+          <li>8.5 Recomendaciones para producción</li>
+        </ol>
+      </li>
+      <li><a href="#cap9">9. Solución de problemas (errores comunes)</a></li>
+      <li><a href="#cap10">10. Anexos</a>
+        <ol>
+          <li>10.1 Mapa de rutas / URLs del sistema</li>
+          <li>10.2 Glosario ampliado</li>
+          <li>10.3 Datos de contacto / soporte</li>
+          <li>10.4 Créditos del proyecto</li>
+        </ol>
+      </li>
+    </ol>
+  </div>
+
+  <h2 style="margin-top:38px;">Control de versiones</h2>
+  <table>
+    <thead>
+      <tr><th style="width:14%;">Versión</th><th style="width:18%;">Fecha</th><th>Descripción</th><th style="width:22%;">Autor</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1.0</td><td>Junio 2026</td><td>Versión inicial del manual de usuario. Documenta la instalación, el portal público, las diez secciones del panel de administración, respaldos, seguridad y solución de problemas de la Plataforma de Servicios Estudiantiles.</td><td>______________</td></tr>
+      <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+      <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    </tbody>
+  </table>
+
+  <div class="doc-footer">
+    <span>Manual de Usuario — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+</section>
+
+<!-- ============================ CAPÍTULO 1 ============================ -->
+<section class="pagina salto" id="cap1">
+  <div class="doc-header">
+    <span><strong>Manual de Usuario</strong> — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+
+  <h1>Capítulo 1. Introducción</h1>
+
+  <h2>1.1 Propósito del manual y del sistema</h2>
+  <p>Este manual describe el uso, la instalación y la administración de la <strong>Plataforma de Servicios Estudiantiles</strong> del Tecnológico Superior de Jalisco (TecMM), Campus Chapala. La plataforma es un portal web institucional que reúne en un solo sitio los servicios digitales del plantel, dirigidos a alumnos, docentes y público en general, e incluye un panel de administración para que el personal institucional gestione todos los contenidos.</p>
+  <p>El documento tiene dos propósitos. En primer lugar, servir de guía para el <strong>personal administrador</strong>, explicando cómo instalar el sistema, dar mantenimiento y operar cada una de las secciones del panel. En segundo lugar, orientar a los <strong>visitantes del portal</strong> (alumnos y público) sobre cómo consultar la información y utilizar los trámites disponibles.</p>
+
+  <h2>1.2 Alcance de la plataforma</h2>
+  <p>La plataforma centraliza los siguientes servicios, cada uno como un módulo independiente del portal:</p>
+  <ul>
+    <li><strong>Portal principal:</strong> página de inicio con carrusel de imágenes, tarjetas de acceso a los módulos, avisos importantes con vigencia por fechas y preguntas frecuentes (FAQ).</li>
+    <li><strong>Directorio y oferta académica:</strong> consulta de personal, docentes, coordinadores, secretarías, carreras, materias y ubicación del campus.</li>
+    <li><strong>Nuevo ingreso / Reinscripción:</strong> requisitos de admisión y generación de un comprobante de examen en formato PDF.</li>
+    <li><strong>Biblioteca:</strong> catálogo de libros con búsqueda y solicitud de préstamos en línea.</li>
+    <li><strong>Convenios:</strong> empresas vinculadas por carrera para residencia profesional, servicio social y prácticas, además de un formulario para sugerir empresas.</li>
+    <li><strong>Buscar maestro / Horarios:</strong> búsqueda de docentes y consulta de sus horarios por carrera y semestre.</li>
+    <li><strong>Requisitos de residencia y servicio social:</strong> guías con checklist interactivo, línea de tiempo de fases, calculadora de créditos y documentos descargables.</li>
+  </ul>
+
+  <div class="advertencia">
+    <span class="etq">⚠ Importante — Funciones que la plataforma NO incluye</span>
+    Para evitar confusiones durante la presentación y el uso, la plataforma <strong>no</strong> cuenta con un sistema de citas o agenda de turnos, ni con pagos en línea. El contacto institucional se realiza a través de los correos por área que aparecen en el pie de página del portal, así como por teléfono y la dirección física del campus.
+  </div>
+
+  <h2>1.3 Público objetivo</h2>
+  <table>
+    <thead><tr><th style="width:28%;">Perfil</th><th>Descripción y uso del manual</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Personal administrador</strong></td><td>Personal institucional responsable de instalar, configurar y mantener la plataforma, así como de cargar y actualizar la información publicada. Utilizará principalmente los capítulos 2 a 10.</td></tr>
+      <tr><td><strong>Visitantes / usuarios finales</strong></td><td>Alumnos, aspirantes y público general que consultan el portal y realizan trámites como solicitar préstamos o generar comprobantes. Utilizarán principalmente el Capítulo 5.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>1.4 Convenciones tipográficas usadas en el manual</h2>
+  <p>Para facilitar la lectura, el manual emplea las siguientes convenciones:</p>
+  <ul>
+    <li>Las rutas de archivos, carpetas, URLs y comandos se muestran en formato monoespaciado, por ejemplo: <code>plataforma/index.php</code> o <code>http://localhost/plataforma</code>.</li>
+    <li>Los nombres de botones, pestañas y secciones de la interfaz se escriben en <strong>negritas</strong>.</li>
+    <li>Los procedimientos se presentan como listas numeradas de pasos.</li>
+  </ul>
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    Los recuadros de <strong>Nota</strong> aportan información útil, recomendaciones o aclaraciones que facilitan el uso del sistema.
+  </div>
+  <div class="advertencia">
+    <span class="etq">⚠ Advertencia</span>
+    Los recuadros de <strong>Advertencia</strong> señalan acciones que pueden provocar pérdida de datos o problemas de funcionamiento. Léalos con atención antes de continuar.
+  </div>
+
+  <h2>1.5 Glosario de términos</h2>
+  <table>
+    <thead><tr><th style="width:24%;">Término</th><th>Definición</th></tr></thead>
+    <tbody>
+      <tr><td><strong>XAMPP</strong></td><td>Paquete de software gratuito que instala en un solo paso el servidor web Apache, la base de datos MariaDB/MySQL y el lenguaje PHP. Se usa para ejecutar la plataforma en una computadora local.</td></tr>
+      <tr><td><strong>Apache</strong></td><td>Servidor web encargado de recibir las peticiones del navegador y entregar las páginas del portal.</td></tr>
+      <tr><td><strong>MySQL / MariaDB</strong></td><td>Sistema gestor de base de datos donde se almacena toda la información de la plataforma (libros, convenios, docentes, avisos, etc.).</td></tr>
+      <tr><td><strong>phpMyAdmin</strong></td><td>Herramienta web incluida en XAMPP para administrar la base de datos de forma visual: crear tablas, importar archivos <code>.sql</code>, consultar datos, etc.</td></tr>
+      <tr><td><strong>Base de datos (BD)</strong></td><td>Conjunto organizado de tablas donde se guarda la información del sistema. En este proyecto se llama <code>kiosko_tsj</code>.</td></tr>
+      <tr><td><strong>PDO</strong></td><td>Interfaz de PHP (PHP Data Objects) que permite conectarse a la base de datos de forma segura, ayudando a prevenir ataques de inyección SQL.</td></tr>
+      <tr><td><strong>Hash</strong></td><td>Representación cifrada e irreversible de una contraseña. La plataforma guarda el hash y nunca la contraseña en texto plano.</td></tr>
+      <tr><td><strong>bcrypt</strong></td><td>Algoritmo utilizado para generar el hash de las contraseñas de administrador, configurado con un costo de 12.</td></tr>
+      <tr><td><strong>CSRF</strong></td><td>Falsificación de petición en sitios cruzados. La plataforma protege todos sus formularios con tokens CSRF para evitar envíos maliciosos.</td></tr>
+      <tr><td><strong>Bitácora</strong></td><td>Registro automático (tabla <code>admin_log</code>) de todas las acciones realizadas en el panel: quién hizo qué, en qué módulo y cuándo.</td></tr>
+      <tr><td><strong>Módulo</strong></td><td>Cada una de las secciones funcionales del portal (Biblioteca, Convenios, Horarios, etc.).</td></tr>
+      <tr><td><strong>Panel de administración (Panel Admin)</strong></td><td>Área privada del sistema, protegida con inicio de sesión, donde el personal gestiona el contenido del portal.</td></tr>
+      <tr><td><strong>Residencia profesional</strong></td><td>Estancia que el estudiante realiza en una empresa u organización como parte final de su formación.</td></tr>
+      <tr><td><strong>Servicio social</strong></td><td>Actividad obligatoria de apoyo a la comunidad que el estudiante debe cumplir para titularse.</td></tr>
+      <tr><td><strong>mod_rewrite</strong></td><td>Módulo de Apache que permite reescribir y direccionar las URLs del portal de forma amigable.</td></tr>
+      <tr><td><strong>jsPDF</strong></td><td>Librería de JavaScript que genera archivos PDF directamente en el navegador; se usa para el comprobante de examen de nuevo ingreso.</td></tr>
+      <tr><td><strong>utf8mb4</strong></td><td>Codificación de caracteres de la base de datos que permite mostrar correctamente acentos, la letra ñ y otros símbolos.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="doc-footer">
+    <span>Manual de Usuario — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+</section>
+
+<!-- ============================ CAPÍTULO 2 ============================ -->
+<section class="pagina salto" id="cap2">
+  <div class="doc-header">
+    <span><strong>Manual de Usuario</strong> — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+
+  <h1>Capítulo 2. Requisitos del sistema</h1>
+  <p>Antes de instalar la plataforma es necesario contar con el software adecuado en el equipo que funcionará como servidor. Los visitantes que solo consultan el portal únicamente requieren un navegador web actualizado.</p>
+
+  <h2>2.1 Requisitos de software</h2>
+  <table>
+    <thead><tr><th style="width:30%;">Componente</th><th>Requisito</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Lenguaje</strong></td><td>PHP 8.0 o superior (PHP puro / vanilla, sin frameworks).</td></tr>
+      <tr><td><strong>Extensiones PHP</strong></td><td>Deben estar habilitadas: <code>pdo_mysql</code>, <code>mysqli</code>, <code>mbstring</code>, <code>gd</code> y <code>fileinfo</code>.</td></tr>
+      <tr><td><strong>Base de datos</strong></td><td>MySQL 5.7 o superior, o bien MariaDB 10.3 o superior. Codificación <code>utf8mb4</code>.</td></tr>
+      <tr><td><strong>Servidor web</strong></td><td>Apache 2.4 o superior, con los módulos <code>mod_rewrite</code> y <code>mod_headers</code> habilitados.</td></tr>
+      <tr><td><strong>Entorno de desarrollo</strong></td><td>XAMPP 8.x (incluye Apache, MySQL/MariaDB y PHP en un solo instalador).</td></tr>
+      <tr><td><strong>Entorno de producción</strong></td><td>Servidor Linux con Apache, o un hosting con panel cPanel.</td></tr>
+      <tr><td><strong>Front-end</strong></td><td>HTML5, CSS3 y JavaScript vanilla (sin jQuery ni React). Iconos vía CDN (Remix Icons / Material Symbols), tipografía Poppins, y la librería jsPDF para comprobantes.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    El instalador de XAMPP 8.x ya incluye PHP 8 con las extensiones más comunes activadas. En la mayoría de los casos no será necesario instalar componentes adicionales para el entorno de desarrollo local.
+  </div>
+
+  <h2>2.2 Requisitos de hardware recomendados</h2>
+  <p>La plataforma es ligera y no exige hardware especializado. Las siguientes características son suficientes para el equipo servidor en entorno local:</p>
+  <table>
+    <thead><tr><th style="width:30%;">Recurso</th><th>Recomendación mínima</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Procesador</strong></td><td>Doble núcleo (equipo de gama media reciente).</td></tr>
+      <tr><td><strong>Memoria RAM</strong></td><td>4 GB como mínimo; 8 GB recomendado para mayor fluidez.</td></tr>
+      <tr><td><strong>Almacenamiento</strong></td><td>Al menos 1 GB libre para XAMPP, los archivos del proyecto y la base de datos.</td></tr>
+      <tr><td><strong>Equipo del visitante</strong></td><td>Cualquier computadora, tableta o teléfono con un navegador moderno; el portal es responsive y se adapta a la pantalla.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>2.3 Navegadores compatibles</h2>
+  <p>El portal y el panel funcionan correctamente en las versiones actualizadas de los siguientes navegadores:</p>
+  <ul>
+    <li>Google Chrome</li>
+    <li>Microsoft Edge</li>
+    <li>Mozilla Firefox</li>
+    <li>Safari (en equipos Apple y dispositivos móviles)</li>
+  </ul>
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    Se recomienda mantener el navegador actualizado a su última versión para garantizar la correcta visualización del carrusel, los formularios y la generación de comprobantes en PDF.
+  </div>
+
+  <div class="doc-footer">
+    <span>Manual de Usuario — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+</section>
+
+<!-- ============================ CAPÍTULO 3 ============================ -->
+<section class="pagina salto" id="cap3">
+  <div class="doc-header">
+    <span><strong>Manual de Usuario</strong> — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+
+  <h1>Capítulo 3. Instalación y puesta en marcha</h1>
+  <p>Este capítulo describe paso a paso cómo instalar la plataforma en una computadora local mediante XAMPP. Al final se incluye un resumen para despliegue en producción y una lista de verificación.</p>
+
+  <h2>3.1 Obtener el proyecto</h2>
+  <ol class="pasos">
+    <li>Obtenga la carpeta del proyecto (por ejemplo, descomprimiendo el archivo entregado o clonando el repositorio).</li>
+    <li>Copie la carpeta dentro del directorio de XAMPP destinado a sitios web. La ruta recomendada es:
+      <pre><code>C:\xampp\htdocs\proyecto-servicio</code></pre>
+    </li>
+    <li>Verifique que dentro de esa carpeta exista la subcarpeta <code>plataforma/</code> y el archivo <code>kiosko_tsj.sql</code> en la raíz del repositorio.</li>
+  </ol>
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    El nombre de la carpeta contenedora puede variar; lo importante es que la carpeta <code>plataforma/</code> quede accesible desde Apache. En este manual se asume la URL base <code>http://localhost/plataforma</code>.
+  </div>
+
+  <h2>3.2 Importar la base de datos <code>kiosko_tsj</code></h2>
+  <p>El archivo <code>kiosko_tsj.sql</code> crea automáticamente la base de datos, todas sus tablas y los datos iniciales. Existen dos métodos para importarlo.</p>
+
+  <div class="advertencia">
+    <span class="etq">⚠ Advertencia</span>
+    El script comienza con la instrucción <code>DROP DATABASE IF EXISTS</code>. Esto significa que, si ya existe una base de datos llamada <code>kiosko_tsj</code>, será <strong>eliminada y reemplazada</strong>. No ejecute este archivo sobre una base de datos con información que desee conservar.
+  </div>
+
+  <h4>Método A — Por phpMyAdmin (recomendado para principiantes)</h4>
+  <ol class="pasos">
+    <li>Abra <code>http://localhost/phpmyadmin</code> en el navegador.</li>
+    <li>En el menú superior, haga clic en la pestaña <strong>Importar</strong> (o cree primero la base con <strong>Nueva</strong> y luego use la pestaña <strong>SQL</strong> para pegar el contenido del archivo).</li>
+    <li>Seleccione el archivo <code>kiosko_tsj.sql</code> y confirme la importación.</li>
+    <li>Al finalizar, verifique en la columna izquierda que aparece la base de datos <code>kiosko_tsj</code> con sus tablas y vistas.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #1: phpMyAdmin mostrando la base de datos kiosko_tsj con sus ~25 tablas y vistas]</span>
+    Vista de phpMyAdmin con la base de datos importada y la lista de tablas (admins, avisos, carreras, convenios, libros, etc.).
+  </div>
+  <p class="pie-figura">Figura 1. Base de datos <code>kiosko_tsj</code> importada correctamente en phpMyAdmin.</p>
+
+  <h4>Método B — Por terminal (línea de comandos)</h4>
+  <p>Desde la carpeta donde se encuentra el archivo <code>.sql</code>, ejecute:</p>
+  <pre><code>mysql -u root &lt; kiosko_tsj.sql</code></pre>
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    En XAMPP el usuario por defecto es <code>root</code> sin contraseña, por lo que el comando funciona tal cual. Si su servidor MySQL tiene contraseña, use <code>mysql -u root -p &lt; kiosko_tsj.sql</code> e introdúzcala cuando se solicite.
+  </div>
+
+  <h2>3.3 Crear el archivo de configuración local</h2>
+  <p>La plataforma utiliza dos archivos de configuración:</p>
+  <table>
+    <thead><tr><th style="width:38%;">Archivo</th><th>Función</th></tr></thead>
+    <tbody>
+      <tr><td><code>plataforma/shared/config.php</code></td><td>Configuración de desarrollo con valores por defecto. Está versionada y funciona tal cual en XAMPP (<code>DB_HOST=localhost</code>, <code>DB_USER=root</code>, <code>DB_PASS</code> vacío, <code>DB_NAME=kiosko_tsj</code>).</td></tr>
+      <tr><td><code>plataforma/shared/config.local.php</code></td><td>Configuración local real. <strong>No</strong> está versionada y debe crearla manualmente. Aquí se definen el correo y el hash del administrador maestro.</td></tr>
+    </tbody>
+  </table>
+  <ol class="pasos">
+    <li>Copie el archivo de ejemplo <code>plataforma/shared/config.local.example.php</code> y renómbrelo como <code>plataforma/shared/config.local.php</code>.</li>
+    <li>Abra el nuevo archivo y localice las constantes del administrador global:
+      <pre><code>define('GLOBAL_ADMIN_EMAIL', 'admin@chapala.tecmm.edu.mx');
+define('GLOBAL_ADMIN_HASH',  '&lt;hash bcrypt generado&gt;');</code></pre>
+    </li>
+    <li>Deje el correo como aparece (o ajústelo al correo institucional que usará la cuenta maestra) y prepare el hash en el siguiente paso.</li>
+  </ol>
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    En XAMPP las credenciales de base de datos ya funcionan por defecto, por lo que normalmente no necesita modificarlas en entorno local. Lo único indispensable es definir el hash de la contraseña del administrador.
+  </div>
+
+  <h2>3.4 Generar el hash de la contraseña del administrador</h2>
+  <p>La contraseña del administrador nunca se guarda en texto plano: se almacena como un hash bcrypt con costo 12. Para generarlo, abra una terminal y ejecute (sustituyendo <code>TU_CLAVE</code> por la contraseña deseada):</p>
+  <pre><code>C:\xampp\php\php.exe -r "echo password_hash('TU_CLAVE', PASSWORD_BCRYPT, ['cost'=>12]);"</code></pre>
+  <ol class="pasos">
+    <li>Copie el texto resultante (comienza con <code>$2y$12$...</code>).</li>
+    <li>Péguelo como valor de <code>GLOBAL_ADMIN_HASH</code> en <code>config.local.php</code>.</li>
+    <li>Guarde el archivo.</li>
+  </ol>
+  <div class="advertencia">
+    <span class="etq">⚠ Advertencia</span>
+    Copie el hash completo, sin espacios ni saltos de línea adicionales. Un hash mal copiado impedirá iniciar sesión en el panel.
+  </div>
+
+  <h2>3.5 Configurar el alias de Apache</h2>
+  <p>Para que el portal responda en la ruta <code>http://localhost/plataforma</code>, configure un alias en Apache que apunte a la carpeta <code>plataforma/</code>.</p>
+  <ol class="pasos">
+    <li>Abra el archivo de configuración de hosts virtuales de Apache, normalmente <code>httpd-vhosts.conf</code> (accesible desde el botón <strong>Config</strong> de Apache en XAMPP).</li>
+    <li>Defina un alias o host virtual que apunte a la carpeta <code>plataforma/</code> del proyecto.</li>
+    <li>Asegúrese de que <code>mod_rewrite</code> esté habilitado.</li>
+    <li>Guarde los cambios y reinicie Apache desde el panel de XAMPP.</li>
+  </ol>
+
+  <h2>3.6 Crear las carpetas de subida</h2>
+  <p>El sistema guarda archivos subidos (horarios y logotipos de convenios) en carpetas específicas que deben existir. Créelas manualmente si no están presentes:</p>
+  <pre><code>plataforma/modulos/horarios/horarios/
+plataforma/modulos/convenios/src/pages/upload/</code></pre>
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    Si estas carpetas no existen, al intentar subir un horario o un logotipo el sistema mostrará un error. En servidores de producción, además, deben tener permisos de escritura (ver Capítulo 8).
+  </div>
+
+  <h2>3.7 Verificación de la instalación</h2>
+  <p>Con los servicios encendidos, abra cada una de las siguientes URLs para confirmar que la instalación quedó correcta:</p>
+  <table>
+    <thead><tr><th style="width:46%;">URL</th><th>Resultado esperado</th></tr></thead>
+    <tbody>
+      <tr><td><code>http://localhost/plataforma</code></td><td>Portal principal con carrusel y tarjetas de módulos.</td></tr>
+      <tr><td><code>http://localhost/plataforma/login.php</code></td><td>Pantalla de acceso del administrador.</td></tr>
+      <tr><td><code>http://localhost/plataforma/admin/</code></td><td>Panel de administración (tras iniciar sesión).</td></tr>
+      <tr><td><code>.../modulos/visitantes/Directorio.php</code></td><td>Directorio institucional.</td></tr>
+      <tr><td><code>.../modulos/biblioteca/buscar.php</code></td><td>Catálogo de libros.</td></tr>
+      <tr><td><code>.../modulos/convenios/index.php</code></td><td>Convenios empresariales por carrera.</td></tr>
+      <tr><td><code>.../modulos/horarios/index.php</code></td><td>Buscar maestro / horarios.</td></tr>
+      <tr><td><code>.../modulos/requisitos/residencia.php</code></td><td>Requisitos de residencia profesional.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3.8 Despliegue en producción / hosting cPanel</h2>
+  <p>Para publicar la plataforma en un servidor real o un hosting con cPanel, el procedimiento general es el siguiente:</p>
+  <ol class="pasos">
+    <li>Suba los archivos del proyecto a la carpeta pública del hosting (generalmente <code>public_html</code>).</li>
+    <li>Cree una base de datos MySQL y un usuario desde el panel del hosting.</li>
+    <li>Importe el archivo <code>kiosko_tsj.sql</code> en esa base de datos (por phpMyAdmin del hosting).</li>
+    <li>Edite <code>config.local.php</code> con las credenciales reales del hosting (host, usuario, contraseña y nombre de la base de datos).</li>
+    <li>Active <strong>HTTPS</strong> (certificado SSL) para que el sitio funcione de forma segura.</li>
+  </ol>
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    En un servidor propio se recomienda crear un usuario de MySQL con privilegios mínimos, por ejemplo <code>tsjplat</code>, en lugar de usar <code>root</code>. Esto reduce el riesgo en caso de un acceso no autorizado.
+  </div>
+
+  <h2>3.9 Checklist de instalación</h2>
+  <table>
+    <thead><tr><th style="width:8%;">✔</th><th>Paso</th></tr></thead>
+    <tbody>
+      <tr><td>☐</td><td>Carpeta del proyecto copiada en <code>htdocs</code>.</td></tr>
+      <tr><td>☐</td><td>Base de datos <code>kiosko_tsj</code> importada desde <code>kiosko_tsj.sql</code>.</td></tr>
+      <tr><td>☐</td><td>Archivo <code>config.local.php</code> creado a partir del ejemplo.</td></tr>
+      <tr><td>☐</td><td>Hash bcrypt generado y pegado en <code>GLOBAL_ADMIN_HASH</code>.</td></tr>
+      <tr><td>☐</td><td>Alias de Apache configurado y <code>mod_rewrite</code> habilitado.</td></tr>
+      <tr><td>☐</td><td>Apache reiniciado.</td></tr>
+      <tr><td>☐</td><td>Carpetas de subida (horarios y convenios) creadas.</td></tr>
+      <tr><td>☐</td><td>Portal, login y panel verificados en el navegador.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="doc-footer">
+    <span>Manual de Usuario — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+</section>
+
+<!-- ============================ CAPÍTULO 4 ============================ -->
+<section class="pagina salto" id="cap4">
+  <div class="doc-header">
+    <span><strong>Manual de Usuario</strong> — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+
+  <h1>Capítulo 4. Primer acceso y arranque diario</h1>
+  <p>Una vez instalada la plataforma, el uso cotidiano comienza encendiendo los servicios y accediendo al portal o al panel. Este capítulo describe esa rutina.</p>
+
+  <h2>4.1 Encender los servicios en el panel de XAMPP</h2>
+  <ol class="pasos">
+    <li>Abra el <strong>Panel de Control de XAMPP</strong>.</li>
+    <li>Presione el botón <strong>Start</strong> del módulo <strong>Apache</strong>.</li>
+    <li>Presione el botón <strong>Start</strong> del módulo <strong>MySQL</strong>.</li>
+    <li>Confirme que ambos módulos quedan resaltados en verde, lo que indica que están en ejecución.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #2: Panel de Control de XAMPP con Apache y MySQL en estado "running" (verde)]</span>
+    Panel de XAMPP mostrando los módulos Apache y MySQL iniciados correctamente.
+  </div>
+  <p class="pie-figura">Figura 2. Panel de Control de XAMPP con Apache y MySQL activos.</p>
+
+  <div class="advertencia">
+    <span class="etq">⚠ Advertencia</span>
+    Si MySQL no inicia, el portal mostrará un error de conexión a la base de datos. Asegúrese de que ningún otro programa esté ocupando los puertos que utiliza XAMPP antes de continuar.
+  </div>
+
+  <h2>4.2 Abrir el portal</h2>
+  <p>Con los servicios activos, abra el navegador y escriba la dirección del portal:</p>
+  <pre><code>http://localhost/plataforma</code></pre>
+  <p>Se mostrará la página principal con el carrusel de imágenes y las tarjetas de acceso a los módulos.</p>
+
+  <h2>4.3 Iniciar sesión en el panel de administración</h2>
+  <ol class="pasos">
+    <li>Acceda a la pantalla de inicio de sesión:
+      <pre><code>http://localhost/plataforma/login.php</code></pre>
+    </li>
+    <li>Introduzca las credenciales de administrador de fábrica:
+      <ul>
+        <li><strong>Correo:</strong> <code>admin@chapala.tecmm.edu.mx</code></li>
+        <li><strong>Contraseña:</strong> <code>Admin2026!TSJ</code></li>
+      </ul>
+    </li>
+    <li>Haga clic en <strong>Entrar al sistema</strong>. Será dirigido al panel de administración (sección <strong>Resumen</strong>).</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #3: Pantalla de inicio de sesión del administrador (login.php) con campos de correo y contraseña]</span>
+    Pantalla "Acceso administrador" con el formulario de correo y contraseña.
+  </div>
+  <p class="pie-figura">Figura 3. Pantalla de inicio de sesión del panel de administración.</p>
+
+  <div class="advertencia">
+    <span class="etq">⚠ Advertencia — Cambie la contraseña de fábrica</span>
+    La contraseña <code>Admin2026!TSJ</code> es genérica y de conocimiento público en este manual. Por seguridad, cámbiela después del primer acceso, ya sea editando el hash en <code>config.local.php</code> o desde la pestaña <strong>Configuración → Seguridad y acceso</strong> (ver Capítulo 8).
+  </div>
+
+  <h2>4.4 Cerrar sesión</h2>
+  <p>Al terminar de trabajar en el panel, cierre la sesión para proteger el acceso. Utilice la opción de salir disponible en la interfaz (icono de salida en la barra superior del portal o la opción correspondiente del panel). Esto es especialmente importante en computadoras compartidas.</p>
+
+  <div class="doc-footer">
+    <span>Manual de Usuario — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+</section>
+
+<!-- ============================ CAPÍTULO 5 ============================ -->
+<section class="pagina salto" id="cap5">
+  <div class="doc-header">
+    <span><strong>Manual de Usuario</strong> — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+
+  <h1>Capítulo 5. Guía del visitante (uso del portal)</h1>
+  <p>Este capítulo está dirigido a los visitantes del portal: alumnos, aspirantes y público en general. Explica cómo navegar la página principal y utilizar cada uno de los módulos públicos. No se requiere iniciar sesión para consultar esta información ni para realizar los trámites disponibles.</p>
+
+  <h2>5.1 Recorrido de la página principal</h2>
+  <p>La página principal (<code>http://localhost/plataforma</code>) es el punto de entrada al portal. Está compuesta por:</p>
+  <ul>
+    <li><strong>Carrusel de imágenes:</strong> banners institucionales que se alternan automáticamente en la parte superior.</li>
+    <li><strong>Barra de navegación:</strong> con accesos a Inicio, Directorio, Biblioteca, Convenios, Buscar Maestro, Serv. Social / Residencia y Oferta Académica.</li>
+    <li><strong>Tarjetas de módulos disponibles:</strong> accesos visuales directos a cada servicio (Ubicación del Campus, Biblioteca, Convenios, Buscar Maestro, Serv. Social / Residencia y Admisiones).</li>
+    <li><strong>Avisos importantes:</strong> comunicados con vigencia por fechas, más abajo en la página.</li>
+    <li><strong>Dudas frecuentes (FAQ):</strong> respuestas a preguntas comunes.</li>
+  </ul>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #4: Portal principal con el carrusel superior y las tarjetas de "Módulos disponibles"]</span>
+    Página de inicio del portal: carrusel y tarjetas de acceso a los módulos.
+  </div>
+  <p class="pie-figura">Figura 4. Página principal del portal con carrusel y módulos disponibles.</p>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #5: Sección "Avisos importantes" y "Dudas frecuentes" con el pie de página de contacto]</span>
+    Sección de avisos importantes, preguntas frecuentes y datos de contacto por área en el pie de página.
+  </div>
+  <p class="pie-figura">Figura 5. Avisos importantes, FAQ y pie de página del portal.</p>
+
+  <h2>5.2 Directorio y oferta académica</h2>
+  <p>El módulo de Directorio permite consultar al personal del campus y la oferta académica.</p>
+  <ol class="pasos">
+    <li>En la barra de navegación, haga clic en <strong>Directorio</strong>.</li>
+    <li>Use las pestañas <strong>Personal Directivo</strong>, <strong>Coordinadores</strong> y <strong>Secretarías</strong> para filtrar al personal según su función.</li>
+    <li>Cada tarjeta muestra el nombre, el área o carrera y el correo de contacto de la persona.</li>
+    <li>Para consultar las carreras, ingrese al menú <strong>Oferta Académica</strong>, donde encontrará la descripción de cada programa y las materias por carrera.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #6: Página "Directorio Institucional" con las pestañas y las tarjetas del personal]</span>
+    Directorio institucional con tarjetas de personal y pestañas de filtrado.
+  </div>
+  <p class="pie-figura">Figura 6. Directorio institucional del portal público.</p>
+
+  <h2>5.3 Nuevo ingreso / Reinscripción y descarga del comprobante en PDF</h2>
+  <p>El módulo de Admisiones / Nuevo Ingreso muestra los requisitos de admisión y permite generar un comprobante de examen en formato PDF.</p>
+  <ol class="pasos">
+    <li>Desde la página principal, abra la tarjeta <strong>Admisiones</strong> o el módulo de Nuevo Ingreso.</li>
+    <li>Revise la lista de <strong>Documentación requerida</strong> para la admisión.</li>
+    <li>En la sección <strong>Examen de Admisión</strong>, escriba el <strong>nombre del aspirante</strong> en el campo correspondiente.</li>
+    <li>Consulte los datos del examen (fecha, hora y lugar) que muestra la página.</li>
+    <li>Haga clic en <strong>Generar Comprobante del Examen</strong>. Se descargará un archivo PDF con los datos del aspirante y del examen.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #7: Página "Inscripción y Reinscripción" con los requisitos de admisión y el formulario del examen]</span>
+    Módulo de nuevo ingreso: requisitos de admisión y generación del comprobante.
+  </div>
+  <p class="pie-figura">Figura 7. Pantalla de inscripción y reinscripción con generación de comprobante PDF.</p>
+
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    El comprobante se genera directamente en el navegador mediante la librería jsPDF. No se realiza ningún pago en línea ni se aparta cita: el documento es únicamente un comprobante informativo del examen.
+  </div>
+
+  <h2>5.4 Biblioteca: buscar un libro y solicitar préstamo</h2>
+  <h4>Buscar un libro</h4>
+  <ol class="pasos">
+    <li>En la barra de navegación, haga clic en <strong>Biblioteca</strong>.</li>
+    <li>En el campo <strong>Buscar libro</strong>, escriba el título o el autor.</li>
+    <li>Opcionalmente, elija el criterio en el selector <strong>Buscar por</strong> (todos los campos, título, autor, etc.).</li>
+    <li>El catálogo mostrará las tarjetas de los libros con su código, título, autor y disponibilidad.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #8: Página "Catálogo de Libros" con el buscador y las tarjetas de libros con botón "Solicitar"]</span>
+    Catálogo de la biblioteca con búsqueda y tarjetas de libros disponibles.
+  </div>
+  <p class="pie-figura">Figura 8. Catálogo de libros del módulo de Biblioteca.</p>
+
+  <h4>Solicitar un préstamo</h4>
+  <ol class="pasos">
+    <li>En el libro deseado, haga clic en el botón <strong>Solicitar</strong>.</li>
+    <li>En la pantalla <strong>Confirmar Solicitud</strong>, verifique el libro y su código (se completan automáticamente).</li>
+    <li>Escriba su <strong>nombre completo</strong>.</li>
+    <li>Elija el <strong>tipo de solicitud</strong> (por ejemplo, préstamo para llevar a casa).</li>
+    <li>Haga clic en <strong>Enviar Petición</strong>. La solicitud llegará al panel de administración para su aprobación.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #9: Página "Confirmar Solicitud" con el libro seleccionado y el formulario de datos del solicitante]</span>
+    Formulario de confirmación de solicitud de préstamo de un libro.
+  </div>
+  <p class="pie-figura">Figura 9. Confirmación de solicitud de préstamo en la biblioteca.</p>
+
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    Enviar la solicitud no garantiza el préstamo de inmediato: la petición queda <strong>pendiente</strong> hasta que el personal de biblioteca la apruebe desde el panel de administración (ver sección 6.6).
+  </div>
+
+  <h2>5.5 Convenios: ver empresas por carrera y "Sugerir empresa"</h2>
+  <ol class="pasos">
+    <li>En la barra de navegación, haga clic en <strong>Convenios</strong>.</li>
+    <li>Se mostrarán las carreras; seleccione la carrera de su interés para ver las empresas vinculadas.</li>
+    <li>Dentro de una carrera, utilice los filtros de <strong>Tipo</strong> (residencia, servicio social, prácticas, otro) y <strong>Sector</strong> (privado, público, asociación civil, otro) para acotar los resultados.</li>
+    <li>Cada empresa muestra su nombre, tipo, datos de contacto y, si aplica, la fecha de vencimiento del convenio.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #10: Página "Convenios Empresariales" con las carreras y el botón "Sugerir empresa"]</span>
+    Convenios empresariales organizados por carrera con la opción de sugerir empresa.
+  </div>
+  <p class="pie-figura">Figura 10. Convenios empresariales por carrera.</p>
+
+  <h4>Sugerir una empresa</h4>
+  <ol class="pasos">
+    <li>Haga clic en el botón <strong>+ Sugerir Empresa</strong>.</li>
+    <li>Complete el formulario con los datos de la empresa propuesta.</li>
+    <li>Envíe la sugerencia. Esta llegará al panel de administración para su revisión (ver sección 6.7).</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #11: Vista de empresas de una carrera (p. ej. Ingeniería en Sistemas Computacionales) con filtros de tipo y sector]</span>
+    Listado de empresas con convenio de una carrera específica, con filtros aplicables.
+  </div>
+  <p class="pie-figura">Figura 11. Empresas con convenio dentro de una carrera, con filtros de tipo y sector.</p>
+
+  <h2>5.6 Buscar maestro y consultar su horario</h2>
+  <ol class="pasos">
+    <li>En la barra de navegación, haga clic en <strong>Buscar Maestro</strong>.</li>
+    <li>Escriba el nombre del docente en el buscador o filtre por carrera con el selector <strong>Todas las carreras</strong>.</li>
+    <li>Localice la tarjeta del docente. Si tiene horario cargado, aparecerá el botón <strong>Ver horario</strong>; si no, mostrará <strong>Sin horario</strong>.</li>
+    <li>Haga clic en <strong>Ver horario</strong> para abrir el archivo (PDF o imagen) correspondiente a su carrera y semestre.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #12: Página "Buscar Maestro" con las tarjetas de docentes y los botones "Ver horario" / "Sin horario"]</span>
+    Búsqueda de docentes con acceso a sus horarios por carrera y semestre.
+  </div>
+  <p class="pie-figura">Figura 12. Módulo "Buscar Maestro" del portal.</p>
+
+  <h2>5.7 Requisitos: residencia profesional y servicio social</h2>
+  <p>El módulo de Serv. Social / Residencia reúne las guías de ambos procesos. Se accede desde la barra de navegación, en <strong>Serv. Social / Residencia</strong>, y se alterna entre las pestañas <strong>Residencia</strong> y <strong>Servicio Social</strong>.</p>
+
+  <h4>Herramientas disponibles</h4>
+  <ul>
+    <li><strong>Calculadora de créditos:</strong> permite calcular cuántos créditos se necesitan para iniciar la residencia. Se ingresan los créditos totales de la carrera y los créditos ya acreditados.</li>
+    <li><strong>Línea de tiempo (timeline) del proceso:</strong> muestra las fases ordenadas, por ejemplo "Fase 1: Solicitud", con su descripción y el momento en que ocurre.</li>
+    <li><strong>Checklist de requisitos:</strong> lista interactiva de requisitos que el estudiante puede ir marcando; el sistema muestra el porcentaje de avance.</li>
+    <li><strong>Documentos descargables:</strong> formatos y guías que el estudiante puede descargar.</li>
+  </ul>
+
+  <h4>Usar la calculadora de créditos</h4>
+  <ol class="pasos">
+    <li>En la pestaña <strong>Residencia</strong>, ubique la <strong>Calculadora de Créditos</strong>.</li>
+    <li>Escriba los <strong>créditos totales de su carrera</strong>.</li>
+    <li>Escriba los <strong>créditos acreditados</strong> hasta el momento.</li>
+    <li>El sistema indicará si cumple con el avance requerido para iniciar la residencia.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #13: Página "Residencia Profesional" con la calculadora de créditos y el inicio del timeline del proceso]</span>
+    Módulo de residencia: calculadora de créditos y línea de tiempo de fases.
+  </div>
+  <p class="pie-figura">Figura 13. Página de Residencia Profesional con calculadora y timeline.</p>
+
+  <h4>Usar el checklist de requisitos</h4>
+  <ol class="pasos">
+    <li>Desplácese hasta la sección <strong>Checklist de Requisitos</strong>.</li>
+    <li>Marque cada requisito conforme lo vaya completando.</li>
+    <li>Observe la barra <strong>Progreso de Residencia</strong>, que muestra el porcentaje de avance según los requisitos marcados.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #14: Sección "Checklist de Requisitos" con casillas marcadas y la barra de "Progreso de Residencia" al 40%]</span>
+    Checklist interactivo de requisitos con indicador de progreso.
+  </div>
+  <p class="pie-figura">Figura 14. Checklist de requisitos y barra de progreso de residencia.</p>
+
+  <div class="doc-footer">
+    <span>Manual de Usuario — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+</section>
+
+<!-- ============================ CAPÍTULO 6 ============================ -->
+<section class="pagina salto" id="cap6">
+  <div class="doc-header">
+    <span><strong>Manual de Usuario</strong> — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+
+  <h1>Capítulo 6. Guía del administrador (panel de administración)</h1>
+  <p>El panel de administración (<code>http://localhost/plataforma/admin/</code>) es el área privada desde la cual el personal institucional gestiona todo el contenido del portal sin necesidad de conocimientos técnicos. El menú lateral está organizado en diez secciones, agrupadas en cuatro bloques: <span class="badge">Principal</span> <span class="badge">Contenido del Portal</span> <span class="badge">Información Académica</span> y <span class="badge">Servicios al Estudiante / Sistema</span>.</p>
+
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    Para acceder a cualquiera de estas secciones es necesario haber iniciado sesión (ver sección 4.3). Todas las acciones que realice quedan registradas automáticamente en la bitácora de auditoría (ver sección 6.8 y 8.3).
+  </div>
+
+  <h2>6.1 Resumen (Dashboard)</h2>
+  <p><strong>Ruta:</strong> <code>admin/index.php</code></p>
+  <p>Es la pantalla de bienvenida del panel. Ofrece una visión general del estado de la plataforma mediante:</p>
+  <ul>
+    <li><strong>Indicadores en vivo:</strong> número de libros en catálogo, convenios activos, docentes registrados y horarios publicados.</li>
+    <li><strong>Alertas:</strong> solicitudes pendientes en biblioteca, préstamos atrasados, convenios vencidos o por vencer en 30 días y sugerencias de empresas pendientes.</li>
+    <li><strong>Gestión por módulo:</strong> tarjetas con accesos directos a cada sección de administración.</li>
+  </ul>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #15: Pantalla "Bienvenido al Panel de Administración" (Resumen) con los indicadores y las alertas]</span>
+    Dashboard del panel con indicadores en vivo, alertas y gestión por módulo.
+  </div>
+  <p class="pie-figura">Figura 15. Resumen (Dashboard) del panel de administración.</p>
+
+  <h2>6.2 Página de inicio</h2>
+  <p><strong>Ruta:</strong> <code>admin/inicio.php</code></p>
+  <p>Gestiona el contenido visible de la portada del portal mediante tres pestañas: <strong>Carrusel de fotos</strong>, <strong>Avisos importantes</strong> y <strong>Dudas frecuentes</strong>.</p>
+
+  <h4>Administrar el carrusel</h4>
+  <ol class="pasos">
+    <li>Entre a la pestaña <strong>Carrusel de fotos</strong>.</li>
+    <li>Revise la tabla de imágenes existentes (vista previa, título, subtítulo y estado <strong>VISIBLE</strong> u <strong>OCULTA</strong>).</li>
+    <li>Use los iconos de acción para ocultar/mostrar, editar o eliminar una imagen.</li>
+    <li>Para añadir una nueva, utilice la sección <strong>Agregar imagen al carrusel</strong> y suba la imagen con su título y subtítulo.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #16: Pestaña "Carrusel de fotos" con la tabla de banners y sus estados (VISIBLE / OCULTA)]</span>
+    Gestión del carrusel de la página de inicio.
+  </div>
+  <p class="pie-figura">Figura 16. Administración del carrusel de fotos.</p>
+
+  <h4>Crear o editar un aviso con vigencia</h4>
+  <ol class="pasos">
+    <li>Entre a la pestaña <strong>Avisos importantes</strong>.</li>
+    <li>Para crear uno nuevo, use la sección <strong>Agregar aviso</strong> y escriba el título y la descripción.</li>
+    <li>Defina la vigencia mediante las fechas de <strong>publicar desde</strong> y <strong>publicar hasta</strong>. Si las deja vacías, el aviso será <strong>permanente</strong>.</li>
+    <li>Controle la visibilidad con el estado <strong>VISIBLE</strong> u <strong>OCULTO</strong>, o edite/elimine avisos existentes con los iconos de acción.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #17: Pestaña "Avisos importantes" con la tabla de avisos, columnas de vigencia y estado]</span>
+    Gestión de avisos importantes con control de vigencia por fechas.
+  </div>
+  <p class="pie-figura">Figura 17. Administración de avisos importantes.</p>
+
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    El control de vigencia permite programar avisos: un aviso con fecha de inicio futura no se mostrará aún en el portal, y uno cuya fecha final ya pasó dejará de mostrarse automáticamente, aunque siga visible en el panel.
+  </div>
+
+  <h4>Administrar las dudas frecuentes (FAQ)</h4>
+  <ol class="pasos">
+    <li>Entre a la pestaña <strong>Dudas frecuentes</strong>.</li>
+    <li>Use <strong>+ Agregar pregunta</strong> para crear una nueva entrada con su pregunta y respuesta.</li>
+    <li>Edite el texto directamente en los campos o use <strong>Eliminar</strong> para quitar una pregunta.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #18: Pestaña "Dudas frecuentes" con preguntas y respuestas editables]</span>
+    Gestión de las dudas frecuentes generales del portal.
+  </div>
+  <p class="pie-figura">Figura 18. Administración de dudas frecuentes (FAQ).</p>
+
+  <h2>6.3 Directorio y carreras</h2>
+  <p><strong>Ruta:</strong> <code>admin/visitantes.php</code></p>
+  <p>Concentra la información académica del portal en varias pestañas: <strong>Directorio</strong>, <strong>Docentes</strong>, <strong>Coordinadores</strong>, <strong>Oferta académica (carreras)</strong>, <strong>Planes de estudio (materias)</strong>, <strong>Secretarías</strong> y <strong>Nuevo ingreso</strong>.</p>
+
+  <h4>Dar de alta o editar un docente</h4>
+  <ol class="pasos">
+    <li>Entre a la pestaña <strong>Docentes</strong>.</li>
+    <li>Revise la lista de docentes; puede filtrar por carrera (ISC, II, IM, IADEV, IGE, LG) o buscar por nombre o correo.</li>
+    <li>Para añadir uno, vaya a <strong>Agregar docente</strong>, escriba el <strong>nombre completo</strong> y el <strong>correo electrónico</strong>.</li>
+    <li>Marque una o varias <strong>carreras en las que imparte clase</strong>.</li>
+    <li>Opcionalmente, suba una <strong>foto de perfil</strong> (JPG, PNG o WEBP, máximo 3 MB).</li>
+    <li>Haga clic en <strong>Guardar</strong>.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #19: Pestaña "Docentes" con la lista de maestros, filtros por carrera y buscador]</span>
+    Gestión de docentes dentro de Directorio y carreras.
+  </div>
+  <p class="pie-figura">Figura 19. Listado de docentes en el panel.</p>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #20: Formulario "Agregar docente" con nombre, correo, selección de carreras y foto de perfil]</span>
+    Formulario de alta de un nuevo docente.
+  </div>
+  <p class="pie-figura">Figura 20. Alta de un docente con selección de carreras.</p>
+
+  <h4>Crear o editar una carrera (oferta académica)</h4>
+  <ol class="pasos">
+    <li>Entre a la pestaña <strong>Oferta académica (carreras)</strong>.</li>
+    <li>Revise la tabla de carreras registradas (color, clave, nombre y estado).</li>
+    <li>Para crear una, use <strong>Agregar carrera</strong> y complete los <strong>Datos básicos</strong>: clave (siglas únicas, no modificables después), nombre completo, color e ícono.</li>
+    <li>Agregue una descripción breve y, si lo desea, los <strong>Textos académicos</strong> (objetivo general, perfil de egreso, etc.) que aparecen en la página pública.</li>
+    <li>Guarde los cambios. Para editar una carrera existente, use el icono de edición de su fila.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #21: Pestaña "Oferta académica (carreras)" con la tabla de las 6 carreras (ISC, II, IM, IADEV, IGE, LG)]</span>
+    Listado de carreras registradas con su color y clave.
+  </div>
+  <p class="pie-figura">Figura 21. Carreras registradas en la oferta académica.</p>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #22: Formulario "Agregar carrera" con datos básicos (clave, nombre, color, ícono) y textos académicos]</span>
+    Formulario de alta de una carrera nueva.
+  </div>
+  <p class="pie-figura">Figura 22. Alta de una carrera con datos básicos y textos académicos.</p>
+
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    Desde las pestañas <strong>Coordinadores</strong>, <strong>Planes de estudio (materias)</strong>, <strong>Secretarías</strong> y <strong>Nuevo ingreso</strong> se gestionan, respectivamente, los coordinadores, las materias de cada carrera, el personal de secretarías y la configuración del examen de admisión, siguiendo una mecánica de alta/edición similar a la descrita.
+  </div>
+
+  <h2>6.4 Maestros y horarios</h2>
+  <p><strong>Ruta:</strong> <code>admin/horarios.php</code></p>
+  <p>Permite cargar y gestionar los archivos de horario de cada maestro. Tiene dos pestañas: <strong>Maestros (lista)</strong>, que es solo de lectura, y <strong>Horarios y archivos</strong>, donde se suben los documentos.</p>
+
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    La pestaña <strong>Maestros (lista)</strong> solo muestra a los docentes. Para agregar o editar un maestro debe hacerlo en <strong>Directorio y carreras → Docentes</strong> (sección 6.3).
+  </div>
+
+  <h4>Subir un archivo de horario</h4>
+  <ol class="pasos">
+    <li>Entre a la pestaña <strong>Horarios y archivos</strong>.</li>
+    <li>Revise la tabla de horarios ya cargados (maestro, carrera, semestre y archivo).</li>
+    <li>En la sección <strong>Agregar / actualizar horario</strong>, seleccione el <strong>maestro</strong>, la <strong>carrera</strong> y el <strong>semestre</strong>.</li>
+    <li>Adjunte el <strong>archivo de horario</strong> en formato PDF o imagen.</li>
+    <li>Guarde. El horario quedará disponible para los visitantes en el módulo "Buscar Maestro".</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #23: Pestaña "Horarios y archivos" con la tabla de horarios y el formulario "Agregar / actualizar horario"]</span>
+    Gestión de archivos de horario por maestro, carrera y semestre.
+  </div>
+  <p class="pie-figura">Figura 23. Carga y gestión de horarios de los maestros.</p>
+
+  <div class="advertencia">
+    <span class="etq">⚠ Advertencia</span>
+    Si al subir un archivo aparece un error, verifique que exista la carpeta <code>plataforma/modulos/horarios/horarios/</code> (ver sección 3.6).
+  </div>
+
+  <h2>6.5 Servicio social y residencias</h2>
+  <p><strong>Ruta:</strong> <code>admin/requisitos.php</code></p>
+  <p>Administra el contenido del módulo de requisitos, separado en dos pestañas: <strong>Residencia Profesional</strong> y <strong>Servicio Social</strong>. En cada una se editan el checklist de requisitos, el timeline de fases, los documentos descargables y las preguntas frecuentes.</p>
+
+  <h4>Editar el checklist de requisitos</h4>
+  <ol class="pasos">
+    <li>Seleccione la pestaña <strong>Residencia Profesional</strong> o <strong>Servicio Social</strong>.</li>
+    <li>En <strong>Checklist de requisitos</strong>, edite el texto de cada requisito directamente en su campo.</li>
+    <li>Use el icono de arrastre para reordenar y el botón rojo para eliminar un requisito.</li>
+    <li>Use <strong>+ Agregar requisito</strong> para añadir uno nuevo.</li>
+    <li>Haga clic en <strong>Guardar requisitos</strong> para aplicar los cambios.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #24: Pestaña "Residencia Profesional" con el checklist de requisitos editable]</span>
+    Edición del checklist de requisitos de residencia profesional.
+  </div>
+  <p class="pie-figura">Figura 24. Edición de requisitos de residencia en el panel.</p>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #25: Pestaña "Servicio Social" con su propio checklist de requisitos y el botón "Guardar requisitos"]</span>
+    Edición del checklist de requisitos de servicio social.
+  </div>
+  <p class="pie-figura">Figura 25. Edición de requisitos de servicio social en el panel.</p>
+
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    Desde la misma sección se gestionan también el <strong>timeline de fases</strong>, los <strong>documentos descargables</strong> y las <strong>preguntas frecuentes</strong> propios de cada proceso (residencia o servicio social).
+  </div>
+
+  <h2>6.6 Biblioteca</h2>
+  <p><strong>Ruta:</strong> <code>admin/biblioteca.php</code></p>
+  <p>Gestiona el acervo y los préstamos mediante tres pestañas: <strong>Catálogo</strong>, <strong>Préstamos activos</strong> y <strong>Solicitudes pendientes</strong>. Las pestañas con un número indican asuntos esperando atención.</p>
+
+  <h4>Alta de un libro en el catálogo</h4>
+  <ol class="pasos">
+    <li>Entre a la pestaña <strong>Catálogo</strong>.</li>
+    <li>Busque por código, título o autor para evitar duplicados.</li>
+    <li>Use el formulario de alta para registrar el libro con su código, título, autor, editorial, categoría y número de ejemplares.</li>
+    <li>Use los iconos de edición o eliminación en cada fila para mantener el catálogo actualizado.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #26: Pestaña "Catálogo" de Biblioteca con la tabla de libros (código, título, autor, editorial, ejemplares)]</span>
+    Catálogo de libros en el panel de administración.
+  </div>
+  <p class="pie-figura">Figura 26. Gestión del catálogo de la biblioteca.</p>
+
+  <h4>Gestionar préstamos activos</h4>
+  <ol class="pasos">
+    <li>Entre a la pestaña <strong>Préstamos activos</strong>.</li>
+    <li>Consulte los préstamos vigentes con su fecha de préstamo y de devolución. Puede filtrar por estudiante, control o libro, o marcar <strong>Solo atrasados</strong>.</li>
+    <li>Al recibir un libro, haga clic en <strong>Devuelto</strong> para cerrar el préstamo.</li>
+    <li>Para registrar un préstamo directo en mostrador, use <strong>Registrar préstamo en mostrador</strong> con el código del libro, el nombre y número de control del estudiante, la carrera, el tipo y los días de préstamo.</li>
+    <li>Use <strong>Exportar CSV</strong> para descargar el listado.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #27: Pestaña "Préstamos activos" con la tabla de préstamos y el formulario "Registrar préstamo en mostrador"]</span>
+    Gestión de préstamos activos y registro en mostrador.
+  </div>
+  <p class="pie-figura">Figura 27. Préstamos activos y registro de préstamo en mostrador.</p>
+
+  <h4>Aprobar o rechazar solicitudes</h4>
+  <ol class="pasos">
+    <li>Entre a la pestaña <strong>Solicitudes pendientes</strong> (muestra el número de peticiones esperando).</li>
+    <li>Revise cada solicitud: estudiante, número de control, libro solicitado, tipo y fecha.</li>
+    <li>Haga clic en <strong>Aprobar</strong> para autorizar el préstamo o en <strong>Rechazar</strong> para denegarlo.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #28: Pestaña "Solicitudes pendientes" con la tabla de peticiones y los botones Aprobar / Rechazar]</span>
+    Aprobación o rechazo de solicitudes de préstamo de estudiantes.
+  </div>
+  <p class="pie-figura">Figura 28. Gestión de solicitudes pendientes de biblioteca.</p>
+
+  <h2>6.7 Convenios</h2>
+  <p><strong>Ruta:</strong> <code>admin/convenios.php</code></p>
+  <p>Administra las empresas con convenio. Permite registrar empresas, asignarles carreras, controlar vencimientos, exportar a CSV y revisar las sugerencias enviadas desde el portal.</p>
+
+  <h4>Alta de un convenio y asignación de carreras</h4>
+  <ol class="pasos">
+    <li>En la sección <strong>Agregar convenio</strong>, escriba el nombre de la empresa, el tipo de convenio (residencia, servicio social, prácticas u otro) y el sector.</li>
+    <li>Registre los datos de contacto (persona, correo, teléfono) y la fecha de vencimiento.</li>
+    <li>Asigne una o varias carreras a las que aplica el convenio.</li>
+    <li>Guarde. La empresa aparecerá en la tabla con su estado: <strong>ACTIVO</strong>, <strong>POR VENCER</strong>, <strong>VENCIDO</strong> o <strong>INACTIVO</strong>.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #29: Sección "Convenios" del panel con la tabla de empresas, estados de vencimiento y "Exportar CSV"]</span>
+    Gestión de convenios con control de vencimientos y exportación CSV.
+  </div>
+  <p class="pie-figura">Figura 29. Administración de convenios empresariales.</p>
+
+  <h4>Exportar y revisar sugerencias</h4>
+  <ol class="pasos">
+    <li>Use <strong>Exportar CSV</strong> para descargar el listado de convenios.</li>
+    <li>Marque <strong>Solo vencidos / por vencer</strong> para enfocarse en los convenios que requieren atención.</li>
+    <li>Revise las <strong>sugerencias de empresas</strong> enviadas por los visitantes (también señaladas como alerta en el Resumen) y decida si las da de alta como convenio.</li>
+  </ol>
+
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    Los estados de vencimiento se calculan automáticamente a partir de la fecha registrada. Un convenio marcado como <strong>POR VENCER</strong> aparece como alerta en el Dashboard para que se renueve a tiempo.
+  </div>
+
+  <h2>6.8 Reportes y estadísticas</h2>
+  <p><strong>Ruta:</strong> <code>admin/reportes.php</code></p>
+  <p>Presenta información agregada para apoyar la toma de decisiones, además de la bitácora de actividad. Incluye:</p>
+  <ul>
+    <li>Libros más prestados y préstamos atrasados.</li>
+    <li>Préstamos por mes y por carrera.</li>
+    <li>Convenios activos por sector y por tipo.</li>
+    <li><strong>Bitácora</strong>: últimas acciones realizadas en el panel.</li>
+  </ul>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #30: Reportes con gráficas de préstamos por carrera/mes y convenios por sector/tipo]</span>
+    Reportes y estadísticas de la plataforma.
+  </div>
+  <p class="pie-figura">Figura 30. Reportes de préstamos y convenios.</p>
+
+  <h4>Revisar la bitácora</h4>
+  <ol class="pasos">
+    <li>Desplácese a la sección <strong>Últimas acciones del panel (bitácora)</strong>.</li>
+    <li>Consulte cada registro: fecha y hora, quién la realizó, módulo, acción y detalle.</li>
+    <li>Filtre por módulo o busque por acción/detalle para localizar un evento específico.</li>
+    <li>Use <strong>Exportar CSV</strong> para guardar el historial.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #31: Sección "Últimas acciones del panel (bitácora)" con la tabla de actividad por administrador, módulo y fecha]</span>
+    Bitácora de auditoría con las últimas acciones del panel.
+  </div>
+  <p class="pie-figura">Figura 31. Bitácora de actividad del panel de administración.</p>
+
+  <h2>6.9 Respaldos de datos</h2>
+  <p><strong>Ruta:</strong> <code>admin/respaldos.php</code></p>
+  <p>Permite exportar e importar la base de datos completa. El procedimiento detallado se describe en el Capítulo 7. En resumen, esta sección ofrece:</p>
+  <ul>
+    <li><strong>Exportar respaldo completo:</strong> descarga un archivo <code>.sql</code> con toda la información.</li>
+    <li><strong>Importar / restaurar respaldo:</strong> reemplaza por completo los datos actuales con los del archivo seleccionado.</li>
+  </ul>
+
+  <div class="advertencia">
+    <span class="etq">⚠ Advertencia</span>
+    Al importar un respaldo, toda la información actual se reemplaza por la del archivo. Descargue primero un respaldo de los datos vigentes antes de restaurar.
+  </div>
+
+  <h2>6.10 Configuración</h2>
+  <p><strong>Ruta:</strong> <code>admin/configuracion.php</code></p>
+  <p>Centraliza los ajustes generales del portal en cinco pestañas: <strong>Datos del portal</strong>, <strong>Correos de contacto</strong>, <strong>Redes sociales</strong>, <strong>Administradores</strong> y <strong>Seguridad y acceso</strong>.</p>
+
+  <h4>Datos del portal</h4>
+  <p>Permite editar el nombre de la institución, el campus, la descripción meta, el eslogan del pie de página y el sitio web oficial.</p>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #32: Pestaña "Datos del portal" con nombre de la institución, campus, descripción, eslogan y sitio oficial]</span>
+    Configuración de los datos generales del portal.
+  </div>
+  <p class="pie-figura">Figura 32. Datos generales del portal en Configuración.</p>
+
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    El campo <strong>URL base de la plataforma</strong> se define en <code>config.local.php</code> mediante la constante <code>PLATAFORMA_URL</code> y no puede modificarse desde el panel.
+  </div>
+
+  <h4>Correos de contacto</h4>
+  <p>Define los correos por área (general, biblioteca, vinculación, facturación, control escolar, dirección y servicios generales). Solo los que tengan valor aparecen en la sección "Contacto por área" del pie de página; deje un campo en blanco para ocultarlo.</p>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #33: Pestaña "Correos de contacto" con los campos de correo por área]</span>
+    Configuración de correos institucionales por área.
+  </div>
+  <p class="pie-figura">Figura 33. Correos de contacto por área.</p>
+
+  <h4>Redes sociales</h4>
+  <p>Permite registrar las URL de Facebook, YouTube, Instagram, X/Twitter y LinkedIn. Las redes con campo vacío no aparecen en el pie de página.</p>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #34: Pestaña "Redes sociales" con los campos de Facebook, YouTube, Instagram, X/Twitter y LinkedIn]</span>
+    Configuración de las redes sociales del campus.
+  </div>
+  <p class="pie-figura">Figura 34. Configuración de redes sociales.</p>
+
+  <h4>Administradores (gestión multi-admin)</h4>
+  <ol class="pasos">
+    <li>Entre a la pestaña <strong>Administradores</strong>.</li>
+    <li>Consulte la tabla de cuentas (nombre, correo, estado y último acceso).</li>
+    <li>Para crear una cuenta, use <strong>Nuevo administrador</strong>: escriba nombre, correo y contraseña (mínimo 8 caracteres, con mayúscula, número y símbolo).</li>
+    <li>Use los iconos de cada fila para editar, activar/desactivar o eliminar una cuenta.</li>
+    <li>Haga clic en <strong>Guardar</strong>.</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #35: Pestaña "Administradores" con la tabla de cuentas y el formulario "Nuevo administrador"]</span>
+    Gestión de cuentas de administrador (multi-admin).
+  </div>
+  <p class="pie-figura">Figura 35. Gestión multi-administrador en Configuración.</p>
+
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    Cada persona que administre el portal debe tener su propia cuenta para que la bitácora registre correctamente quién realiza cada cambio. La <strong>cuenta maestra</strong> definida en <code>config.local.php</code> siempre funciona como respaldo y se gestiona en la pestaña <strong>Seguridad y acceso</strong>.
+  </div>
+
+  <h4>Seguridad y acceso</h4>
+  <p>Permite cambiar la contraseña de la cuenta maestra. Este procedimiento se detalla en la sección 8.1.</p>
+
+  <div class="doc-footer">
+    <span>Manual de Usuario — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+</section>
+
+<!-- ============================ CAPÍTULO 7 ============================ -->
+<section class="pagina salto" id="cap7">
+  <div class="doc-header">
+    <span><strong>Manual de Usuario</strong> — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+
+  <h1>Capítulo 7. Respaldos y mantenimiento</h1>
+  <p>Realizar respaldos periódicos es la mejor forma de proteger la información de la plataforma. Toda la operación se realiza desde la sección <strong>Respaldos de datos</strong> del panel (<code>admin/respaldos.php</code>).</p>
+
+  <h2>7.1 Exportar la base de datos desde el panel</h2>
+  <ol class="pasos">
+    <li>En el panel, abra <strong>Respaldos de datos</strong>.</li>
+    <li>En la sección <strong>Exportar respaldo completo</strong>, haga clic en <strong>Descargar respaldo (.sql)</strong>.</li>
+    <li>Se descargará un archivo <code>.sql</code> con toda la información actual de la plataforma.</li>
+    <li>Guarde el archivo en un lugar seguro (memoria USB, nube u otra computadora).</li>
+  </ol>
+
+  <div class="captura">
+    <span class="marca">[CAPTURA #36: Sección "Respaldos de datos" con los bloques "Exportar respaldo completo" e "Importar / restaurar respaldo"]</span>
+    Exportación e importación de respaldos de la base de datos.
+  </div>
+  <p class="pie-figura">Figura 36. Sección de respaldos de datos del panel.</p>
+
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    La pantalla muestra la fecha y hora del último respaldo descargado, lo que ayuda a llevar un control de cuándo se realizó la última copia.
+  </div>
+
+  <h2>7.2 Importar / restaurar un respaldo</h2>
+  <ol class="pasos">
+    <li>En la sección <strong>Importar / restaurar respaldo</strong>, haga clic en <strong>Seleccionar archivo</strong> y elija un archivo <code>.sql</code> generado previamente con el botón de descarga.</li>
+    <li>En el campo <strong>Confirmación</strong>, escriba la palabra <code>REEMPLAZAR</code> en mayúsculas.</li>
+    <li>Haga clic en <strong>Restaurar desde respaldo</strong>.</li>
+  </ol>
+
+  <div class="advertencia">
+    <span class="etq">⚠ Advertencia — Esta acción reemplaza todos los datos</span>
+    Al importar un respaldo, <strong>toda la información actual de la instalación se reemplaza por completo</strong> con la del archivo: lo que tenga en ese momento se perderá. Por seguridad, descargue primero un respaldo de los datos actuales antes de restaurar. La palabra de confirmación existe precisamente para evitar restauraciones accidentales.
+  </div>
+
+  <h2>7.3 Buenas prácticas de respaldo</h2>
+  <ul>
+    <li><strong>Periodicidad:</strong> genere un respaldo cada vez que realice cambios importantes (altas masivas de docentes, libros o convenios) y, además, de forma periódica (por ejemplo, semanal o quincenal).</li>
+    <li><strong>Antes de cambios grandes:</strong> respalde siempre antes de importar otro respaldo, antes de actualizaciones del sistema o antes de modificaciones extensas.</li>
+    <li><strong>Dónde guardarlos:</strong> conserve los archivos <code>.sql</code> en más de un lugar (por ejemplo, una USB y un servicio en la nube). No los deje únicamente en la computadora servidor.</li>
+    <li><strong>Identifíquelos:</strong> agregue la fecha al nombre del archivo para reconocer fácilmente el respaldo más reciente.</li>
+  </ul>
+
+  <div class="doc-footer">
+    <span>Manual de Usuario — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+</section>
+
+<!-- ============================ CAPÍTULO 8 ============================ -->
+<section class="pagina salto" id="cap8">
+  <div class="doc-header">
+    <span><strong>Manual de Usuario</strong> — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+
+  <h1>Capítulo 8. Seguridad</h1>
+  <p>La plataforma incorpora varias medidas de seguridad para proteger el acceso al panel y la integridad de la información. Este capítulo explica cómo aprovecharlas y qué recomendaciones seguir en producción.</p>
+
+  <h2>8.1 Cambio de contraseña del administrador</h2>
+  <p>Existen dos formas de cambiar la contraseña de la cuenta maestra:</p>
+  <ol class="pasos">
+    <li><strong>Desde el panel:</strong> abra <strong>Configuración → Seguridad y acceso</strong> y siga las indicaciones para actualizar la contraseña.</li>
+    <li><strong>Editando el archivo de configuración:</strong> genere un nuevo hash bcrypt (ver sección 3.4) y reemplace el valor de <code>GLOBAL_ADMIN_HASH</code> en <code>config.local.php</code>.</li>
+  </ol>
+  <div class="advertencia">
+    <span class="etq">⚠ Advertencia</span>
+    Cambie la contraseña de fábrica <code>Admin2026!TSJ</code> lo antes posible. Use una contraseña de al menos 8 caracteres que combine mayúsculas, minúsculas, números y símbolos.
+  </div>
+
+  <h2>8.2 Gestión multi-administrador</h2>
+  <p>La plataforma admite varias cuentas de administrador (tabla <code>admins</code>), además de la cuenta maestra de respaldo definida en <code>config.local.php</code>. La gestión se realiza en <strong>Configuración → Administradores</strong> (ver sección 6.10):</p>
+  <ul>
+    <li><strong>Altas:</strong> crear nuevas cuentas con nombre, correo y contraseña que cumpla los requisitos de complejidad.</li>
+    <li><strong>Bajas / desactivación:</strong> desactivar o eliminar cuentas que ya no deban tener acceso.</li>
+    <li><strong>Último acceso:</strong> la tabla muestra cuándo ingresó por última vez cada administrador, útil para auditar el uso.</li>
+  </ul>
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    Asignar una cuenta individual a cada persona permite que la bitácora identifique con precisión quién realizó cada acción, lo que mejora la rendición de cuentas.
+  </div>
+
+  <h2>8.3 Bitácora de auditoría</h2>
+  <p>La bitácora (tabla <code>admin_log</code>) registra automáticamente las acciones del panel. Para cada evento guarda la <strong>acción</strong>, el <strong>administrador</strong> que la realizó, la <strong>dirección IP</strong> y la <strong>fecha</strong>. Se consulta desde <strong>Reportes y estadísticas → Últimas acciones del panel (bitácora)</strong> (ver sección 6.8), donde puede filtrarse por módulo y exportarse a CSV.</p>
+
+  <h2>8.4 Protección del login y tokens CSRF</h2>
+  <ul>
+    <li><strong>Rate limiting en el login:</strong> tras 5 intentos fallidos en un lapso de 15 minutos, el acceso se bloquea temporalmente. Esto dificulta los ataques de adivinación de contraseñas por fuerza bruta.</li>
+    <li><strong>Tokens CSRF:</strong> todos los formularios y peticiones POST incluyen un token CSRF que impide que un sitio externo envíe acciones en nombre del administrador.</li>
+    <li><strong>Contraseñas con bcrypt (costo 12):</strong> las contraseñas se almacenan cifradas e irreversibles.</li>
+    <li><strong>Sesión verificada en cada página:</strong> el panel comprueba la sesión global (<code>isGlobalAdmin()</code>) en cada pantalla, de modo que nadie sin sesión válida pueda acceder.</li>
+    <li><strong>Protección de archivos sensibles:</strong> un archivo <code>.htaccess</code> bloquea el acceso web directo a los archivos de configuración.</li>
+  </ul>
+
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    Si un administrador queda bloqueado por superar los intentos de inicio de sesión, basta con esperar 15 minutos para volver a intentarlo (ver Capítulo 9).
+  </div>
+
+  <h2>8.5 Recomendaciones para producción</h2>
+  <table>
+    <thead><tr><th style="width:34%;">Recomendación</th><th>Descripción</th></tr></thead>
+    <tbody>
+      <tr><td><strong>HTTPS obligatorio</strong></td><td>Active un certificado SSL para que toda la comunicación viaje cifrada.</td></tr>
+      <tr><td><strong><code>display_errors=Off</code></strong></td><td>Desactive la visualización de errores PHP en producción para no exponer información del sistema; mantenga <code>log_errors=On</code> para registrarlos en un archivo.</td></tr>
+      <tr><td><strong>Permisos de carpetas</strong></td><td>Las carpetas de subida deben tener permisos <code>755</code> (no <code>777</code>).</td></tr>
+      <tr><td><strong>Usuario MySQL limitado</strong></td><td>Use un usuario de base de datos con privilegios mínimos (por ejemplo <code>tsjplat</code>) en lugar de <code>root</code>.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="doc-footer">
+    <span>Manual de Usuario — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+</section>
+
+<!-- ============================ CAPÍTULO 9 ============================ -->
+<section class="pagina salto" id="cap9">
+  <div class="doc-header">
+    <span><strong>Manual de Usuario</strong> — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+
+  <h1>Capítulo 9. Solución de problemas (errores comunes)</h1>
+  <p>La siguiente tabla resume los problemas más frecuentes, su causa probable y la solución recomendada.</p>
+
+  <table>
+    <thead>
+      <tr><th style="width:26%;">Síntoma</th><th style="width:34%;">Causa probable</th><th>Solución</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Error de conexión a la base de datos</td>
+        <td>MySQL apagado en XAMPP, o credenciales incorrectas en <code>config.local.php</code>.</td>
+        <td>Encienda MySQL en XAMPP y revise que <code>DB_USER</code>, <code>DB_PASS</code> y <code>DB_NAME</code> sean correctos.</td>
+      </tr>
+      <tr>
+        <td>No puedo iniciar sesión en el admin</td>
+        <td>Hash mal generado, o bloqueo por 5 intentos fallidos (rate limit).</td>
+        <td>Regenere el hash bcrypt y péguelo correctamente en <code>GLOBAL_ADMIN_HASH</code>; si fue por intentos fallidos, espere 15 minutos.</td>
+      </tr>
+      <tr>
+        <td>Página 404 / no carga <code>/plataforma</code></td>
+        <td>Alias de Apache mal configurado o <code>mod_rewrite</code> deshabilitado.</td>
+        <td>Revise <code>httpd-vhosts.conf</code>, habilite <code>mod_rewrite</code> y reinicie Apache.</td>
+      </tr>
+      <tr>
+        <td>No se suben horarios o logotipos / error al subir</td>
+        <td>Carpetas de subida inexistentes o sin permisos.</td>
+        <td>Cree <code>modulos/horarios/horarios/</code> y <code>modulos/convenios/src/pages/upload/</code> (permisos <code>755</code> en producción).</td>
+      </tr>
+      <tr>
+        <td>Los acentos o la ñ se ven raros</td>
+        <td>Codificación distinta de <code>utf8mb4</code>.</td>
+        <td>Verifique que tanto la base de datos como la conexión usen <code>utf8mb4</code>.</td>
+      </tr>
+      <tr>
+        <td>Página en blanco al abrir un módulo</td>
+        <td>Error de PHP oculto.</td>
+        <td>Revise el log de Apache/PHP; en desarrollo, active temporalmente <code>display_errors</code> para ver el detalle.</td>
+      </tr>
+      <tr>
+        <td>El correo de "Sugerir empresa" no llega</td>
+        <td>En el hosting falta el servidor de correo (MTA) o la configuración de <code>mail()</code>.</td>
+        <td>Configure el servidor de correo del hosting para que la función de envío funcione.</td>
+      </tr>
+      <tr>
+        <td>Olvidé la contraseña del administrador</td>
+        <td>No se recuerda la contraseña de la cuenta maestra.</td>
+        <td>Regenere el hash bcrypt y reemplace <code>GLOBAL_ADMIN_HASH</code> en <code>config.local.php</code>.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    Si un problema persiste tras aplicar la solución sugerida, revise los registros (logs) de Apache y PHP, que suelen indicar la causa exacta del fallo.
+  </div>
+
+  <div class="doc-footer">
+    <span>Manual de Usuario — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+</section>
+
+<!-- ============================ CAPÍTULO 10 ============================ -->
+<section class="pagina salto" id="cap10">
+  <div class="doc-header">
+    <span><strong>Manual de Usuario</strong> — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+
+  <h1>Capítulo 10. Anexos</h1>
+
+  <h2>10.1 Mapa de rutas / URLs del sistema</h2>
+  <table>
+    <thead><tr><th style="width:40%;">Ruta / URL</th><th>Descripción</th></tr></thead>
+    <tbody>
+      <tr><td><code>http://localhost/plataforma</code></td><td>Portal principal (entrada pública).</td></tr>
+      <tr><td><code>plataforma/index.php</code></td><td>Archivo de entrada del portal.</td></tr>
+      <tr><td><code>plataforma/login.php</code></td><td>Inicio de sesión del administrador.</td></tr>
+      <tr><td><code>plataforma/admin/</code></td><td>Panel de administración.</td></tr>
+      <tr><td><code>admin/index.php</code></td><td>Resumen (Dashboard).</td></tr>
+      <tr><td><code>admin/inicio.php</code></td><td>Página de inicio (carrusel, avisos, FAQ).</td></tr>
+      <tr><td><code>admin/visitantes.php</code></td><td>Directorio y carreras.</td></tr>
+      <tr><td><code>admin/horarios.php</code></td><td>Maestros y horarios.</td></tr>
+      <tr><td><code>admin/requisitos.php</code></td><td>Servicio social y residencias.</td></tr>
+      <tr><td><code>admin/biblioteca.php</code></td><td>Biblioteca (catálogo, préstamos, solicitudes).</td></tr>
+      <tr><td><code>admin/convenios.php</code></td><td>Convenios.</td></tr>
+      <tr><td><code>admin/reportes.php</code></td><td>Reportes y estadísticas (incluye bitácora).</td></tr>
+      <tr><td><code>admin/respaldos.php</code></td><td>Respaldos de datos.</td></tr>
+      <tr><td><code>admin/configuracion.php</code></td><td>Configuración general.</td></tr>
+      <tr><td><code>plataforma/modulos/visitantes/</code></td><td>Directorio, oferta académica y nuevo ingreso.</td></tr>
+      <tr><td><code>plataforma/modulos/biblioteca/</code></td><td>Catálogo y solicitudes de la biblioteca.</td></tr>
+      <tr><td><code>plataforma/modulos/convenios/</code></td><td>Convenios por carrera y sugerencias.</td></tr>
+      <tr><td><code>plataforma/modulos/horarios/</code></td><td>Buscar maestro y horarios.</td></tr>
+      <tr><td><code>plataforma/modulos/requisitos/</code></td><td>Residencia y servicio social.</td></tr>
+      <tr><td><code>plataforma/shared/config.php</code></td><td>Configuración de desarrollo (versionada).</td></tr>
+      <tr><td><code>plataforma/shared/config.local.php</code></td><td>Configuración local real (no versionada).</td></tr>
+      <tr><td><code>http://localhost/phpmyadmin</code></td><td>Administrador visual de la base de datos.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>10.2 Glosario ampliado</h2>
+  <table>
+    <thead><tr><th style="width:24%;">Término</th><th>Definición</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Alias / Host virtual</strong></td><td>Configuración de Apache que asocia una ruta o nombre con una carpeta del proyecto, permitiendo acceder al portal mediante una URL amigable.</td></tr>
+      <tr><td><strong>cPanel</strong></td><td>Panel de control común en servicios de hosting para administrar archivos, bases de datos, correos y dominios.</td></tr>
+      <tr><td><strong>CSV</strong></td><td>Formato de archivo de texto separado por comas, utilizado para exportar tablas (préstamos, convenios, bitácora) y abrirlas en Excel u hojas de cálculo.</td></tr>
+      <tr><td><strong>Front-end</strong></td><td>Parte visible de la plataforma con la que interactúa el usuario, construida con HTML, CSS y JavaScript.</td></tr>
+      <tr><td><strong>htdocs</strong></td><td>Carpeta de XAMPP donde se colocan los sitios web para que Apache los publique.</td></tr>
+      <tr><td><strong>.htaccess</strong></td><td>Archivo de configuración de Apache que aplica reglas a una carpeta, por ejemplo bloquear el acceso a archivos sensibles.</td></tr>
+      <tr><td><strong>Inyección SQL</strong></td><td>Ataque que intenta insertar instrucciones maliciosas en las consultas a la base de datos; se previene con consultas preparadas (PDO).</td></tr>
+      <tr><td><strong>Rate limiting</strong></td><td>Mecanismo que limita el número de intentos en un periodo, usado en el login para frenar ataques de fuerza bruta.</td></tr>
+      <tr><td><strong>Responsive</strong></td><td>Diseño que se adapta automáticamente al tamaño de la pantalla (computadora, tableta o teléfono).</td></tr>
+      <tr><td><strong>SSL / HTTPS</strong></td><td>Tecnología que cifra la comunicación entre el navegador y el servidor, mostrando el candado de seguridad.</td></tr>
+      <tr><td><strong>Timeline</strong></td><td>Línea de tiempo que presenta las fases de un proceso (residencia o servicio social) en orden.</td></tr>
+      <tr><td><strong>Vista (SQL)</strong></td><td>Consulta almacenada en la base de datos que combina información de varias tablas para facilitar su lectura.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>10.3 Datos de contacto / soporte</h2>
+  <p>Complete los siguientes datos con la información oficial de la institución:</p>
+  <table>
+    <thead><tr><th style="width:34%;">Dato</th><th>Valor</th></tr></thead>
+    <tbody>
+      <tr><td>Responsable de la plataforma</td><td>__________________________________________</td></tr>
+      <tr><td>Correo de soporte</td><td>__________________________________________</td></tr>
+      <tr><td>Teléfono de soporte</td><td>__________________________________________</td></tr>
+      <tr><td>Horario de atención</td><td>__________________________________________</td></tr>
+      <tr><td>Dirección del campus</td><td>__________________________________________</td></tr>
+    </tbody>
+  </table>
+  <div class="nota">
+    <span class="etq">📌 Nota</span>
+    Los correos por área (general, biblioteca, vinculación, control escolar, etc.) se configuran y se muestran en el pie de página del portal desde <strong>Configuración → Correos de contacto</strong> (ver sección 6.10).
+  </div>
+
+  <h2>10.4 Créditos del proyecto</h2>
+  <table>
+    <thead><tr><th style="width:34%;">Concepto</th><th>Detalle</th></tr></thead>
+    <tbody>
+      <tr><td>Nombre del proyecto</td><td>Plataforma de Servicios Estudiantiles — Tecnológico Superior de Jalisco, Campus Chapala.</td></tr>
+      <tr><td>Naturaleza</td><td>Proyecto de Residencias Profesionales / Servicio Social.</td></tr>
+      <tr><td>Versión</td><td>1.0 (2026).</td></tr>
+      <tr><td>Tecnologías</td><td>PHP 8 (puro), MySQL/MariaDB, HTML5, CSS3 y JavaScript vanilla; jsPDF para comprobantes.</td></tr>
+      <tr><td>Institución</td><td>Tecnológico Superior de Jalisco (TecMM), Campus Chapala.</td></tr>
+      <tr><td>Fecha del manual</td><td>Junio 2026.</td></tr>
+    </tbody>
+  </table>
+
+  <hr class="sep">
+  <p style="text-align:center; color:var(--gris); font-style:italic; font-size:10pt;">Fin del Manual de Usuario — Plataforma de Servicios Estudiantiles TSJ Chapala · Versión 1.0 · Junio 2026</p>
+
+  <div class="doc-footer">
+    <span>Manual de Usuario — Plataforma de Servicios Estudiantiles TSJ Chapala</span>
+    <span>Versión 1.0 · Junio 2026</span>
+  </div>
+</section>
+
+</body>
+</html>
