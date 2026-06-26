@@ -31,12 +31,18 @@ define('PLATAFORMA_URL', '/plataforma');
 define('GLOBAL_ADMIN_EMAIL', 'admin@chapala.tecmm.edu.mx');
 define('GLOBAL_ADMIN_HASH',  '$2y$12$REEMPLAZA_ESTE_VALOR');
 
-// ── Hash de admin Biblioteca ───────────────────────────────────────────────────
-// Genera con: php plataforma/modulos/biblioteca/tools/setup_password.php
+// ── LEGACY (OPCIONAL) — logins por módulo ───────────────────────────────────────
+// La administración usa el login global de arriba (plataforma/login.php). Las
+// constantes de abajo solo aplican a los logins legacy de los módulos Biblioteca
+// y Horarios; NO son necesarias para operar el panel unificado. Déjalas tal cual
+// si no usas esos accesos directos.
+//
+// Hash de admin Biblioteca — genera con:
+//   php plataforma/modulos/biblioteca/tools/setup_password.php
 define('BIBLIOTECA_ADMIN_USER', 'admin');
 define('BIBLIOTECA_ADMIN_HASH', '$2y$12$REEMPLAZA_ESTE_VALOR');
 
-// ── Hash de admin Horarios ─────────────────────────────────────────────────────
-// Genera con: php plataforma/modulos/horarios/tools/setup_password.php
+// Hash de admin Horarios — genera con:
+//   php plataforma/modulos/horarios/tools/setup_password.php
 define('HORARIOS_ADMIN_EMAIL', 'admin@tecsj.edu.mx');
 define('HORARIOS_ADMIN_HASH',  '$2y$12$REEMPLAZA_ESTE_VALOR');
